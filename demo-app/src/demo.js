@@ -13,6 +13,7 @@ import 'antd/dist/antd.css';
 
 import {Table, Column, DataCell} from 'fixed-data-table-2';
 import {CustomItemRenderer} from './demo/customRenderers';
+import {generateRandomRowsAndItems} from './stories/sampleData';
 
 const {TIMELINE_MODES} = Timeline;
 
@@ -70,56 +71,19 @@ export default class DemoTimeline extends Component {
   }
 
   reRender(useMoment = this.state.useMoment) {
-    const list = [];
-    const groups = [];
     const {snap} = this.state;
-
-    this.key = 0;
-    for (let i = 0; i < this.state.rows; i++) {
-      groups.push({id: i, title: `Row ${i}`, description: `Description for row ${i}`});
-      for (let j = 0; j < this.state.items_per_row; j++) {
-        this.key += 1;
-        const colorIndex = (i + j) % (COLORS.length + 1);
-        const color = colorIndex != COLORS.length + 1 ? COLORS[colorIndex] : '';
-        const gradientStop = Math.random() * 100;
-        let glowOnHover = false;
-        let tooltip;
-        if ((i + j) % 3 === 0) {
-          glowOnHover = true;
-          tooltip = 'Item with key=' + this.key;
-        }
-        const duration = ITEM_DURATIONS[Math.floor(Math.random() * ITEM_DURATIONS.length)];
-        // let start = last_moment;
-        let start = moment(
-          Math.floor(
-            Math.random() * (this.state.maxDate.valueOf() - this.state.minDate.valueOf()) + this.state.minDate.valueOf()
-          )
-        );
-        let end = start.clone().add(duration);
-
-        // Round to the nearest snap distance
-        const roundedStartSeconds = Math.floor(start.second() / snap) * snap;
-        const roundedEndSeconds = Math.floor(end.second() / snap) * snap;
-        start.second(roundedStartSeconds);
-        end.second(roundedEndSeconds);
-
-        list.push({
-          key: this.key,
-          title: duration.humanize(),
-          color,
-          row: i,
-          start: useMoment ? start : start.valueOf(),
-          end: useMoment ? end : end.valueOf(),
-          glowOnHover,
-          gradientStop,
-          tooltip
-        });
-      }
-    }
-
+    const [groups, items] = generateRandomRowsAndItems(
+      this.state.rows,
+      this.state.items_per_row,
+      useMoment,
+      snap,
+      this.state.minDate,
+      this.state.maxDate
+    );	
+	
     // this.state = {selectedItems: [11, 12], groups, items: list};
     this.forceUpdate();
-    this.setState({items: list, groups, useMoment});
+    this.setState({items: items, groups, useMoment});
   }
 
   handleRowClick = (e, rowNumber, clickedTime, snappedClickedTime) => {

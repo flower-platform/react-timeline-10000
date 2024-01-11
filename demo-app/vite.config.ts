@@ -61,6 +61,9 @@ export default defineConfig({
   },
   // JSX in .js files, part 1
   optimizeDeps: {
+    // This exclude was needed because working with fixed-data-table-2 as a yarn link (for development purpose) was not working.
+    // Because of some caching the modifications made in fixed-data-table-2, were not seen when starting the storybook script
+    exclude: ["fixed-data-table-2"],
     force: true,
     esbuildOptions: {
       loader: {
