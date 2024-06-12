@@ -359,7 +359,8 @@
   white-space: nowrap;
   box-sizing: border-box;
   height: 100%;
-  padding: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .rct9k-timebar-inner.rct9k-timebar-inner-bottom {
