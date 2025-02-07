@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Fragment} from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, {string} from 'prop-types';
 import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
 
@@ -40,7 +40,7 @@ import {
 
 // startsWith polyfill for IE11 support
 import 'core-js/fn/string/starts-with';
-import SplitPane from 'react-split-pane';
+import SplitPane, {Size, SplitPaneProps} from 'react-split-pane';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
 import ItemRenderer from './components/ItemRenderer';
 import {SelectionHolder} from './utils/SelectionHolder';
@@ -473,12 +473,26 @@ export default class Timeline extends React.Component {
     onContextMenuShow: PropTypes.func,
 
     /**
+     * This is default size for split when have table props and the split isn't controlled
+     *
+     * @type { Size }
+     */
+    splitPaneSizeInitial: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+
+    /**
      * If this handler is provided, it will be called when the table is resized
      * by dragging the split bar between the table and the gantt.
      *
      * @type {(splitSize: number) => void}
      */
     onSplitChange: PropTypes.func,
+
+    /**
+     * The split pane props to override props
+     *
+     * @type { Partial<SplitPaneProps> }
+     */
+    splitPaneProps: PropTypes.object,
 
     /**
      * This property controls if one segment (item) whose period overlaps another segment (item)'s period
@@ -558,7 +572,9 @@ export default class Timeline extends React.Component {
     onDragToCreateEnded: undefined,
     onContextMenuShow: undefined,
     onSelectionChange() {},
+    splitPaneSizeInitial: undefined,
     onSplitChange: undefined,
+    splitPaneProps: undefined,
     displayItemOnSeparateRowIfOverlap: true,
     zIndexFunction() {
       return 3;
@@ -614,7 +630,7 @@ export default class Timeline extends React.Component {
       verticalGridLines: [],
       screenHeight: 0,
       gridWidth: 0,
-      splitSize: props.table ? props.table.props.width : 0,
+      splitSize: 0,
       dragToCreateMode: false,
       dragToCreatePopupClosed: false,
       openMenu: false,
@@ -692,6 +708,19 @@ export default class Timeline extends React.Component {
   componentDidMount() {
     window.addEventListener('resize', this.updateDimensions);
     window.addEventListener('wheel', this.wheelHandler, {passive: false});
+
+    // deci aici pot calcula :)
+    if (this.props.table) {
+      let splitSize = 0;
+      if (typeof this.props.splitPaneSizeInitial == 'string') {
+        // width from screen
+        const width = PARENT_ELEMENT(this.props.componentId).getBoundingClientRect().width;
+        splitSize = (width * parseInt(this.props.splitPaneSizeInitial.replace('%', ''))) / 100;
+      } else {
+        splitSize = this.props.splitPaneSizeInitial || this.props.table.props.width;
+      }
+      this.setState({splitSize: splitSize});
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -2502,6 +2531,7 @@ export default class Timeline extends React.Component {
                 style={{display: 'flex', flexDirection: 'row', height: '100%'}}>
                 {this.props.table ? (
                   <SplitPane
+                    {...this.props.splitPaneProps}
                     split="vertical"
                     style={{height: this.state.screenHeight, position: 'relative'}}
                     size={this.props.onSplitChange ? this.props.table.props.width : this.state.splitSize}
