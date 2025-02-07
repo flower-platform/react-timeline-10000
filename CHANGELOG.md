@@ -1,5 +1,7 @@
 ## Unreleased
 
+## v2.10.0
+
 * [Default split size](https://github.com/flower-platform/react-timeline-10000/pull/94/files)
 
 ## v2.9.0
