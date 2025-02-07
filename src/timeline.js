@@ -709,9 +709,10 @@ export default class Timeline extends React.Component {
     window.addEventListener('resize', this.updateDimensions);
     window.addEventListener('wheel', this.wheelHandler, {passive: false});
 
-    // deci aici pot calcula :)
+    // calculate the initial split size
     if (this.props.table) {
       let splitSize = 0;
+      // if the default size is specified in % calculate the width
       if (typeof this.props.splitPaneSizeInitial == 'string') {
         // width from screen
         const width = PARENT_ELEMENT(this.props.componentId).getBoundingClientRect().width;
