@@ -1,7 +1,7 @@
 'use strict';
 
 import React, {Fragment} from 'react';
-import PropTypes, {string} from 'prop-types';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
 
