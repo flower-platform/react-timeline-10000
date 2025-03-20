@@ -9,21 +9,25 @@ type Position = StrictPopupProps["position"];
 
 type IParamsForAction = {
   selection: any[];
-  position?: Position;
-  [key: string]: any;
-}
-interface ContextMenuProps {
-  actions: IAction[];
-
-  paramsForAction: IParamsForAction;
+  isOpened: boolean;
   /**
-   * if undefined => the menu is closed else {x, y} position where the menu should open
+   * Position for the popover.
+   */
+  position?: Position;
+  /**
+   * The coordinates {x, y} of position where the menu should be rendered when it's opened
    */
   positionToOpen?: Point;
   /**
    * Callback for extra actions when the menu is closed
    */
   onClose?: () => void;
+  [key: string]: any;
+}
+interface ContextMenuProps {
+  actions: IAction[];
+
+  actionParam: IParamsForAction;
 }
 
 const testids = createTestids('ContextMenu', {
@@ -32,30 +36,20 @@ const testids = createTestids('ContextMenu', {
 });
 export const contextMenuTestIds = testids;
 
-export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: boolean }> {
+export class ContextMenu extends React.Component<ContextMenuProps> {
 
-  constructor(props) {
+  constructor(props: ContextMenuProps) {
     super(props);
     this.close = this.close.bind(this);
-    this.state = {
-      isOpened: props.positionToOpen
-    }
-  }
-
-  componentDidUpdate(prevProps: Readonly<ContextMenuProps>, prevState: Readonly<{}>, snapshot?: any): void {
-    if (this.props.positionToOpen != prevProps.positionToOpen) {
-      this.setState({ isOpened: this.props.positionToOpen ? true : false });
-    }
   }
 
   close() {
-    this.setState({ isOpened: false });
-    this.props.onClose && this.props.onClose();
+    this.props.actionParam.onClose && this.props.actionParam.onClose();
   }
 
   getPopupContext(): HTMLElement {
-    const x = this.props.positionToOpen?.x;
-    const y = this.props.positionToOpen?.y;
+    const x = this.props.actionParam.positionToOpen?.x;
+    const y = this.props.actionParam.positionToOpen?.y;
     return {
       getBoundingClientRect: () => ({
         left: x,
@@ -69,7 +63,7 @@ export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: 
   }
 
   getVisisbleActions(actions: IAction[]): IAction[] {
-    return actions.filter(action => action.isVisible ? action.isVisible(this.props.paramsForAction) : true);
+    return actions.filter(action => action.isVisible ? action.isVisible(this.props.actionParam) : true);
   }
 
   render() {
@@ -77,10 +71,10 @@ export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: 
     return <>
       <TestsAreDemoCheat objectToPublish={this} />
       <Popup basic wide='very' data-testid={testids.popup} context={this.getPopupContext()}
-        position={this.props.paramsForAction.position}
+        position={this.props.actionParam.position}
         onClose={() => {
           this.close();
-        }} open={(this.state.isOpened && visibleActions.length > 0)}>
+        }} open={(this.props.actionParam.isOpened && visibleActions.length > 0)}>
         <Menu className="rct9k-context-menu" secondary vertical>
           {visibleActions.map((action: IAction) => {
             const key = visibleActions.indexOf(action);
@@ -89,17 +83,17 @@ export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: 
                 data-testid={testids.menuItem + "_" + key}
                 key={key}
                 icon={action.icon}
-                disabled={action.isDisabled ? action.isDisabled(this.props.paramsForAction) : false}
-                content={action.label instanceof Function ? action.label({ ...this.props.paramsForAction }) : action.label}
+                disabled={action.isDisabled ? action.isDisabled(this.props.actionParam) : false}
+                content={action.label instanceof Function ? action.label({ ...this.props.actionParam }) : action.label}
                 onClick={(event) => {
-                  let params: IActionParamForRun = { ...this.props.paramsForAction, closeContextMenu: this.close, eventPoint: { x: event.clientX, y: event.clientY } }
+                  let params: IActionParamForRun = { ...this.props.actionParam, closeContextMenu: this.close, eventPoint: { x: event.clientX, y: event.clientY } }
                   action.run && action.run(params);
                   if (!params.dontCloseContextMenuAfterRunAutomatically) {
                     this.close();
                   }
                 }}>
               </Menu.Item>
-              : React.cloneElement(action.renderInMenu({ ...this.props.paramsForAction, closeContextMenu: this.close }), { key: visibleActions.indexOf(action), "data-testid": testids.menuItem + "_" + key })
+              : React.cloneElement(action.renderInMenu({ ...this.props.actionParam, closeContextMenu: this.close }), { key: visibleActions.indexOf(action), "data-testid": testids.menuItem + "_" + key })
             );
           })
           }
