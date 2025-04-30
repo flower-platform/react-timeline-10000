@@ -43,7 +43,7 @@ export default class DemoTimeline extends Component {
     const endDate = moment('2018-09-30');
     this.state = {
       selectedItems: [],
-      rows: 100,
+      rows: 1,
       items_per_row: 30,
       snap: 60,
       startDate,
@@ -54,7 +54,8 @@ export default class DemoTimeline extends Component {
       timelineMode: TIMELINE_MODES.SELECT | TIMELINE_MODES.DRAG | TIMELINE_MODES.RESIZE,
       useTable: true,
       zoomEnabled: true,
-      useMoment: true
+      useMoment: true,
+      fullHeight: false
     };
     this.reRender = this.reRender.bind(this);
     this.zoomIn = this.zoomIn.bind(this);
@@ -66,6 +67,7 @@ export default class DemoTimeline extends Component {
     this.toggleUseMoment = this.toggleUseMoment.bind(this);
     this.toggleUseTable = this.toggleUseTable.bind(this);
     this.toggleZoomEnabled = this.toggleZoomEnabled.bind(this);
+    this.toggleFullHeight = this.toggleFullHeight.bind(this);
   }
 
   componentWillMount() {
@@ -141,6 +143,11 @@ export default class DemoTimeline extends Component {
     } else {
       this.setState({zoomEnabled: false});
     }
+  }
+
+  toggleFullHeight() {
+    const {fullHeight} = this.state;
+    this.setState({fullHeight: !fullHeight});
   }
 
   handleItemClick = (e, key) => {
@@ -266,7 +273,8 @@ export default class DemoTimeline extends Component {
       timelineMode,
       useMoment,
       useTable,
-      zoomEnabled
+      zoomEnabled,
+      fullHeight
     } = this.state;
     const rangeValue = [startDate, endDate];
     const minMaxRangeValue = [minDate, maxDate];
@@ -385,6 +393,12 @@ export default class DemoTimeline extends Component {
                 Zoom enabled
               </Checkbox>
             </Form.Item>
+            <Form.Item>
+              <Checkbox onChange={this.toggleFullHeight} checked={fullHeight}>
+                Use full height
+              </Checkbox>
+            </Form.Item>
+            
           </Form>
           <div>
             <span>Debug: </span>
@@ -449,6 +463,7 @@ export default class DemoTimeline extends Component {
           onRowClick={this.handleRowClick}
           onRowContextClick={this.handleRowContextClick}
           onRowDoubleClick={this.handleRowDoubleClick}
+          fullHeight={fullHeight}
           itemRenderer={useCustomRenderers ? CustomItemRenderer : ItemRenderer}
         />
       </div>

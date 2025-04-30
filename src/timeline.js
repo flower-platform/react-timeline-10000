@@ -525,7 +525,14 @@ export default class Timeline extends React.Component {
      *
      * @type {boolean | (() => boolean)}
      */
-    zoomEnabled: PropTypes.oneOfType([PropTypes.bool, PropTypes.func])
+    zoomEnabled: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
+
+    /**
+     * If this property is set to false, then the gantt body is not pre-filled with empty rows, if there are few rows.
+     *
+     * @type { undefined | boolean}
+     */
+    fullHeight: PropTypes.bool
   };
 
   static defaultProps = {
@@ -580,7 +587,8 @@ export default class Timeline extends React.Component {
       return 3;
     },
     showZoomShortcuts: false,
-    zoomEnabled: true
+    zoomEnabled: true,
+    fullHeight: true
   };
 
   /**
@@ -797,7 +805,11 @@ export default class Timeline extends React.Component {
       this.refreshGrid();
     }
 
-    if (prevState.hasHorizontalScrollbar != this.state.hasHorizontalScrollbar) {
+    if (
+      prevState.hasHorizontalScrollbar != this.state.hasHorizontalScrollbar ||
+      prevProps.fullHeight != this.props.fullHeight ||
+      prevProps.groups.length != this.props.groups.length
+    ) {
       this.fillInTimelineWithEmptyRows(this.props.groups);
       this.refreshGrid();
     }
@@ -1103,7 +1115,7 @@ export default class Timeline extends React.Component {
     let fillInGroups = [];
 
     let groupId = -1;
-    while (heightToFillIn > 0) {
+    while (this.props.fullHeight && heightToFillIn > 0) {
       // create new empty group;
       // if the last row would be only partially visible, then we set the height of the row as the remaining
       // height (add `rowHeight` in group, which will be used in rowHeight() function)
@@ -2308,7 +2320,6 @@ export default class Timeline extends React.Component {
       topResolution,
       backgroundLayer
     } = this.props;
-    let that = this;
 
     let varTimebarProps = {};
     if (timebarFormat) varTimebarProps['timeFormats'] = timebarFormat;
@@ -2463,7 +2474,9 @@ export default class Timeline extends React.Component {
   }
 
   render() {
-    const {componentId} = this.props;
+    const {componentId, groups, itemHeight} = this.props;
+    const rowHeightCache = this.rowHeightCache;
+    const {hasHorizontalScrollbar} = this.state;
     /**
      * @returns { number } height of the timebar
      */
@@ -2492,6 +2505,18 @@ export default class Timeline extends React.Component {
       return Math.max(height - getTimebarHeight(), 0);
     }
 
+    function calculateItemsHeight() {
+      let totalItemsHeight = 0;
+      _.forEach(
+        groups.filter(group => !group.key || !group.key.startsWith(EMPTY_GROUP_KEY)),
+        group => {
+          totalItemsHeight += (rowHeightCache[group.id] || 1) * itemHeight;
+        }
+      );
+      totalItemsHeight += hasHorizontalScrollbar ? SCROLLBAR_SIZE : 0;
+      return totalItemsHeight;
+    }
+
     const lastRow = this.state.groups[this.state.groups.length - 1];
     const hasEmptyRows = lastRow && lastRow.key && lastRow.key.startsWith(EMPTY_GROUP_KEY);
     {
@@ -2512,70 +2537,72 @@ export default class Timeline extends React.Component {
           // Instead of <Measure .../>, in the past <AutoSizer ... /> was used. However it would round with/height, which generated and endless
           // scrollbar appear/disappear, depending on the parent, depending on the resolution.
         }
-        <Measure
-          bounds
-          onResize={contentRect => {
-            const dimensions = {
-              width: contentRect.bounds ? contentRect.bounds.width : 0,
-              height: contentRect.bounds ? contentRect.bounds.height : 0
-            };
-            this.setState({screenHeight: dimensions.height});
-            this.refreshGrid(dimensions);
-          }}>
-          {({measureRef}) => {
-            const bodyHeight = calculateHeight(this.state.screenHeight);
-            const timebarHeight = getTimebarHeight();
-            return (
-              <div
-                ref={measureRef}
-                className="flex-grow"
-                style={{display: 'flex', flexDirection: 'row', height: '100%'}}>
-                {this.props.table ? (
-                  <SplitPane
-                    {...this.props.splitPaneProps}
-                    split="vertical"
-                    style={{height: this.state.screenHeight, position: 'relative'}}
-                    size={this.props.onSplitChange ? this.props.table.props.width : this.state.splitSize}
-                    onChange={this.onSplitChange}
-                    ref={this.splitPane_ref_callback}>
-                    <TableWithStyle
-                      table={React.cloneElement(this.props.table, {
-                        rowsCount: this.state.groups.length,
-                        rowHeightGetter: this.tableRowHeight,
-                        rowHeight: this.props.itemHeight,
-                        ref: this.table_ref_callback,
-                        touchScrollEnabled: true,
-                        onVerticalScroll: this.handleScrollTable,
-                        isVerticalScrollExact: true,
-                        scrollTop: this.state.tableScrollTop,
-                        headerHeight: timebarHeight,
-                        height: this.state.screenHeight,
-                        rowClassNameGetter: rowIndex => {
-                          let classNameDefinedByUser =
-                            this.props.table !== undefined &&
-                            this.props.table.props.rowClassNameGetter !== undefined &&
-                            this.props.table.props.rowClassNameGetter(rowIndex);
-                          if (classNameDefinedByUser) {
-                            return classNameDefinedByUser;
-                          } else {
-                            return this.getRowClassName(rowIndex);
-                          }
-                        },
-                        // Because the content of the empty rows are now significant
-                        // avoid showing vertical scrollbar in case horizontal scrollbar is needed when shrinking the table
-                        showScrollbarY: !hasEmptyRows,
-                        ...(this.props.onSplitChange ? {} : {width: this.state.splitSize})
-                      })}
-                    />
-                    {this.renderGanttPart({bodyHeight, timebarHeight})}
-                  </SplitPane>
-                ) : (
-                  this.renderGanttPart({bodyHeight, timebarHeight})
-                )}
-              </div>
-            );
-          }}
-        </Measure>
+        <div style={{height: this.props.fullHeight ? '100%' : getTimebarHeight() + calculateItemsHeight()}}>
+          <Measure
+            bounds
+            onResize={contentRect => {
+              const dimensions = {
+                width: contentRect.bounds ? contentRect.bounds.width : 0,
+                height: contentRect.bounds ? contentRect.bounds.height : 0
+              };
+              this.setState({screenHeight: dimensions.height});
+              this.refreshGrid(dimensions);
+            }}>
+            {({measureRef}) => {
+              const bodyHeight = calculateHeight(this.state.screenHeight);
+              const timebarHeight = getTimebarHeight();
+              return (
+                <div
+                  ref={measureRef}
+                  className="flex-grow"
+                  style={{display: 'flex', flexDirection: 'row', height: '100%'}}>
+                  {this.props.table ? (
+                    <SplitPane
+                      {...this.props.splitPaneProps}
+                      split="vertical"
+                      style={{height: this.state.screenHeight, position: 'relative'}}
+                      size={this.props.onSplitChange ? this.props.table.props.width : this.state.splitSize}
+                      onChange={this.onSplitChange}
+                      ref={this.splitPane_ref_callback}>
+                      <TableWithStyle
+                        table={React.cloneElement(this.props.table, {
+                          rowsCount: this.state.groups.length,
+                          rowHeightGetter: this.tableRowHeight,
+                          rowHeight: this.props.itemHeight,
+                          ref: this.table_ref_callback,
+                          touchScrollEnabled: true,
+                          onVerticalScroll: this.handleScrollTable,
+                          isVerticalScrollExact: true,
+                          scrollTop: this.state.tableScrollTop,
+                          headerHeight: timebarHeight,
+                          height: this.state.screenHeight,
+                          rowClassNameGetter: rowIndex => {
+                            let classNameDefinedByUser =
+                              this.props.table !== undefined &&
+                              this.props.table.props.rowClassNameGetter !== undefined &&
+                              this.props.table.props.rowClassNameGetter(rowIndex);
+                            if (classNameDefinedByUser) {
+                              return classNameDefinedByUser;
+                            } else {
+                              return this.getRowClassName(rowIndex);
+                            }
+                          },
+                          // Because the content of the empty rows are now significant
+                          // avoid showing vertical scrollbar in case horizontal scrollbar is needed when shrinking the table
+                          showScrollbarY: !hasEmptyRows,
+                          ...(this.props.onSplitChange ? {} : {width: this.state.splitSize})
+                        })}
+                      />
+                      {this.renderGanttPart({bodyHeight, timebarHeight})}
+                    </SplitPane>
+                  ) : (
+                    this.renderGanttPart({bodyHeight, timebarHeight})
+                  )}
+                </div>
+              );
+            }}
+          </Measure>
+        </div>
       </Fragment>
     );
   }
