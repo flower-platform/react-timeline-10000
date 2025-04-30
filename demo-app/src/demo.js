@@ -43,7 +43,7 @@ export default class DemoTimeline extends Component {
     const endDate = moment('2018-09-30');
     this.state = {
       selectedItems: [],
-      rows: 1,
+      rows: 100,
       items_per_row: 30,
       snap: 60,
       startDate,
