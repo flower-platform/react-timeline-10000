@@ -5,7 +5,7 @@ import {Item} from '../utils/itemUtils';
 
 const ITEM_RENDERER_CLS = 'rct9k-item-renderer';
 const ITEM_RENDERER_GLOW_CLS = 'rct9k-item-glow';
-
+const WHITE_COLOR = Color('white');
 /**
  * Item (segment) renderer. All the properties of an item are copied as properties of this component. Hence the component
  * doesn't use the property `item`.
@@ -93,7 +93,7 @@ export default class ItemRenderer extends React.Component {
   static defaultProps = {
     color: '#3791D4',
     glowOnHover: true,
-    gradientBrightness: 0.45,
+    gradientBrightness: 0.65,
     gradientStop: 40,
     gradientReverseDirection: false,
     title: undefined,
@@ -169,8 +169,8 @@ export default class ItemRenderer extends React.Component {
   }
 
   /**
-   * Create a linear gradient using the base color (calls getColor()) and a color obtained adjusting
-   * the brightness of that color using getGradientBrightness(). The default order of the colors is
+   * Create a linear gradient using the base color (calls getColor()) and a color obtained mixing
+   * the white whit that color using getGradientBrightness(). The default order of the colors is
    * [brighter gradient color, gradient color]; this order can be reversed if getGradientReverseDirection() is true.
    *
    * By default, the background of an item uses a linear gradient, this method should be overriden if this behaviour is not wanted.
@@ -179,7 +179,7 @@ export default class ItemRenderer extends React.Component {
   getBackgroundGradient() {
     let colors = [
       Color(this.getColor())
-        .lighten(this.getGradientBrightness())
+        .mix(WHITE_COLOR, this.getGradientBrightness())
         .hex(),
       this.getColor()
     ];
