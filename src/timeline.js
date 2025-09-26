@@ -504,6 +504,22 @@ export default class Timeline extends React.Component {
      * @type { boolean | (item: Item, rowIndex: number) => boolean }
      */
     displayItemOnSeparateRowIfOverlap: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
+    
+    /**
+     * The vertical gap between overlapping items displayed on separate subrows in case `displayItemOnSeparateRowIfOverlap == true`
+     * 
+     * @default 2
+     * @type { number } 
+     */
+    verticalGapBetweenOverlappingItems: PropTypes.number,
+    
+    /**
+     * The top and down empty space inside a row 
+     * 
+     * @default 2
+     * @type { number }
+     */
+    rowTopBottomPadding: PropTypes.number,
 
     /**
      * The segments with bigger index are staying in front of the ones with smaller index.
@@ -576,6 +592,8 @@ export default class Timeline extends React.Component {
     onSplitChange: undefined,
     splitPaneProps: undefined,
     displayItemOnSeparateRowIfOverlap: true,
+    verticalGapBetweenOverlappingItems: 2,
+    rowTopBottomPadding: 2,
     zIndexFunction() {
       return 3;
     },
@@ -1094,8 +1112,9 @@ export default class Timeline extends React.Component {
     let totalItemsHeight = 0;
     let that = this;
     this.rowIdToRowIndexMap = {};
+    let numberOfSubrows;
     _.forEach(groups, (group, index) => {
-      totalItemsHeight += (that.rowHeightCache[group.id] || 1) * that.props.itemHeight;
+      totalItemsHeight += that.getNonEmptyRowHeight(group.id);
       this.rowIdToRowIndexMap[group.id] = index;
     });
     let heightToFillIn = this._grid.props.height - totalItemsHeight;
@@ -1802,7 +1821,7 @@ export default class Timeline extends React.Component {
       const layersInRow = this.props.rowLayers.filter(r => r.rowNumber === rowIndex);
       let rowHeight = this.props.itemHeight;
       if (this.rowHeightCache[rowId]) {
-        rowHeight = rowHeight * this.rowHeightCache[rowId];
+        rowHeight = this.getNonEmptyRowHeight(rowId);
       }
       var props = this.props;
       return (
@@ -1847,6 +1866,8 @@ export default class Timeline extends React.Component {
             this.getEndFromItem,
             timelineTestids,
             this.props.displayItemOnSeparateRowIfOverlap,
+            this.props.verticalGapBetweenOverlappingItems,
+            this.props.rowTopBottomPadding,
             this.props.zIndexFunction,
             rowIndex
           )}
@@ -1880,8 +1901,12 @@ export default class Timeline extends React.Component {
     if (group.rowHeight && group.key.startsWith(EMPTY_GROUP_KEY)) {
       return group.rowHeight;
     }
-    let rh = this.rowHeightCache[group.id] ? this.rowHeightCache[group.id] : 1;
-    return rh * this.props.itemHeight;
+    return this.getNonEmptyRowHeight(group.id);
+  }
+  
+  getNonEmptyRowHeight(rowId) {
+    let rh = this.rowHeightCache[rowId] ? this.rowHeightCache[rowId] : 1;
+    return rh * this.props.itemHeight + (rh - 1) * this.props.verticalGapBetweenOverlappingItems + 2 * this.props.rowTopBottomPadding;
   }
 
   /**
