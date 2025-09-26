@@ -70,7 +70,7 @@ const EMPTY_GROUP_KEY = 'empty-group';
 // This was added by bogdan. From my understanding it reprezents the table vertical scrollbar width
 // If we don't take in consideration this, a horizontal scrollbar appears
 export const TABLE_OFFSET = 15;
-export const DEFAULT_ITEM_HEIGHT = 40;
+export const DEFAULT_ITEM_HEIGHT = 30;
 export const DEFAULT_ROW_CLASS = 'rct9k-row';
 export const DEFAULT_ROW_EVEN_CLASS = 'rct9k-row-even';
 /**
@@ -85,6 +85,8 @@ const FADE_OPACITY_OFFSET = 0.1;
 const FADE_TIMER_INTERVAR = 100;
 export const ZOOM_PERCENT = 0.2;
 export const MIN_DISPLAY_TIME = 60000;
+const DEFAULT_VERTICAL_GAP_BETWEEN_OVERLAPPING_ITEMS = 1;
+const DEFAULT_ROW_TOP_BOTTOM_PADDING = 1;
 
 export const PARENT_ELEMENT = componentId => document.querySelector(`.rct9k-id-${componentId} .parent-div`);
 
@@ -504,18 +506,18 @@ export default class Timeline extends React.Component {
      * @type { boolean | (item: Item, rowIndex: number) => boolean }
      */
     displayItemOnSeparateRowIfOverlap: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
-    
+
     /**
      * The vertical gap between overlapping items displayed on separate subrows in case `displayItemOnSeparateRowIfOverlap == true`
-     * 
+     *
      * @default 2
-     * @type { number } 
+     * @type { number }
      */
     verticalGapBetweenOverlappingItems: PropTypes.number,
-    
+
     /**
-     * The top and down empty space inside a row 
-     * 
+     * The top and down empty space inside a row
+     *
      * @default 2
      * @type { number }
      */
@@ -592,8 +594,8 @@ export default class Timeline extends React.Component {
     onSplitChange: undefined,
     splitPaneProps: undefined,
     displayItemOnSeparateRowIfOverlap: true,
-    verticalGapBetweenOverlappingItems: 2,
-    rowTopBottomPadding: 2,
+    verticalGapBetweenOverlappingItems: DEFAULT_VERTICAL_GAP_BETWEEN_OVERLAPPING_ITEMS,
+    rowTopBottomPadding: DEFAULT_ROW_TOP_BOTTOM_PADDING,
     zIndexFunction() {
       return 3;
     },
@@ -1903,10 +1905,14 @@ export default class Timeline extends React.Component {
     }
     return this.getNonEmptyRowHeight(group.id);
   }
-  
+
   getNonEmptyRowHeight(rowId) {
     let rh = this.rowHeightCache[rowId] ? this.rowHeightCache[rowId] : 1;
-    return rh * this.props.itemHeight + (rh - 1) * this.props.verticalGapBetweenOverlappingItems + 2 * this.props.rowTopBottomPadding;
+    return (
+      rh * this.props.itemHeight +
+      (rh - 1) * this.props.verticalGapBetweenOverlappingItems +
+      2 * this.props.rowTopBottomPadding
+    );
   }
 
   /**
