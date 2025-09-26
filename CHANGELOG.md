@@ -1,6 +1,7 @@
 ## Unreleased
 
 * [Change color used for BackgroundGradient](https://github.com/flower-platform/react-timeline-10000/pull/96)
+* [Add `verticalGapBetweenOverlappingItems` and `rowTopBottomPadding` properties](https://github.com/flower-platform/react-timeline-10000/pull/97)
 
 ## v2.10.0
 
