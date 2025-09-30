@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [Fix to avoid rendering of the context menu and scrollbar at every mouse move](https://github.com/flower-platform/react-timeline-10000/pull/99)
 * [Change color used for BackgroundGradient](https://github.com/flower-platform/react-timeline-10000/pull/96)
 
 ## v2.10.0
