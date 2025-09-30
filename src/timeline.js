@@ -2200,6 +2200,9 @@ export default class Timeline extends React.Component {
       time: this.state.openedContextMenuTime
     };
     let actions = this.props.onContextMenuShow ? this.props.onContextMenuShow({actionParam}) : [];
+    if (actions.length == 0) {
+      return <></>;
+    }
     if (this.props.onDragToCreateEnded && this.props.forceDragToCreateMode == undefined) {
       // If the user doesn't forces the enter/exit from dragToCreateMode =>
       // a default mechanism is implemented via an action that enters the drag to create mode
