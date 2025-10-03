@@ -725,8 +725,6 @@ export default class Timeline extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const tableWidth = this.getInitialTableWidth(nextProps);
-
     if (this.props.verticalScrollPosition != nextProps.verticalScrollPosition) {
       this.verticalScrollTo(nextProps.verticalScrollPosition);
     }
@@ -2651,15 +2649,13 @@ export default class Timeline extends React.Component {
     let scrollTime = this.getStartFromItem(item).valueOf() - displayIntervalInMiliseconds * 0.1;
     this.setState({startDate: moment(scrollTime), endDate: moment(scrollTime + displayIntervalInMiliseconds)});
 
-    const rowIndex = this.props.groups ? this.props.groups.findIndex(group => group.id === item.row) : -1;
-
     // Vertical scoll so that the item is on the first row
+    const rowIndex = this.props.groups ? this.props.groups.findIndex(group => group.id === item.row) : -1;
     if (rowIndex >= 0) {
       let exactTop = 0;
       for (let i = 0; i < rowIndex; i++) {
         exactTop += this.tableRowHeight(i);
       }
-
       this.verticalScrollTo(exactTop);
     }
 

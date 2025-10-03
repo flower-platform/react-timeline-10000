@@ -94,7 +94,7 @@ export class SelectionHolder extends React.Component<SelectionHolderProps, Selec
   }
   
   setSelection(itemsKeys: (number | string)[]) {
-    this.setState( {selectedItems: itemsKeys});
+    this.setState({ selectedItems: itemsKeys });
 
     // Notify the host component about selection change
     if (this.props.selectionChangedHandler) {
@@ -105,4 +105,5 @@ export class SelectionHolder extends React.Component<SelectionHolderProps, Selec
   render(): React.ReactNode {
     return null;
   }
+
 }
