@@ -801,25 +801,6 @@ export default class Timeline extends React.Component {
       this.fillInTimelineWithEmptyRows(this.props.groups);
       this.refreshGrid();
     }
-
-    // if (this._pendingScrollItem &&
-    //     prevState.startDate !== this.state.startDate) {
-    //   console.log("vertical scroll");
-    //   console.log(prevState.startDate);
-    //   console.log(this.state.startDate);
-    //   // const rowIndex = this.itemRowMap ? this.itemRowMap[this._pendingScrollItem] : undefined;
-    //   const rowIndex = this.state.groups ? this.state.groups.findIndex(group => group.id === this._pendingScrollItem.row) : -1;
-    //   if (rowIndex >= 0) {
-    //     this.scrollToRowIndex(rowIndex);
-    //   };
-
-    //   // select the item for better highlighting
-    //   this._selectionHolder.setSelection([this._pendingScrollItem.key]);
-    //   console.log(this._pendingScrollItem);
-    //   console.log(this._pendingScrollItem.key);
-
-    //   this._pendingScrollItem = null;
-    // }
   }
 
   isTouchDevice() {

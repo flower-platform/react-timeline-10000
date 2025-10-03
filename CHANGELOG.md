@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [Add `scrollToItem` feature](https://github.com/flower-platform/react-timeline-10000/pull/100)
 * [Change color used for BackgroundGradient](https://github.com/flower-platform/react-timeline-10000/pull/96)
 
 ## v2.10.0
