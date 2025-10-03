@@ -56,6 +56,7 @@ export default class DemoTimeline extends Component {
       zoomEnabled: true,
       useMoment: true
     };
+    this.timelineRef = React.createRef();
     this.reRender = this.reRender.bind(this);
     this.zoomIn = this.zoomIn.bind(this);
     this.zoomOut = this.zoomOut.bind(this);
@@ -66,6 +67,7 @@ export default class DemoTimeline extends Component {
     this.toggleUseMoment = this.toggleUseMoment.bind(this);
     this.toggleUseTable = this.toggleUseTable.bind(this);
     this.toggleZoomEnabled = this.toggleZoomEnabled.bind(this);
+    this.scrollToRandomItem = this.scrollToRandomItem.bind(this);
   }
 
   componentWillMount() {
@@ -141,6 +143,14 @@ export default class DemoTimeline extends Component {
     } else {
       this.setState({zoomEnabled: false});
     }
+  }
+
+  scrollToRandomItem() {
+    const randomIndex = Math.floor(Math.random() * this.state.items.length);
+    const randomItem = this.state.items[randomIndex];
+    
+    this.timelineRef.current.scrollToItem(randomItem.key);
+    this.setState({ message: `Scrolled to item: ${randomItem.key} (${randomItem.title || 'No title'})` });
   }
 
   handleItemClick = (e, key) => {
@@ -385,6 +395,11 @@ export default class DemoTimeline extends Component {
                 Zoom enabled
               </Checkbox>
             </Form.Item>
+            <Form.Item>
+              <Button type="primary" onClick={this.scrollToRandomItem}>
+                Scroll to Random Item
+              </Button>
+            </Form.Item>
           </Form>
           <div>
             <span>Debug: </span>
@@ -392,6 +407,7 @@ export default class DemoTimeline extends Component {
           </div>
         </div>
         <Timeline
+          ref={this.timelineRef}
           shallowUpdateCheck
           items={items}
           groups={groups}
