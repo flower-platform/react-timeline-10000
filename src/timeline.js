@@ -1738,11 +1738,11 @@ export default class Timeline extends React.Component {
       // When a drag to create starts (at mousedown) above an item
       // we want to avoid that item to be selected,
       // so we postpone the selection till an actual click/right click happens
+      const isDragToCreate = this.getDragToCreateMode();
       if (
-        (!this.getDragToCreateMode() && e.type == 'mousedown') ||
-        (this.getDragToCreateMode() && e.type == 'click') ||
-        (this.getDragToCreateMode() && e.type == 'contextmenu') ||
-        (this.isTouchDevice() && e.type == 'tap')
+        (!isDragToCreate && e.type === 'mousedown') ||
+        (isDragToCreate && (e.type === 'click' || e.type === 'contextmenu')) ||
+        (this.isTouchDevice() && e.type === 'tap')
       ) {
         // Calculate new selection by delegating to selection component
         this._selectionHolder.addRemoveItems([itemKey], e);
