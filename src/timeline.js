@@ -2629,13 +2629,16 @@ export default class Timeline extends React.Component {
   }
 
   verticalScrollTo(verticalScrollPosition) {
-    // Programatically scroll table
-    this.setState({tableScrollTop: verticalScrollPosition});
-    this.setState({avoidCallingTableScrollHandlers: true});
-
-    // // Programatically scroll gantt
-    this._grid.scrollToPosition({scrollTop: verticalScrollPosition});
-    this.setState({avoidCallingGanttScrollHandlers: true});
+    this.setState(
+      {
+        tableScrollTop: verticalScrollPosition,
+        avoidCallingTableScrollHandlers: true,
+        avoidCallingGanttScrollHandlers: true
+      },
+      () => {
+        this._grid.scrollToPosition({scrollTop: verticalScrollPosition});
+      }
+    );
   }
 
   scrollToItem(id) {

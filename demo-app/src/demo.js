@@ -146,8 +146,14 @@ export default class DemoTimeline extends Component {
   }
 
   scrollToRandomItem() {
-    const randomIndex = Math.floor(Math.random() * this.state.items.length);
-    const randomItem = this.state.items[randomIndex];
+    const { items } = this.state;
+    if (!items || items.length === 0) {
+      this.setState({ message: 'No items to scroll to.' });
+      return;
+    }
+    
+    const randomIndex = Math.floor(Math.random() * items.length);
+    const randomItem = items[randomIndex];
     
     this.timelineRef.current.scrollToItem(randomItem.key);
     this.setState({ message: `Scrolled to item: ${randomItem.key} (${randomItem.title || 'No title'})` });
