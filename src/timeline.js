@@ -1693,7 +1693,7 @@ export default class Timeline extends React.Component {
       this._selectRectangleInteractable
         .draggable({
           enabled: true,
-          ignoreFrom: '.item_draggable, .rct9k-group, .rct9k-timebar'
+          ignoreFrom: '.rct9k-group, .rct9k-timebar'
         })
         .styleCursor(false)
         .on('dragstart', e => {
@@ -1735,7 +1735,15 @@ export default class Timeline extends React.Component {
       let itemKey = target.getAttribute('data-item-index');
       itemKey = isNaN(Number(itemKey)) ? itemKey : Number(itemKey);
       itemCallback && itemCallback(e, itemKey);
-      if (e.type == 'mousedown' || (this.isTouchDevice() && e.type == 'tap')) {
+      // When a drag to create starts (at mousedown) above an item
+      // we want to avoid that item to be selected,
+      // so we postpone the selection till an actual click/right click happens
+      if (
+        (!this.getDragToCreateMode() && e.type == 'mousedown') ||
+        (this.getDragToCreateMode() && e.type == 'click') ||
+        (this.getDragToCreateMode() && e.type == 'contextmenu') ||
+        (this.isTouchDevice() && e.type == 'tap')
+      ) {
         // Calculate new selection by delegating to selection component
         this._selectionHolder.addRemoveItems([itemKey], e);
       }
