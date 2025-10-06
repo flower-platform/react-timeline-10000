@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [Drag to create can start on top of an existing item](https://github.com/flower-platform/react-timeline-10000/pull/101)
 * [Change color used for BackgroundGradient](https://github.com/flower-platform/react-timeline-10000/pull/96)
 
 ## v2.10.0
