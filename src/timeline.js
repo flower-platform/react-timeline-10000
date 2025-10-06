@@ -650,9 +650,7 @@ export default class Timeline extends React.Component {
       touchPositionX: undefined,
       fadeEffectOpen: false,
       fadeEffectContent: undefined,
-      fadeEffectOpacity: 0,
-      lastMouseOverItem: undefined,
-      lastMouseOutEvent: undefined
+      fadeEffectOpacity: 0
     };
 
     // These functions need to be bound because they are passed as parameters.
@@ -700,6 +698,8 @@ export default class Timeline extends React.Component {
     this.getRowClassName = this.getRowClassName.bind(this);
     this.wheelHandler = this.wheelHandler.bind(this);
     this.startFadeOutEffect = this.startFadeOutEffect.bind(this);
+    this.lastMouseOverItem = undefined;
+    this.lastMouseOutEvent = undefined;
 
     const canSelect = Timeline.isBitSet(Timeline.TIMELINE_MODES.SELECT, this.props.timelineMode);
     const canDrag = Timeline.isBitSet(Timeline.TIMELINE_MODES.DRAG, this.props.timelineMode);
@@ -1725,10 +1725,10 @@ export default class Timeline extends React.Component {
       return;
     }
 
-    if (e.type == 'mouseout') {
+    if (e.type === 'mouseout') {
       // We wait till the next mouseover event to see if the mouseout happened
       // because we exit the segment or because we entered on a child element of the same segment
-      this.setState({lastMouseOutEvent: e});
+      this.lastMouseOutEvent = e;
       return;
     }
 
@@ -1744,13 +1744,13 @@ export default class Timeline extends React.Component {
     // In case the segment contains children the mouseout/mouseover events are triggered also
     // for those children. We want to threat only the mouseover/mouseout events
     // from the current segment to other segments or to no segment at all
-    if (e.type == 'mouseover') {
+    if (e.type === 'mouseover') {
       const currentMouseOverItem = target ? target.getAttribute('data-item-index') : undefined;
-      if (this.state.lastMouseOverItem != currentMouseOverItem) {
-        if (this.state.lastMouseOverItem) {
-          this.props.onItemLeave(this.state.lastMouseOutEvent, this.state.lastMouseOverItem);
+      if (this.lastMouseOverItem !== currentMouseOverItem) {
+        if (this.lastMouseOverItem) {
+          this.props.onItemLeave(this.lastMouseOutEvent, this.lastMouseOverItem);
         }
-        this.setState({lastMouseOverItem: currentMouseOverItem});
+        this.lastMouseOverItem = currentMouseOverItem;
         // This is a mouseover event on a new segment. Continue the usual processing of this event
       } else {
         // Avoid processing the current mouseover event
