@@ -510,7 +510,7 @@ export default class Timeline extends React.Component {
     /**
      * The vertical gap between overlapping items displayed on separate subrows in case `displayItemOnSeparateRowIfOverlap == true`
      *
-     * @default 2
+     * @default 1
      * @type { number }
      */
     verticalGapBetweenOverlappingItems: PropTypes.number,
@@ -518,7 +518,7 @@ export default class Timeline extends React.Component {
     /**
      * The top and down empty space inside a row
      *
-     * @default 2
+     * @default 1
      * @type { number }
      */
     rowTopBottomPadding: PropTypes.number,
@@ -1114,7 +1114,6 @@ export default class Timeline extends React.Component {
     let totalItemsHeight = 0;
     let that = this;
     this.rowIdToRowIndexMap = {};
-    let numberOfSubrows;
     _.forEach(groups, (group, index) => {
       totalItemsHeight += that.getNonEmptyRowHeight(group.id);
       this.rowIdToRowIndexMap[group.id] = index;
