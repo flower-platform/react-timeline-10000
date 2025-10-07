@@ -2,6 +2,7 @@ import React from 'react';
 import { Menu, Popup, StrictPopupProps } from 'semantic-ui-react';
 import { IAction, IActionParamForRun } from './IAction';
 import { TestsAreDemoCheat, createTestids } from '@famiprog-foundation/tests-are-demo';
+import _ from 'lodash';
 
 export type Point = { x: number, y: number };
 
@@ -38,8 +39,17 @@ export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: 
     super(props);
     this.close = this.close.bind(this);
     this.state = {
-      isOpened: props.positionToOpen
+      isOpened: props.positionToOpen ? true : false
     }
+  }
+  
+  shouldComponentUpdate(nextProps, nextState) {
+    return (
+      !_.isEqual(nextProps.positionToOpen, this.props.positionToOpen) ||
+      !_.isEqual(nextProps.actions, this.props.actions) ||
+      !_.isEqual(nextProps.paramsForAction, this.props.paramsForAction) ||
+      nextState.isOpened !== this.state.isOpened
+    );
   }
 
   componentDidUpdate(prevProps: Readonly<ContextMenuProps>, prevState: Readonly<{}>, snapshot?: any): void {

@@ -172,21 +172,20 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
     }
 
     shouldComponentUpdate(nextProps: Readonly<ScrollbarProperties>, nextState: Readonly<{ scrollbarSize: number }>) {
-        const {props} = this;
-        if (nextProps.minScrollPosition != props.minScrollPosition
-            || nextProps.maxScrollPosition != props.maxScrollPosition
-            || nextProps.pageSize != props.pageSize
-            || nextProps.direction !== this.props.direction
-            || nextProps.hasArrows !== this.props.hasArrows) {
+        const { props, state } = this;
+        if (nextProps.minScrollPosition !== props.minScrollPosition
+            || nextProps.maxScrollPosition !== props.maxScrollPosition
+            || nextProps.pageSize !== props.pageSize
+            || nextProps.direction !== props.direction
+            || nextProps.hasArrows !== props.hasArrows) {
             return true;
         }
-        
-         if (nextState.scrollbarSize !== this.state.scrollbarSize) {
-            return true;  
-         }
-         return false;
+        if (nextState.scrollbarSize !== state.scrollbarSize) {
+            return true;
+        }
+        return false;
     }
-    
+
     render(): React.ReactNode {
         return <Measure
             bounds
