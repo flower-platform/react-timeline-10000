@@ -1079,7 +1079,7 @@ export default class Timeline extends React.Component {
    */
   fillInTimelineWithEmptyRows(groups) {
     // remove empty groups
-    groups = groups.filter(group => typeof group.id !== 'string' || !group.id.startsWith(EMPTY_GROUP_ID_PREFIX));
+    groups = groups.filter(group => !this.isEmptyGroup(group));
 
     // get height of the grid (without timebar);
     // used to compute the number of rows we need to fill in
@@ -1118,6 +1118,10 @@ export default class Timeline extends React.Component {
       groupId--;
     }
     this.setState({groups: [...groups, ...fillInGroups]});
+  }
+
+  isEmptyGroup(group) {
+    return typeof group.id === 'string' && group.id.startsWith(EMPTY_GROUP_ID_PREFIX);
   }
 
   /**
@@ -1877,7 +1881,7 @@ export default class Timeline extends React.Component {
     let group = this.state.groups[index];
     // only for empty rows (EMPTY_GROUP_KEY), if the group has a custom row height,
     // we will return that height
-    if (group.rowHeight && group.id.startsWith(EMPTY_GROUP_ID_PREFIX)) {
+    if (group.rowHeight && this.isEmptyGroup(group)) {
       return group.rowHeight;
     }
     let rh = this.rowHeightCache[group.id] ? this.rowHeightCache[group.id] : 1;
@@ -1901,7 +1905,7 @@ export default class Timeline extends React.Component {
     }
     var tableRowHeight = this.rowHeight({index});
     let group = this.state.groups[index];
-    if (group.rowHeight && group.id.startsWith(EMPTY_GROUP_ID_PREFIX)) {
+    if (group.rowHeight && this.isEmptyGroup(group)) {
       tableRowHeight = Math.round(tableRowHeight) + (this.state.hasHorizontalScrollbar ? SCROLLBAR_SIZE : 0) - 2;
     }
     return tableRowHeight;
@@ -2493,7 +2497,7 @@ export default class Timeline extends React.Component {
     }
 
     const lastRow = this.state.groups[this.state.groups.length - 1];
-    const hasEmptyRows = lastRow && lastRow.key && lastRow.key.startsWith(EMPTY_GROUP_ID_PREFIX);
+    const hasEmptyRows = lastRow && this.isEmptyGroup(lastRow);
     {
       /* Instead of <Measure .../>, in the past <AutoSizer ... /> was used. However it would round with/height, which generated and endless
     scrollbar appear/disappear, depending on the parent, depending on the resolution. */
