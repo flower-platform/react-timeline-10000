@@ -1079,7 +1079,7 @@ export default class Timeline extends React.Component {
    */
   fillInTimelineWithEmptyRows(groups) {
     // remove empty groups
-    groups = groups.filter(group => !this.isEmptyGroup(group));
+    groups = groups.filter(group => !this.isEmptyGroup(group.id));
 
     // get height of the grid (without timebar);
     // used to compute the number of rows we need to fill in
@@ -1120,8 +1120,8 @@ export default class Timeline extends React.Component {
     this.setState({groups: [...groups, ...fillInGroups]});
   }
 
-  isEmptyGroup(group) {
-    return typeof group.id === 'string' && group.id.startsWith(EMPTY_GROUP_ID_PREFIX);
+  isEmptyGroup(groupId) {
+    return typeof groupId === 'string' && groupId.startsWith(EMPTY_GROUP_ID_PREFIX);
   }
 
   /**
@@ -1164,6 +1164,9 @@ export default class Timeline extends React.Component {
   changeGroup(item, curRow, newRow) {
     curRowId = this.state.groups[curRow].id;
     newRowId = this.state.groups[newRow].id;
+    if (this.isEmptyGroup(newRowId)) {
+      return;
+    }
     item.row = newRowId;
     this.itemRowMap[item.key] = newRowId;
     this.rowItemMap[curRowId] = this.rowItemMap[curRowId].filter(i => i.key !== item.key);
@@ -1881,7 +1884,7 @@ export default class Timeline extends React.Component {
     let group = this.state.groups[index];
     // only for empty rows (EMPTY_GROUP_KEY), if the group has a custom row height,
     // we will return that height
-    if (group.rowHeight && this.isEmptyGroup(group)) {
+    if (group.rowHeight && this.isEmptyGroup(group.id)) {
       return group.rowHeight;
     }
     let rh = this.rowHeightCache[group.id] ? this.rowHeightCache[group.id] : 1;
@@ -1905,7 +1908,7 @@ export default class Timeline extends React.Component {
     }
     var tableRowHeight = this.rowHeight({index});
     let group = this.state.groups[index];
-    if (group.rowHeight && this.isEmptyGroup(group)) {
+    if (group.rowHeight && this.isEmptyGroup(group.id)) {
       tableRowHeight = Math.round(tableRowHeight) + (this.state.hasHorizontalScrollbar ? SCROLLBAR_SIZE : 0) - 2;
     }
     return tableRowHeight;
@@ -2497,7 +2500,7 @@ export default class Timeline extends React.Component {
     }
 
     const lastRow = this.state.groups[this.state.groups.length - 1];
-    const hasEmptyRows = lastRow && this.isEmptyGroup(lastRow);
+    const hasEmptyRows = lastRow && this.isEmptyGroup(lastRow.id);
     {
       /* Instead of <Measure .../>, in the past <AutoSizer ... /> was used. However it would round with/height, which generated and endless
     scrollbar appear/disappear, depending on the parent, depending on the resolution. */
