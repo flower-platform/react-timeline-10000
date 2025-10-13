@@ -123,6 +123,7 @@
 .rct9k-vertical-scrollbar-outter {
   overflow-y: scroll;
   overflow-x: hidden;
+  padding-left: 2px;
 }
 
 .rct9k-vertical-scrollbar-outter.rct9k-scrollbar-with-arrows::-webkit-scrollbar-button:vertical:decrement {
