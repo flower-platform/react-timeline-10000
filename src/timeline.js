@@ -892,11 +892,22 @@ export default class Timeline extends React.Component {
    * @returns {moment}
    */
   getMaxDate() {
+    let end;
     if (this.props.maxDate) {
-      return convertDateToMoment(this.props.maxDate, this.props.useMoment);
+      end = convertDateToMoment(this.props.maxDate, this.props.useMoment);
     } else {
-      return convertDateToMoment(this.props.endDate, this.props.useMoment);
+      end = convertDateToMoment(this.props.endDate, this.props.useMoment);
     }
+    const width = this.state.gridWidth;
+    const vScrollbarWidth =
+      this._gridDomNode && this._gridDomNode.firstChild
+        ? this._gridDomNode.getBoundingClientRect().width - this._gridDomNode.firstChild.getBoundingClientRect().width
+        : 0;
+
+    if (!vScrollbarWidth || !width) return end;
+
+    const extraMs = getDurationFromPixels(vScrollbarWidth, this.getStartDate(), this.getEndDate(), width);
+    return end.clone().add(extraMs, 'milliseconds');
   }
 
   /**
