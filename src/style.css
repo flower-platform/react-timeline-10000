@@ -86,6 +86,7 @@
   overflow-x: scroll;
   overflow-y: hidden;
   width: 100%;
+  /* This adds a spacing between the content that is scrolled and the scrollbar */
   padding-top: 2px;
 }
 
@@ -94,8 +95,8 @@
     no-repeat center;
   background-size: 16px 16px;
   border: none;
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
 }
 
 .rct9k-horizontal-scrollbar-outter.rct9k-scrollbar-with-arrows::-webkit-scrollbar-button:horizontal:decrement:hover {
@@ -107,8 +108,8 @@
     no-repeat center;
   background-size: 16px 16px;
   border: none;
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
 }
 
 .rct9k-horizontal-scrollbar-outter.rct9k-scrollbar-with-arrows::-webkit-scrollbar-button:horizontal:increment:hover {
@@ -123,6 +124,7 @@
 .rct9k-vertical-scrollbar-outter {
   overflow-y: scroll;
   overflow-x: hidden;
+  /* This adds a spacing between the content that is scrolled and the scrollbar */
   padding-left: 2px;
 }
 
@@ -131,8 +133,8 @@
     no-repeat center;
   background-size: 16px 16px;
   border: none;
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
 }
 
 .rct9k-vertical-scrollbar-outter.rct9k-scrollbar-with-arrows::-webkit-scrollbar-button:vertical:decrement:hover {
@@ -144,8 +146,8 @@
     no-repeat center;
   background-size: 16px 16px;
   border: none;
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
 }
 
 .rct9k-vertical-scrollbar-outter.rct9k-scrollbar-with-arrows::-webkit-scrollbar-button:vertical:increment:hover {

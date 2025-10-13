@@ -899,10 +899,11 @@ export default class Timeline extends React.Component {
       end = convertDateToMoment(this.props.endDate, this.props.useMoment);
     }
     const width = this.state.gridWidth;
-    const vScrollbarWidth =
-      this._gridDomNode && this._gridDomNode.firstChild
-        ? this._gridDomNode.getBoundingClientRect().width - this._gridDomNode.firstChild.getBoundingClientRect().width
-        : 0;
+    // This calculation is fragile as it depends on the internal DOM structure of react-virtualized's Grid.
+    const virtualizedGridFirstChild = this._gridDomNode ? this._gridDomNode.firstChild : undefined;
+    const vScrollbarWidth = virtualizedGridFirstChild
+      ? this._gridDomNode.getBoundingClientRect().width - virtualizedGridFirstChild.getBoundingClientRect().width
+      : 0;
 
     if (!vScrollbarWidth || !width) return end;
 
