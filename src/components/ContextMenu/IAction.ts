@@ -10,7 +10,7 @@ export interface IActionParam {
 }
 
 export interface IActionParamForRun extends IActionParam {
-    closeContextMenu: () => void,
+    closeContextMenu?: () => void,
     
     /**
      * By default the context menu closes immediately after the action is run
