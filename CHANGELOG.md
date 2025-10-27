@@ -1,5 +1,7 @@
 ## Unreleased
 
+* [Make `IActionParamForRun.closeContextMenu` optional](https://github.com/flower-platform/react-timeline-10000/pull/104)
+
 * [Change color used for BackgroundGradient](https://github.com/flower-platform/react-timeline-10000/pull/96)
 
 ## v2.10.0
