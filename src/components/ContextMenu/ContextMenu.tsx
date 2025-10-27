@@ -1,21 +1,13 @@
 import React from 'react';
-import { Menu, Popup, StrictPopupProps } from 'semantic-ui-react';
+import { Menu, Popup } from 'semantic-ui-react';
 import { IAction, IActionParamForRun } from './IAction';
 import { TestsAreDemoCheat, createTestids } from '@famiprog-foundation/tests-are-demo';
 
 export type Point = { x: number, y: number };
-
-type Position = StrictPopupProps["position"];
-
-type IParamsForAction = {
-  selection: any[];
-  position?: Position;
-  [key: string]: any;
-}
 interface ContextMenuProps {
   actions: IAction[];
 
-  paramsForAction: IParamsForAction;
+  paramsForAction: IActionParamForRun;
   /**
    * if undefined => the menu is closed else {x, y} position where the menu should open
    */
