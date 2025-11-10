@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [Empty row IDs now include a special prefix instead of relying solely on negative numbers](https://github.com/flower-platform/react-timeline-10000/pull/102)
 * [Change color used for BackgroundGradient](https://github.com/flower-platform/react-timeline-10000/pull/96)
 
 ## v2.10.0
