@@ -698,6 +698,8 @@ export default class Timeline extends React.Component {
     this.getRowClassName = this.getRowClassName.bind(this);
     this.wheelHandler = this.wheelHandler.bind(this);
     this.startFadeOutEffect = this.startFadeOutEffect.bind(this);
+    this.lastMouseOverItem = undefined;
+    this.lastMouseOutEvent = undefined;
 
     const canSelect = Timeline.isBitSet(Timeline.TIMELINE_MODES.SELECT, this.props.timelineMode);
     const canDrag = Timeline.isBitSet(Timeline.TIMELINE_MODES.DRAG, this.props.timelineMode);
@@ -764,17 +766,8 @@ export default class Timeline extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const tableWidth = this.getInitialTableWidth(nextProps);
-
-    // VERTICAL SCROLL POSITION change
     if (this.props.verticalScrollPosition != nextProps.verticalScrollPosition) {
-      // Programatically scroll table
-      this.setState({tableScrollTop: nextProps.verticalScrollPosition});
-      this.setState({avoidCallingTableScrollHandlers: true});
-
-      // // Programatically scroll gantt
-      this._gridDomNode.scrollTop = nextProps.verticalScrollPosition;
-      this.setState({avoidCallingGanttScrollHandlers: true});
+      this.verticalScrollTo(nextProps.verticalScrollPosition);
     }
 
     if (
@@ -783,12 +776,19 @@ export default class Timeline extends React.Component {
       convertDateToMoment(this.props.endDate, this.props.useMoment).valueOf() !=
         convertDateToMoment(nextProps.endDate, nextProps.useMoment).valueOf()
     ) {
+      // If the externally controlled start/end changed,
+      // The setTimeMap will also be called but later in componentDidUpdate based on state start/end dates
+      // This avoids calling setTimeMap with stale start/end state values
       this.setState({startDate: nextProps.startDate, endDate: nextProps.endDate});
-    } else {
+    } else if (
+      nextProps.useMoment !== this.props.useMoment ||
+      nextProps.displayItemOnSeparateRowIfOverlap !== this.props.displayItemOnSeparateRowIfOverlap ||
+      nextProps.items !== this.props.items
+    ) {
       this.setTimeMap(
         nextProps.items,
-        convertDateToMoment(nextProps.startDate, nextProps.useMoment),
-        convertDateToMoment(nextProps.endDate, nextProps.useMoment),
+        convertDateToMoment(this.state.startDate, nextProps.useMoment),
+        convertDateToMoment(this.state.endDate, nextProps.useMoment),
         nextProps.useMoment,
         nextProps.displayItemOnSeparateRowIfOverlap
       );
@@ -1761,6 +1761,14 @@ export default class Timeline extends React.Component {
     if (this.selecting) {
       return;
     }
+
+    if (e.type === 'mouseout') {
+      // We wait till the next mouseover event to see if the mouseout happened
+      // because we exit the segment or because we entered on a child element of the same segment
+      this.lastMouseOutEvent = e;
+      return;
+    }
+
     let row;
     let target = e.target;
     while (target) {
@@ -1769,6 +1777,25 @@ export default class Timeline extends React.Component {
       }
       target = target.parentElement;
     }
+
+    // In case the segment contains children the mouseout/mouseover events are triggered also
+    // for those children. We want to threat only the mouseover/mouseout events
+    // from the current segment to other segments or to no segment at all
+    if (e.type === 'mouseover') {
+      const currentMouseOverItem = target ? target.getAttribute('data-item-index') : undefined;
+      if (this.lastMouseOverItem !== currentMouseOverItem) {
+        if (this.lastMouseOverItem) {
+          this.props.onItemLeave(this.lastMouseOutEvent, this.lastMouseOverItem);
+        }
+        this.lastMouseOverItem = currentMouseOverItem;
+        // This is a mouseover event on a new segment. Continue the usual processing of this event
+      } else {
+        // Avoid processing the current mouseover event
+        // and the last mouseout event on the same segment
+        return;
+      }
+    }
+
     if (target) {
       row = target.parentElement.getAttribute('data-row-index');
       let itemKey = target.getAttribute('data-item-index');
@@ -2631,5 +2658,42 @@ export default class Timeline extends React.Component {
       this._selectBox.end();
       this.dragEnd();
     }
+  }
+
+  verticalScrollTo(verticalScrollPosition) {
+    this.setState(
+      {
+        tableScrollTop: verticalScrollPosition,
+        avoidCallingTableScrollHandlers: true,
+        avoidCallingGanttScrollHandlers: true
+      },
+      () => {
+        this._grid.scrollToPosition({scrollTop: verticalScrollPosition});
+      }
+    );
+  }
+
+  scrollToItem(id) {
+    const item = this.props.items ? this.props.items.find(item => item.key == id) : undefined;
+    if (!item) {
+      return;
+    }
+
+    // Horizontal scroll so that the item is in the left part of the diagram with a 10% left padding from the display interval
+    const displayIntervalInMiliseconds = this.getEndDate().diff(this.getStartDate(), 'milliseconds');
+    let scrollTime = this.getStartFromItem(item).valueOf() - displayIntervalInMiliseconds * 0.1;
+    this.setState({startDate: moment(scrollTime), endDate: moment(scrollTime + displayIntervalInMiliseconds)});
+
+    // Vertical scoll so that the item is on the first row
+    const rowIndex = this.props.groups ? this.props.groups.findIndex(group => group.id === item.row) : -1;
+    if (rowIndex >= 0) {
+      let exactTop = 0;
+      for (let i = 0; i < rowIndex; i++) {
+        exactTop += this.tableRowHeight(i);
+      }
+      this.verticalScrollTo(exactTop);
+    }
+
+    this._selectionHolder.setSelection([item.key]);
   }
 }
