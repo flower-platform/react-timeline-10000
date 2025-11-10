@@ -727,17 +727,8 @@ export default class Timeline extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const tableWidth = this.getInitialTableWidth(nextProps);
-
-    // VERTICAL SCROLL POSITION change
     if (this.props.verticalScrollPosition != nextProps.verticalScrollPosition) {
-      // Programatically scroll table
-      this.setState({tableScrollTop: nextProps.verticalScrollPosition});
-      this.setState({avoidCallingTableScrollHandlers: true});
-
-      // // Programatically scroll gantt
-      this._gridDomNode.scrollTop = nextProps.verticalScrollPosition;
-      this.setState({avoidCallingGanttScrollHandlers: true});
+      this.verticalScrollTo(nextProps.verticalScrollPosition);
     }
 
     if (
@@ -746,12 +737,19 @@ export default class Timeline extends React.Component {
       convertDateToMoment(this.props.endDate, this.props.useMoment).valueOf() !=
         convertDateToMoment(nextProps.endDate, nextProps.useMoment).valueOf()
     ) {
+      // If the externally controlled start/end changed,
+      // The setTimeMap will also be called but later in componentDidUpdate based on state start/end dates
+      // This avoids calling setTimeMap with stale start/end state values
       this.setState({startDate: nextProps.startDate, endDate: nextProps.endDate});
-    } else {
+    } else if (
+      nextProps.useMoment !== this.props.useMoment ||
+      nextProps.displayItemOnSeparateRowIfOverlap !== this.props.displayItemOnSeparateRowIfOverlap ||
+      nextProps.items !== this.props.items
+    ) {
       this.setTimeMap(
         nextProps.items,
-        convertDateToMoment(nextProps.startDate, nextProps.useMoment),
-        convertDateToMoment(nextProps.endDate, nextProps.useMoment),
+        convertDateToMoment(this.state.startDate, nextProps.useMoment),
+        convertDateToMoment(this.state.endDate, nextProps.useMoment),
         nextProps.useMoment,
         nextProps.displayItemOnSeparateRowIfOverlap
       );
@@ -2657,5 +2655,42 @@ export default class Timeline extends React.Component {
       this._selectBox.end();
       this.dragEnd();
     }
+  }
+
+  verticalScrollTo(verticalScrollPosition) {
+    this.setState(
+      {
+        tableScrollTop: verticalScrollPosition,
+        avoidCallingTableScrollHandlers: true,
+        avoidCallingGanttScrollHandlers: true
+      },
+      () => {
+        this._grid.scrollToPosition({scrollTop: verticalScrollPosition});
+      }
+    );
+  }
+
+  scrollToItem(id) {
+    const item = this.props.items ? this.props.items.find(item => item.key == id) : undefined;
+    if (!item) {
+      return;
+    }
+
+    // Horizontal scroll so that the item is in the left part of the diagram with a 10% left padding from the display interval
+    const displayIntervalInMiliseconds = this.getEndDate().diff(this.getStartDate(), 'milliseconds');
+    let scrollTime = this.getStartFromItem(item).valueOf() - displayIntervalInMiliseconds * 0.1;
+    this.setState({startDate: moment(scrollTime), endDate: moment(scrollTime + displayIntervalInMiliseconds)});
+
+    // Vertical scoll so that the item is on the first row
+    const rowIndex = this.props.groups ? this.props.groups.findIndex(group => group.id === item.row) : -1;
+    if (rowIndex >= 0) {
+      let exactTop = 0;
+      for (let i = 0; i < rowIndex; i++) {
+        exactTop += this.tableRowHeight(i);
+      }
+      this.verticalScrollTo(exactTop);
+    }
+
+    this._selectionHolder.setSelection([item.key]);
   }
 }

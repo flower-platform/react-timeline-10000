@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [Add `scrollToItem` feature](https://github.com/flower-platform/react-timeline-10000/pull/100)
 * [Fix `onItemHover` and `onItemLeave` firing too often on items with children](https://github.com/flower-platform/react-timeline-10000/pull/98)
 * [Change color used for BackgroundGradient](https://github.com/flower-platform/react-timeline-10000/pull/96)
 
