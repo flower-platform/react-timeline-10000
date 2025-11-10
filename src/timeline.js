@@ -698,6 +698,8 @@ export default class Timeline extends React.Component {
     this.getRowClassName = this.getRowClassName.bind(this);
     this.wheelHandler = this.wheelHandler.bind(this);
     this.startFadeOutEffect = this.startFadeOutEffect.bind(this);
+    this.lastMouseOverItem = undefined;
+    this.lastMouseOutEvent = undefined;
 
     const canSelect = Timeline.isBitSet(Timeline.TIMELINE_MODES.SELECT, this.props.timelineMode);
     const canDrag = Timeline.isBitSet(Timeline.TIMELINE_MODES.DRAG, this.props.timelineMode);
@@ -1720,6 +1722,14 @@ export default class Timeline extends React.Component {
     if (this.selecting) {
       return;
     }
+
+    if (e.type === 'mouseout') {
+      // We wait till the next mouseover event to see if the mouseout happened
+      // because we exit the segment or because we entered on a child element of the same segment
+      this.lastMouseOutEvent = e;
+      return;
+    }
+
     let row;
     let target = e.target;
     while (target) {
@@ -1728,6 +1738,25 @@ export default class Timeline extends React.Component {
       }
       target = target.parentElement;
     }
+
+    // In case the segment contains children the mouseout/mouseover events are triggered also
+    // for those children. We want to threat only the mouseover/mouseout events
+    // from the current segment to other segments or to no segment at all
+    if (e.type === 'mouseover') {
+      const currentMouseOverItem = target ? target.getAttribute('data-item-index') : undefined;
+      if (this.lastMouseOverItem !== currentMouseOverItem) {
+        if (this.lastMouseOverItem) {
+          this.props.onItemLeave(this.lastMouseOutEvent, this.lastMouseOverItem);
+        }
+        this.lastMouseOverItem = currentMouseOverItem;
+        // This is a mouseover event on a new segment. Continue the usual processing of this event
+      } else {
+        // Avoid processing the current mouseover event
+        // and the last mouseout event on the same segment
+        return;
+      }
+    }
+
     if (target) {
       row = target.parentElement.getAttribute('data-row-index');
       let itemKey = target.getAttribute('data-item-index');
