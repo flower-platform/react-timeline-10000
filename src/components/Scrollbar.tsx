@@ -171,6 +171,21 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
         return className + (this.props.hasArrows ? " rct9k-scrollbar-with-arrows" : "");
     }
 
+    shouldComponentUpdate(nextProps: Readonly<ScrollbarProperties>, nextState: Readonly<{ scrollbarSize: number }>) {
+        const { props, state } = this;
+        if (nextProps.minScrollPosition !== props.minScrollPosition
+            || nextProps.maxScrollPosition !== props.maxScrollPosition
+            || nextProps.pageSize !== props.pageSize
+            || nextProps.direction !== props.direction
+            || nextProps.hasArrows !== props.hasArrows) {
+            return true;
+        }
+        if (nextState.scrollbarSize !== state.scrollbarSize) {
+            return true;
+        }
+        return false;
+    }
+
     render(): React.ReactNode {
         return <Measure
             bounds

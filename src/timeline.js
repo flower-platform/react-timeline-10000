@@ -705,6 +705,45 @@ export default class Timeline extends React.Component {
     const canDrag = Timeline.isBitSet(Timeline.TIMELINE_MODES.DRAG, this.props.timelineMode);
     const canResize = Timeline.isBitSet(Timeline.TIMELINE_MODES.RESIZE, this.props.timelineMode);
     this.setUpDragging(canSelect, canDrag, canResize);
+    this.DRAG_TO_CREATE_ACTION = {
+      label: DRAG_TO_CREATE_ACTION_LABEL,
+      run: param => {
+        that.setDragToCreateMode(true);
+        param.closeContextMenu();
+      }
+    };
+    this.ZOOM_IN_ACTION = {
+      label: ZOOM_IN_ACTION_LABEL,
+      icon: 'zoom-in',
+      run: param => {
+        let event = new MouseEvent('wheel', {
+          ctrlKey: true,
+          clientX: that._gridDomNode.getBoundingClientRect().x + that._grid.props.width / 2,
+          bubbles: true,
+          cancelable: true
+        });
+        event.deltaY = -1;
+        that._gridDomNode.dispatchEvent(event);
+        param.closeContextMenu();
+        that.startFadeOutEffect('Zoomed in');
+      }
+    };
+    this.ZOOM_OUT_ACTION = {
+      label: ZOOM_OUT_ACTION_LABEL,
+      icon: 'zoom-out',
+      run: param => {
+        let event = new MouseEvent('wheel', {
+          ctrlKey: true,
+          clientX: that._gridDomNode.getBoundingClientRect().x + that._grid.props.width / 2,
+          bubbles: true,
+          cancelable: true
+        });
+        event.deltaY = 1;
+        that._gridDomNode.dispatchEvent(event);
+        param.closeContextMenu();
+        that.startFadeOutEffect('Zoomed out');
+      }
+    };
   }
 
   componentDidMount() {
@@ -2230,57 +2269,21 @@ export default class Timeline extends React.Component {
     if (this.props.onDragToCreateEnded && this.props.forceDragToCreateMode == undefined) {
       // If the user doesn't forces the enter/exit from dragToCreateMode =>
       // a default mechanism is implemented via an action that enters the drag to create mode
-      let that = this;
-      actions.push({
-        label: DRAG_TO_CREATE_ACTION_LABEL,
-        run: param => {
-          that.setDragToCreateMode(true);
-          param.closeContextMenu();
-        }
-      });
+      actions.push(this.DRAG_TO_CREATE_ACTION);
     }
     if (this.props.showZoomShortcuts) {
-      let that = this;
-      actions.push({
-        label: ZOOM_IN_ACTION_LABEL,
-        icon: 'zoom-in',
-        run: param => {
-          let event = new MouseEvent('wheel', {
-            ctrlKey: true,
-            clientX: that._gridDomNode.getBoundingClientRect().x + that._grid.props.width / 2,
-            bubbles: true,
-            cancelable: true
-          });
-          event.deltaY = -1;
-          that._gridDomNode.dispatchEvent(event);
-          param.closeContextMenu();
-          that.startFadeOutEffect('Zommed in');
-        }
-      });
-      actions.push({
-        label: ZOOM_OUT_ACTION_LABEL,
-        icon: 'zoom-out',
-        run: param => {
-          let event = new MouseEvent('wheel', {
-            ctrlKey: true,
-            clientX: that._gridDomNode.getBoundingClientRect().x + that._grid.props.width / 2,
-            bubbles: true,
-            cancelable: true
-          });
-          event.deltaY = 1;
-          that._gridDomNode.dispatchEvent(event);
-          param.closeContextMenu();
-          that.startFadeOutEffect('Zommed out');
-        }
-      });
+      actions.push(this.ZOOM_IN_ACTION);
+      actions.push(this.ZOOM_OUT_ACTION);
     }
-
     return (
-      <ContextMenu
-        paramsForAction={actionParam}
-        positionToOpen={actions.length > 0 ? this.state.openedContextMenuCoordinates : undefined}
-        actions={actions}
-      />
+      actions.length > 0 &&
+      this.state.openedContextMenuCoordinates && (
+        <ContextMenu
+          paramsForAction={actionParam}
+          positionToOpen={this.state.openedContextMenuCoordinates}
+          actions={actions}
+        />
+      )
     );
   }
 
