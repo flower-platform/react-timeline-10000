@@ -62,7 +62,9 @@ export function rowItemsRenderer(
       typeof displayItemOnSeparateRowIfOverlap === `function`
         ? displayItemOnSeparateRowIfOverlap(i, rowIndex)
         : displayItemOnSeparateRowIfOverlap;
-    let top = displayCurrentItemOnSeparateRow ? (rowTopBottomPadding + i['rowOffset'] * (itemHeight + verticalGapBetweenOverlappingItems)): 0;
+    let top = displayCurrentItemOnSeparateRow
+      ? rowTopBottomPadding + i['rowOffset'] * (itemHeight + verticalGapBetweenOverlappingItems)
+      : rowTopBottomPadding;
     let item_offset_mins = getStartFromItem(i).diff(vis_start, 'milliseconds');
     let item_duration_mins = getEndFromItem(i).diff(getStartFromItem(i), 'milliseconds');
     let left = Math.round(item_offset_mins * pixels_per_ms);

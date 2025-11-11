@@ -85,8 +85,8 @@ const FADE_OPACITY_OFFSET = 0.1;
 const FADE_TIMER_INTERVAR = 100;
 export const ZOOM_PERCENT = 0.2;
 export const MIN_DISPLAY_TIME = 60000;
-const DEFAULT_VERTICAL_GAP_BETWEEN_OVERLAPPING_ITEMS = 1;
-const DEFAULT_ROW_TOP_BOTTOM_PADDING = 1;
+export const DEFAULT_VERTICAL_GAP_BETWEEN_OVERLAPPING_ITEMS = 1;
+export const DEFAULT_ROW_TOP_BOTTOM_PADDING = 1;
 
 export const PARENT_ELEMENT = componentId => document.querySelector(`.rct9k-id-${componentId} .parent-div`);
 
@@ -725,6 +725,7 @@ export default class Timeline extends React.Component {
     const canDrag = Timeline.isBitSet(Timeline.TIMELINE_MODES.DRAG, this.props.timelineMode);
     const canResize = Timeline.isBitSet(Timeline.TIMELINE_MODES.RESIZE, this.props.timelineMode);
     this.setUpDragging(canSelect, canDrag, canResize);
+    const that = this;
     this.DRAG_TO_CREATE_ACTION = {
       label: DRAG_TO_CREATE_ACTION_LABEL,
       run: param => {
