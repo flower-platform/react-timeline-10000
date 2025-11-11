@@ -1,7 +1,11 @@
 ## Unreleased
 
 * [Prevented wrong segments on empty rows by giving them IDs with a special prefix](https://github.com/flower-platform/react-timeline-10000/pull/102)
+* [Fix to avoid rendering of the context menu and scrollbar at every mouse move](https://github.com/flower-platform/react-timeline-10000/pull/99)
+* [Add `scrollToItem` feature](https://github.com/flower-platform/react-timeline-10000/pull/100)
+* [Fix `onItemHover` and `onItemLeave` firing too often on items with children](https://github.com/flower-platform/react-timeline-10000/pull/98)
 * [Change color used for BackgroundGradient](https://github.com/flower-platform/react-timeline-10000/pull/96)
+* [Add `verticalGapBetweenOverlappingItems` and `rowTopBottomPadding` properties](https://github.com/flower-platform/react-timeline-10000/pull/97)
 
 ## v2.10.0
 

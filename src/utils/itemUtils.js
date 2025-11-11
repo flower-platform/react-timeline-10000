@@ -32,6 +32,8 @@ export function rowItemsRenderer(
   getEndFromItem,
   timelineTestids,
   displayItemOnSeparateRowIfOverlap,
+  verticalGapBetweenOverlappingItems,
+  rowTopBottomPadding,
   zIndexFunction,
   rowIndex
 ) {
@@ -60,12 +62,7 @@ export function rowItemsRenderer(
       typeof displayItemOnSeparateRowIfOverlap === `function`
         ? displayItemOnSeparateRowIfOverlap(i, rowIndex)
         : displayItemOnSeparateRowIfOverlap;
-    let top = displayCurrentItemOnSeparateRow ? itemHeight * i['rowOffset'] : 0;
-    // itemHeight is also used to calculate the row height; the row height is the maximum number of overlapping items
-    // in a row multiplied with itemHeight.
-    // If the max overlapping items is 1, then itemHeight = row height,
-    // we need to subtract 10 (5 top + 5 bottom) because of the margin (see rct9k-items-inner class in style.css)
-    const adjustedItemHeight = itemHeight - 10;
+    let top = displayCurrentItemOnSeparateRow ? (rowTopBottomPadding + i['rowOffset'] * (itemHeight + verticalGapBetweenOverlappingItems)): 0;
     let item_offset_mins = getStartFromItem(i).diff(vis_start, 'milliseconds');
     let item_duration_mins = getEndFromItem(i).diff(getStartFromItem(i), 'milliseconds');
     let left = Math.round(item_offset_mins * pixels_per_ms);
@@ -85,7 +82,7 @@ export function rowItemsRenderer(
         data-item-index={i.key}
         className={outerClassnames}
         style={{left, width, top, backgroundColor: 'transparent', zIndex: zIndexFunction(i)}}>
-        <Comp {...itemRendererDefaultProps} {...i} item={i} className={compClassnames} height={adjustedItemHeight} />
+        <Comp {...itemRendererDefaultProps} {...i} item={i} className={compClassnames} height={itemHeight} />
       </span>
     );
   });
