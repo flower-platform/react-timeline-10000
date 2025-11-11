@@ -1,5 +1,7 @@
 ## Unreleased
 
+## v2.11.0
+
 * [Prevented wrong segments on empty rows by giving them IDs with a special prefix](https://github.com/flower-platform/react-timeline-10000/pull/102)
 * [Fix to avoid rendering of the context menu and scrollbar at every mouse move](https://github.com/flower-platform/react-timeline-10000/pull/99)
 * [Add `scrollToItem` feature](https://github.com/flower-platform/react-timeline-10000/pull/100)
