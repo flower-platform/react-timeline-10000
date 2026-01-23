@@ -6,7 +6,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import {Component} from 'react';
 
-import { Timeline, ItemRenderer } from "@famiprog-foundation/react-gantt";
+import { Timeline, ItemRenderer, ZOOM_IN, ZOOM_OUT } from "@famiprog-foundation/react-gantt";
 
 import {Button, Checkbox, DatePicker, Form, InputNumber, Switch} from 'antd';
 import 'antd/dist/antd.css';
@@ -95,14 +95,10 @@ export default class DemoTimeline extends Component {
     this.setState({selectedItems: [], message});
   };
   zoomIn() {
-    let currentMilliseconds = this.state.endDate.diff(this.state.startDate, 'milliseconds');
-    let newSec = currentMilliseconds / 2;
-    this.setState({endDate: this.state.startDate.clone().add(newSec, 'milliseconds')});
+    this.timelineRef.current.zoom(ZOOM_IN);
   }
   zoomOut() {
-    let currentMilliseconds = this.state.endDate.diff(this.state.startDate, 'milliseconds');
-    let newSec = currentMilliseconds * 2;
-    this.setState({endDate: this.state.startDate.clone().add(newSec, 'milliseconds')});
+    this.timelineRef.current.zoom(ZOOM_OUT);
   }
 
   toggleCustomRenderers(checked) {
