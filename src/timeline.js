@@ -921,6 +921,14 @@ export default class Timeline extends React.Component {
    *  (0 = left edge, 0.5 = center, 1 = right edge).
    */
   zoom(direction, anchor = 0.5) {
+    if (direction !== ZOOM_IN && direction !== ZOOM_OUT) {
+      console.warn(`Timeline.zoom: 'direction' parameter must be either ZOOM_IN or ZOOM_OUT. Received: ${direction}`);
+      return;
+    }
+    if (typeof anchor !== 'number' || anchor < 0 || anchor > 1) {
+      console.warn(`Timeline.zoom: 'anchor' parameter must be a number between 0 and 1. Received: ${anchor}`);
+      return;
+    }
     const interval = this.getEndDate().valueOf() - this.getStartDate().valueOf();
     const deltaInterval = interval * ZOOM_PERCENT * direction;
     this.zoomInternal(deltaInterval, anchor);
