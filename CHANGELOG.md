@@ -1,6 +1,6 @@
 ## Unreleased
 
-* [Add public api for zoom in/out]()
+* [Add public api for zoom in/out](https://github.com/flower-platform/react-timeline-10000/pull/106)
 
 ## v2.11.0
 
