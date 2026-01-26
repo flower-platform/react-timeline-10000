@@ -1,5 +1,7 @@
 ## Unreleased
 
+* [Fix exception when zooming or resizing window due to undefined grid reference](https://github.com/flower-platform/react-timeline-10000/pull/)
+
 ## v2.11.0
 
 * [Prevented wrong segments on empty rows by giving them IDs with a special prefix](https://github.com/flower-platform/react-timeline-10000/pull/102)

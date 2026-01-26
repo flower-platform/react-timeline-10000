@@ -1070,7 +1070,10 @@ export default class Timeline extends React.Component {
     clearTimeout(this.resizeTimeout);
     this.resizeTimeout = setTimeout(() => {
       this.forceUpdate();
-      this._grid.recomputeGridSize();
+      // Grid may be null as <Measure> forces a remount of the grid on window resize.
+      if (this._grid) {
+        this._grid.recomputeGridSize();
+      }
     }, 100);
   }
 
