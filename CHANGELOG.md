@@ -1,6 +1,6 @@
 ## Unreleased
 
-* [Fix exception when zooming or resizing window due to undefined grid reference](https://github.com/flower-platform/react-timeline-10000/pull/)
+* [Fix exception when zooming or resizing window due to undefined grid reference](https://github.com/flower-platform/react-timeline-10000/pull/107)
 
 ## v2.11.0
 
