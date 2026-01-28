@@ -84,6 +84,8 @@ export const DRAG_TO_CREATE_POPUP_LABEL_2 = 'Popup will close in a few moments.'
 const FADE_OPACITY_OFFSET = 0.1;
 const FADE_TIMER_INTERVAR = 100;
 export const ZOOM_PERCENT = 0.2;
+export const ZOOM_IN = 1;
+export const ZOOM_OUT = -1;
 export const MIN_DISPLAY_TIME = 60000;
 export const DEFAULT_VERTICAL_GAP_BETWEEN_OVERLAPPING_ITEMS = 1;
 export const DEFAULT_ROW_TOP_BOTTOM_PADDING = 1;
@@ -890,19 +892,46 @@ export default class Timeline extends React.Component {
       if (e.deltaY > 0) {
         deltaInterval *= -1;
       }
-
-      const startDate = Math.max(this.getStartDate().valueOf() + delta * deltaInterval, this.getMinDate().valueOf());
-      const endDate = Math.min(this.getEndDate().valueOf() - (1 - delta) * deltaInterval, this.getMaxDate().valueOf());
-      if (endDate - startDate < MIN_DISPLAY_TIME) {
-        return;
-      }
-
-      this.setState({
-        startDate: this.props.useMoment ? moment(startDate) : startDate,
-        endDate: this.props.useMoment ? moment(endDate) : endDate
-      });
+      this.zoomInternal(deltaInterval, delta);
       this.throttledMouseMoveFunc(e);
     }
+  }
+
+  zoomInternal(deltaInterval, anchor) {
+    const minDate = this.getMinDate().valueOf();
+    const maxDate = this.getMaxDate().valueOf();
+
+    const startDate = Math.max(this.getStartDate().valueOf() + anchor * deltaInterval, minDate);
+    const endDate = Math.min(this.getEndDate().valueOf() - (1 - anchor) * deltaInterval, maxDate);
+
+    if (endDate - startDate < MIN_DISPLAY_TIME) {
+      return;
+    }
+
+    this.setState({
+      startDate: this.props.useMoment ? moment(startDate) : startDate,
+      endDate: this.props.useMoment ? moment(endDate) : endDate
+    });
+  }
+
+  /**
+   * Public API method.
+   * @param {number} direction Must be either `ZOOM_IN` or `ZOOM_OUT` constants
+   * @param {?number} anchor Value between 0 and 1 representing the zoom anchor
+   *  (0 = left edge, 0.5 = center, 1 = right edge).
+   */
+  zoom(direction, anchor = 0.5) {
+    if (direction !== ZOOM_IN && direction !== ZOOM_OUT) {
+      console.warn(`Timeline.zoom: 'direction' parameter must be either ZOOM_IN or ZOOM_OUT. Received: ${direction}`);
+      return;
+    }
+    if (typeof anchor !== 'number' || anchor < 0 || anchor > 1) {
+      console.warn(`Timeline.zoom: 'anchor' parameter must be a number between 0 and 1. Received: ${anchor}`);
+      return;
+    }
+    const interval = this.getEndDate().valueOf() - this.getStartDate().valueOf();
+    const deltaInterval = interval * ZOOM_PERCENT * direction;
+    this.zoomInternal(deltaInterval, anchor);
   }
 
   /**
