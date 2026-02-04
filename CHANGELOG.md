@@ -1,6 +1,7 @@
 ## Unreleased
 
 * [Fix exception when zooming or resizing window due to undefined grid reference](https://github.com/flower-platform/react-timeline-10000/pull/107)
+* [Add public api for zoom in/out](https://github.com/flower-platform/react-timeline-10000/pull/106)
 
 ## v2.11.0
 
