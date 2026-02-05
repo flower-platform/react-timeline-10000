@@ -103,15 +103,17 @@ export class NowMarker extends React.Component {
       if (
         startDateTimeline &&
         endDateTimeline &&
+        this.props.onUpdate &&
         startDateTimeline.isSameOrBefore(now) &&
         endDateTimeline.isSameOrAfter(now) &&
         startDateTimeline.isSameOrBefore(this.previousTime) &&
-        endDateTimeline.isSameOrAfter(this.previousTime) &&
-        this.props.onUpdate
+        endDateTimeline.isSameOrAfter(this.previousTime)
       ) {
         const posPrev = this.props.calculateHorizontalPosition(this.previousTime, this.previousTime);
         const posNow = this.props.calculateHorizontalPosition(now, now);
 
+        // The timeline horizontal scrollbar doesn't scrolls if you pass intervals < 1px
+        // We accumulate smaller intervals to process all together.
         if (posPrev && posNow && posNow.left - posPrev.left + this.unprocessedScrollInterval >= 1) {
           this.props.onUpdate(posNow.left - posPrev.left + this.unprocessedScrollInterval);
           this.unprocessedScrollInterval = 0;

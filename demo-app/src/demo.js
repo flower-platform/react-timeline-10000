@@ -20,7 +20,6 @@ const {TIMELINE_MODES} = Timeline;
 const ITEM_DURATIONS = [moment.duration(6, 'hours'), moment.duration(12, 'hours'), moment.duration(18, 'hours')];
 
 const COLORS = ['#0099cc', '#f03a36', '#06ad96', '#fce05b', '#dd5900', '#cc6699'];
-const DISPLAY_INTERVAL_IN_HOURS = 12;
 
 const headerStyle = {
   color: '#000',
