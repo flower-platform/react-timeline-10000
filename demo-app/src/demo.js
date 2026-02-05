@@ -6,7 +6,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import {Component} from 'react';
 
-import { Timeline, ItemRenderer, ZOOM_IN, ZOOM_OUT } from "@famiprog-foundation/react-gantt";
+import { Timeline, ItemRenderer, ZOOM_IN, ZOOM_OUT, BackgroundLayer } from "@famiprog-foundation/react-gantt";
 
 import {Button, Checkbox, DatePicker, Form, InputNumber, Switch} from 'antd';
 import 'antd/dist/antd.css';
@@ -20,6 +20,7 @@ const {TIMELINE_MODES} = Timeline;
 const ITEM_DURATIONS = [moment.duration(6, 'hours'), moment.duration(12, 'hours'), moment.duration(18, 'hours')];
 
 const COLORS = ['#0099cc', '#f03a36', '#06ad96', '#fce05b', '#dd5900', '#cc6699'];
+const DISPLAY_INTERVAL_IN_HOURS = 12;
 
 const headerStyle = {
   color: '#000',
@@ -38,9 +39,10 @@ export default class DemoTimeline extends Component {
   constructor(props) {
     super(props);
 
-    const startDate = moment('2018-08-31');
-    //const endDate = startDate.clone().add(4, 'days');
-    const endDate = moment('2018-09-30');
+    const now = moment();
+    const startDate = now.clone().subtract(1, "day");
+    const endDate = now.clone().add(2, "day");
+    
     this.state = {
       selectedItems: [],
       rows: 100,
@@ -48,13 +50,15 @@ export default class DemoTimeline extends Component {
       snap: 60,
       startDate,
       endDate,
-      minDate: moment('2018-07-31'),
-      maxDate: moment('2018-10-30'),
+      minDate: now.clone().subtract(2, "day"),
+      maxDate: now.clone().add(3, "day"),
       message: '',
       timelineMode: TIMELINE_MODES.SELECT | TIMELINE_MODES.DRAG | TIMELINE_MODES.RESIZE,
       useTable: true,
       zoomEnabled: true,
-      useMoment: true
+      useMoment: true,
+      nowMarkerLiveUpdateEnabled: true,
+      nowMarkerLiveUpdateInterval: 10000
     };
     this.timelineRef = React.createRef();
     this.reRender = this.reRender.bind(this);
@@ -68,6 +72,7 @@ export default class DemoTimeline extends Component {
     this.toggleUseTable = this.toggleUseTable.bind(this);
     this.toggleZoomEnabled = this.toggleZoomEnabled.bind(this);
     this.scrollToRandomItem = this.scrollToRandomItem.bind(this);
+    this.nowMarkerLiveUpdateEnabled = this.nowMarkerLiveUpdateEnabled.bind(this);
   }
 
   componentWillMount() {
@@ -139,6 +144,10 @@ export default class DemoTimeline extends Component {
     } else {
       this.setState({zoomEnabled: false});
     }
+  }
+
+  nowMarkerLiveUpdateEnabled() {
+    this.setState({ nowMarkerLiveUpdateEnabled: !this.state.nowMarkerLiveUpdateEnabled });
   }
 
   scrollToRandomItem() {
@@ -278,7 +287,9 @@ export default class DemoTimeline extends Component {
       timelineMode,
       useMoment,
       useTable,
-      zoomEnabled
+      zoomEnabled,
+      nowMarkerLiveUpdateEnabled,
+      nowMarkerLiveUpdateInterval
     } = this.state;
     const rangeValue = [startDate, endDate];
     const minMaxRangeValue = [minDate, maxDate];
@@ -398,6 +409,19 @@ export default class DemoTimeline extends Component {
               </Checkbox>
             </Form.Item>
             <Form.Item>
+              <Checkbox onChange={this.nowMarkerLiveUpdateEnabled} checked={nowMarkerLiveUpdateEnabled}>
+                Now marker live update
+              </Checkbox>
+            </Form.Item>
+            <Form.Item label="Now marker interval (ms)">
+              <InputNumber
+                min={100}
+                step={100}
+                value={nowMarkerLiveUpdateInterval}
+                onChange={value => this.setState({ nowMarkerLiveUpdateInterval: value })}
+              />
+            </Form.Item>
+            <Form.Item>
               <Button type="primary" onClick={this.scrollToRandomItem}>
                 Scroll to Random Item
               </Button>
@@ -419,6 +443,13 @@ export default class DemoTimeline extends Component {
           endDate={useMoment ? endDate : endDate.valueOf()}
           minDate={useMoment ? minDate : minDate.valueOf()}
           maxDate={useMoment ? maxDate : maxDate.valueOf()}
+          backgroundLayer={
+            <BackgroundLayer
+              nowMarker={true}
+              nowMarkerLiveUpdate={this.state.nowMarkerLiveUpdateEnabled}
+              nowMarkerLiveUpdateInterval={this.state.nowMarkerLiveUpdateInterval}
+            />
+          }
           table={
             useTable ? (
               <Table rowHeight={50} width={315} isColumnResizing={true}>
