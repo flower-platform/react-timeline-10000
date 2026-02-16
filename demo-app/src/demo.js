@@ -71,7 +71,7 @@ export default class DemoTimeline extends Component {
     this.toggleUseTable = this.toggleUseTable.bind(this);
     this.toggleZoomEnabled = this.toggleZoomEnabled.bind(this);
     this.scrollToRandomItem = this.scrollToRandomItem.bind(this);
-    this.nowMarkerLiveUpdateEnabled = this.nowMarkerLiveUpdateEnabled.bind(this);
+    this.toggleNowMarkerLiveUpdate = this.toggleNowMarkerLiveUpdate.bind(this);
   }
 
   componentWillMount() {
@@ -145,7 +145,7 @@ export default class DemoTimeline extends Component {
     }
   }
 
-  nowMarkerLiveUpdateEnabled() {
+  toggleNowMarkerLiveUpdate() {
     this.setState({ nowMarkerLiveUpdateEnabled: !this.state.nowMarkerLiveUpdateEnabled });
   }
 
@@ -408,7 +408,7 @@ export default class DemoTimeline extends Component {
               </Checkbox>
             </Form.Item>
             <Form.Item>
-              <Checkbox onChange={this.nowMarkerLiveUpdateEnabled} checked={nowMarkerLiveUpdateEnabled}>
+              <Checkbox onChange={this.toggleNowMarkerLiveUpdate} checked={nowMarkerLiveUpdateEnabled}>
                 Now marker live update
               </Checkbox>
             </Form.Item>
