@@ -1,6 +1,9 @@
+import { createTestids } from "@famiprog-foundation/tests-are-demo";
 import React from "react";
 import Measure from 'react-measure';
 
+const testIds = createTestids('Scrollbar', { div: '' });
+export const scrollbarTestIds = testIds;
 export interface ScrollbarProperties {
     /**
      * A number which represents the maximum scroll position
@@ -209,7 +212,7 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
             {({ measureRef }) => {
                 return (
                     this.isScrollbarNeeded(this.props) ?
-                    <div
+                    <div data-testid={scrollbarTestIds.div}
                         className={this.getOutterDivClassName()}
                         style={this.props.direction == Direction.HORIZONTAL ? {height: SCROLLBAR_SIZE} : {width: SCROLLBAR_SIZE}}
                         ref={(node) => {

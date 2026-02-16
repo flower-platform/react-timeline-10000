@@ -347,6 +347,8 @@ export class BackgroundLayer extends React.Component {
           {this.renderCustomComponents(this.props.highlightedIntervals)}
           {this.props.nowMarker && (
             <NowMarker
+              // Use a negative number to differentiate from the other markers testIds that starts from 0
+              id={-1}
               nowMarkerClassName={this.props.nowMarkerClassName}
               nowMarkerStyle={this.props.nowMarkerStyle}
               height={this.props.height}

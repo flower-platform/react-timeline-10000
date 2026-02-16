@@ -8,6 +8,8 @@ import moment from 'moment';
  */
 export class NowMarker extends React.Component {
   static propTypes = {
+    /** Internal (passed by parent). Used for Marker data-testid. */
+    id: PropTypes.number,
     /**
      * @type { string }
      */
@@ -54,7 +56,7 @@ export class NowMarker extends React.Component {
   };
 
   static defaultProps = {
-    nowMarker: false,
+    id: undefined,
     nowMarkerClassName: undefined,
     nowMarkerStyle: undefined,
     height: undefined,
@@ -95,6 +97,7 @@ export class NowMarker extends React.Component {
   }
 
   startTimer() {
+    this.setState({currentTime: moment()});
     if (this.timer) return;
     this.timer = setInterval(() => {
       const now = moment();
@@ -148,17 +151,20 @@ export class NowMarker extends React.Component {
 
     return (
       <Fragment>
-        <Marker
-          date={currentDate}
-          top={0}
-          height={this.props.height + this.props.topOffset}
-          shouldUpdate={this.props.shouldUpdate}
-          calculateHorizontalPosition={date => {
-            return this.props.calculateHorizontalPosition(date, date);
-          }}
-          className={`rct9k-background-layer-now-marker ${this.props.nowMarkerClassName || ''}`}
-          style={this.props.nowMarkerStyle}
-        />
+        <span>
+          <Marker
+            id={this.props.id}
+            date={currentDate}
+            top={0}
+            height={this.props.height + this.props.topOffset}
+            shouldUpdate={this.props.shouldUpdate}
+            calculateHorizontalPosition={date => {
+              return this.props.calculateHorizontalPosition(date, date);
+            }}
+            className={`rct9k-background-layer-now-marker ${this.props.nowMarkerClassName || ''}`}
+            style={this.props.nowMarkerStyle}
+          />
+        </span>
       </Fragment>
     );
   }
