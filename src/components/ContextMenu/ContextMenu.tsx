@@ -93,7 +93,7 @@ export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: 
         }} open={(this.state.isOpened && visibleActions.length > 0)}>
         <Menu className="rct9k-context-menu" secondary vertical>
           {visibleActions.map((action: IAction) => {
-            const key = visibleActions.indexOf(action);
+            const key = (action.key instanceof Function ? action.key({ ...this.props.paramsForAction }) : action.key) || visibleActions.indexOf(action);
             return (!action.renderInMenu ?
               <Menu.Item
                 data-testid={testids.menuItem + "_" + key}
