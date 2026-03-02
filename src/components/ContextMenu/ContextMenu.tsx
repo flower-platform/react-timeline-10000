@@ -109,7 +109,7 @@ export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: 
                   }
                 }}>
               </Menu.Item>
-              : React.cloneElement(action.renderInMenu({ ...this.props.paramsForAction, closeContextMenu: this.close }), { key: visibleActions.indexOf(action), "data-testid": testids.menuItem + "_" + key })
+              : React.cloneElement(action.renderInMenu({ ...this.props.paramsForAction, closeContextMenu: this.close }), { key: key, "data-testid": testids.menuItem + "_" + key })
             );
           })
           }
