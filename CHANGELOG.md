@@ -1,4 +1,5 @@
 ## Unreleased
+* [Improving data-testids for actions](https://github.com/flower-platform/react-timeline-10000/pull/109)
 
 ## v2.12.0
 
