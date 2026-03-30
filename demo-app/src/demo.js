@@ -6,7 +6,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import {Component} from 'react';
 
-import { Timeline, ItemRenderer } from "@famiprog-foundation/react-gantt";
+import { Timeline, ItemRenderer, ZOOM_IN, ZOOM_OUT } from "@famiprog-foundation/react-gantt";
 
 import {Button, Checkbox, DatePicker, Form, InputNumber, Switch} from 'antd';
 import 'antd/dist/antd.css';
@@ -56,6 +56,7 @@ export default class DemoTimeline extends Component {
       zoomEnabled: true,
       useMoment: true
     };
+    this.timelineRef = React.createRef();
     this.reRender = this.reRender.bind(this);
     this.zoomIn = this.zoomIn.bind(this);
     this.zoomOut = this.zoomOut.bind(this);
@@ -66,6 +67,7 @@ export default class DemoTimeline extends Component {
     this.toggleUseMoment = this.toggleUseMoment.bind(this);
     this.toggleUseTable = this.toggleUseTable.bind(this);
     this.toggleZoomEnabled = this.toggleZoomEnabled.bind(this);
+    this.scrollToRandomItem = this.scrollToRandomItem.bind(this);
   }
 
   componentWillMount() {
@@ -93,14 +95,10 @@ export default class DemoTimeline extends Component {
     this.setState({selectedItems: [], message});
   };
   zoomIn() {
-    let currentMilliseconds = this.state.endDate.diff(this.state.startDate, 'milliseconds');
-    let newSec = currentMilliseconds / 2;
-    this.setState({endDate: this.state.startDate.clone().add(newSec, 'milliseconds')});
+    this.timelineRef.current.zoom(ZOOM_IN);
   }
   zoomOut() {
-    let currentMilliseconds = this.state.endDate.diff(this.state.startDate, 'milliseconds');
-    let newSec = currentMilliseconds * 2;
-    this.setState({endDate: this.state.startDate.clone().add(newSec, 'milliseconds')});
+    this.timelineRef.current.zoom(ZOOM_OUT);
   }
 
   toggleCustomRenderers(checked) {
@@ -141,6 +139,20 @@ export default class DemoTimeline extends Component {
     } else {
       this.setState({zoomEnabled: false});
     }
+  }
+
+  scrollToRandomItem() {
+    const { items } = this.state;
+    if (!items || items.length === 0) {
+      this.setState({ message: 'No items to scroll to.' });
+      return;
+    }
+    
+    const randomIndex = Math.floor(Math.random() * items.length);
+    const randomItem = items[randomIndex];
+    
+    this.timelineRef.current.scrollToItem(randomItem.key);
+    this.setState({ message: `Scrolled to item: ${randomItem.key} (${randomItem.title || 'No title'})` });
   }
 
   handleItemClick = (e, key) => {
@@ -385,6 +397,11 @@ export default class DemoTimeline extends Component {
                 Zoom enabled
               </Checkbox>
             </Form.Item>
+            <Form.Item>
+              <Button type="primary" onClick={this.scrollToRandomItem}>
+                Scroll to Random Item
+              </Button>
+            </Form.Item>
           </Form>
           <div>
             <span>Debug: </span>
@@ -392,6 +409,7 @@ export default class DemoTimeline extends Component {
           </div>
         </div>
         <Timeline
+          ref={this.timelineRef}
           shallowUpdateCheck
           items={items}
           groups={groups}

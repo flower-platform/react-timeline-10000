@@ -66,11 +66,11 @@ const testids = createTestids('Timeline', {
 });
 export const timelineTestids = testids;
 
-const EMPTY_GROUP_KEY = 'empty-group';
+const EMPTY_GROUP_ID_PREFIX = 'empty_';
 // This was added by bogdan. From my understanding it reprezents the table vertical scrollbar width
 // If we don't take in consideration this, a horizontal scrollbar appears
 export const TABLE_OFFSET = 15;
-export const DEFAULT_ITEM_HEIGHT = 40;
+export const DEFAULT_ITEM_HEIGHT = 30;
 export const DEFAULT_ROW_CLASS = 'rct9k-row';
 export const DEFAULT_ROW_EVEN_CLASS = 'rct9k-row-even';
 /**
@@ -84,7 +84,11 @@ export const DRAG_TO_CREATE_POPUP_LABEL_2 = 'Popup will close in a few moments.'
 const FADE_OPACITY_OFFSET = 0.1;
 const FADE_TIMER_INTERVAR = 100;
 export const ZOOM_PERCENT = 0.2;
+export const ZOOM_IN = 1;
+export const ZOOM_OUT = -1;
 export const MIN_DISPLAY_TIME = 60000;
+export const DEFAULT_VERTICAL_GAP_BETWEEN_OVERLAPPING_ITEMS = 1;
+export const DEFAULT_ROW_TOP_BOTTOM_PADDING = 1;
 
 export const PARENT_ELEMENT = componentId => document.querySelector(`.rct9k-id-${componentId} .parent-div`);
 
@@ -506,6 +510,22 @@ export default class Timeline extends React.Component {
     displayItemOnSeparateRowIfOverlap: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
 
     /**
+     * The vertical gap between overlapping items displayed on separate subrows in case `displayItemOnSeparateRowIfOverlap == true`
+     *
+     * @default 1
+     * @type { number }
+     */
+    verticalGapBetweenOverlappingItems: PropTypes.number,
+
+    /**
+     * The top and down empty space inside a row
+     *
+     * @default 1
+     * @type { number }
+     */
+    rowTopBottomPadding: PropTypes.number,
+
+    /**
      * The segments with bigger index are staying in front of the ones with smaller index.
      * To not show the segment in front of the now marker, cursor time
      * please do not return a number greater than 998 @see rct9k-marker style
@@ -576,6 +596,8 @@ export default class Timeline extends React.Component {
     onSplitChange: undefined,
     splitPaneProps: undefined,
     displayItemOnSeparateRowIfOverlap: true,
+    verticalGapBetweenOverlappingItems: DEFAULT_VERTICAL_GAP_BETWEEN_OVERLAPPING_ITEMS,
+    rowTopBottomPadding: DEFAULT_ROW_TOP_BOTTOM_PADDING,
     zIndexFunction() {
       return 3;
     },
@@ -698,11 +720,53 @@ export default class Timeline extends React.Component {
     this.getRowClassName = this.getRowClassName.bind(this);
     this.wheelHandler = this.wheelHandler.bind(this);
     this.startFadeOutEffect = this.startFadeOutEffect.bind(this);
+    this.lastMouseOverItem = undefined;
+    this.lastMouseOutEvent = undefined;
 
     const canSelect = Timeline.isBitSet(Timeline.TIMELINE_MODES.SELECT, this.props.timelineMode);
     const canDrag = Timeline.isBitSet(Timeline.TIMELINE_MODES.DRAG, this.props.timelineMode);
     const canResize = Timeline.isBitSet(Timeline.TIMELINE_MODES.RESIZE, this.props.timelineMode);
     this.setUpDragging(canSelect, canDrag, canResize);
+    const that = this;
+    this.DRAG_TO_CREATE_ACTION = {
+      label: DRAG_TO_CREATE_ACTION_LABEL,
+      run: param => {
+        that.setDragToCreateMode(true);
+        param.closeContextMenu();
+      }
+    };
+    this.ZOOM_IN_ACTION = {
+      label: ZOOM_IN_ACTION_LABEL,
+      icon: 'zoom-in',
+      run: param => {
+        let event = new MouseEvent('wheel', {
+          ctrlKey: true,
+          clientX: that._gridDomNode.getBoundingClientRect().x + that._grid.props.width / 2,
+          bubbles: true,
+          cancelable: true
+        });
+        event.deltaY = -1;
+        that._gridDomNode.dispatchEvent(event);
+        param.closeContextMenu();
+        that.startFadeOutEffect('Zoomed in');
+      }
+    };
+    this.ZOOM_OUT_ACTION = {
+      label: ZOOM_OUT_ACTION_LABEL,
+      icon: 'zoom-out',
+      run: param => {
+        let event = new MouseEvent('wheel', {
+          ctrlKey: true,
+          clientX: that._gridDomNode.getBoundingClientRect().x + that._grid.props.width / 2,
+          bubbles: true,
+          cancelable: true
+        });
+        event.deltaY = 1;
+        that._gridDomNode.dispatchEvent(event);
+        param.closeContextMenu();
+        that.startFadeOutEffect('Zoomed out');
+      }
+    };
   }
 
   componentDidMount() {
@@ -725,17 +789,8 @@ export default class Timeline extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const tableWidth = this.getInitialTableWidth(nextProps);
-
-    // VERTICAL SCROLL POSITION change
     if (this.props.verticalScrollPosition != nextProps.verticalScrollPosition) {
-      // Programatically scroll table
-      this.setState({tableScrollTop: nextProps.verticalScrollPosition});
-      this.setState({avoidCallingTableScrollHandlers: true});
-
-      // // Programatically scroll gantt
-      this._gridDomNode.scrollTop = nextProps.verticalScrollPosition;
-      this.setState({avoidCallingGanttScrollHandlers: true});
+      this.verticalScrollTo(nextProps.verticalScrollPosition);
     }
 
     if (
@@ -744,12 +799,19 @@ export default class Timeline extends React.Component {
       convertDateToMoment(this.props.endDate, this.props.useMoment).valueOf() !=
         convertDateToMoment(nextProps.endDate, nextProps.useMoment).valueOf()
     ) {
+      // If the externally controlled start/end changed,
+      // The setTimeMap will also be called but later in componentDidUpdate based on state start/end dates
+      // This avoids calling setTimeMap with stale start/end state values
       this.setState({startDate: nextProps.startDate, endDate: nextProps.endDate});
-    } else {
+    } else if (
+      nextProps.useMoment !== this.props.useMoment ||
+      nextProps.displayItemOnSeparateRowIfOverlap !== this.props.displayItemOnSeparateRowIfOverlap ||
+      nextProps.items !== this.props.items
+    ) {
       this.setTimeMap(
         nextProps.items,
-        convertDateToMoment(nextProps.startDate, nextProps.useMoment),
-        convertDateToMoment(nextProps.endDate, nextProps.useMoment),
+        convertDateToMoment(this.state.startDate, nextProps.useMoment),
+        convertDateToMoment(this.state.endDate, nextProps.useMoment),
         nextProps.useMoment,
         nextProps.displayItemOnSeparateRowIfOverlap
       );
@@ -830,19 +892,46 @@ export default class Timeline extends React.Component {
       if (e.deltaY > 0) {
         deltaInterval *= -1;
       }
-
-      const startDate = Math.max(this.getStartDate().valueOf() + delta * deltaInterval, this.getMinDate().valueOf());
-      const endDate = Math.min(this.getEndDate().valueOf() - (1 - delta) * deltaInterval, this.getMaxDate().valueOf());
-      if (endDate - startDate < MIN_DISPLAY_TIME) {
-        return;
-      }
-
-      this.setState({
-        startDate: this.props.useMoment ? moment(startDate) : startDate,
-        endDate: this.props.useMoment ? moment(endDate) : endDate
-      });
+      this.zoomInternal(deltaInterval, delta);
       this.throttledMouseMoveFunc(e);
     }
+  }
+
+  zoomInternal(deltaInterval, anchor) {
+    const minDate = this.getMinDate().valueOf();
+    const maxDate = this.getMaxDate().valueOf();
+
+    const startDate = Math.max(this.getStartDate().valueOf() + anchor * deltaInterval, minDate);
+    const endDate = Math.min(this.getEndDate().valueOf() - (1 - anchor) * deltaInterval, maxDate);
+
+    if (endDate - startDate < MIN_DISPLAY_TIME) {
+      return;
+    }
+
+    this.setState({
+      startDate: this.props.useMoment ? moment(startDate) : startDate,
+      endDate: this.props.useMoment ? moment(endDate) : endDate
+    });
+  }
+
+  /**
+   * Public API method.
+   * @param {number} direction Must be either `ZOOM_IN` or `ZOOM_OUT` constants
+   * @param {?number} anchor Value between 0 and 1 representing the zoom anchor
+   *  (0 = left edge, 0.5 = center, 1 = right edge).
+   */
+  zoom(direction, anchor = 0.5) {
+    if (direction !== ZOOM_IN && direction !== ZOOM_OUT) {
+      console.warn(`Timeline.zoom: 'direction' parameter must be either ZOOM_IN or ZOOM_OUT. Received: ${direction}`);
+      return;
+    }
+    if (typeof anchor !== 'number' || anchor < 0 || anchor > 1) {
+      console.warn(`Timeline.zoom: 'anchor' parameter must be a number between 0 and 1. Received: ${anchor}`);
+      return;
+    }
+    const interval = this.getEndDate().valueOf() - this.getStartDate().valueOf();
+    const deltaInterval = interval * ZOOM_PERCENT * direction;
+    this.zoomInternal(deltaInterval, anchor);
   }
 
   /**
@@ -1022,7 +1111,10 @@ export default class Timeline extends React.Component {
     clearTimeout(this.resizeTimeout);
     this.resizeTimeout = setTimeout(() => {
       this.forceUpdate();
-      this._grid.recomputeGridSize();
+      // Grid may be null as <Measure> forces a remount of the grid on window resize.
+      if (this._grid) {
+        this._grid.recomputeGridSize();
+      }
     }, 100);
   }
 
@@ -1091,7 +1183,7 @@ export default class Timeline extends React.Component {
    */
   fillInTimelineWithEmptyRows(groups) {
     // remove empty groups
-    groups = groups.filter(group => !group.key || !group.key.startsWith(EMPTY_GROUP_KEY));
+    groups = groups.filter(group => !this.isEmptyGroup(group.id));
 
     // get height of the grid (without timebar);
     // used to compute the number of rows we need to fill in
@@ -1107,7 +1199,7 @@ export default class Timeline extends React.Component {
     let that = this;
     this.rowIdToRowIndexMap = {};
     _.forEach(groups, (group, index) => {
-      totalItemsHeight += (that.rowHeightCache[group.id] || 1) * that.props.itemHeight;
+      totalItemsHeight += that.getNonEmptyRowHeight(group.id);
       this.rowIdToRowIndexMap[group.id] = index;
     });
     let heightToFillIn = this._grid.props.height - totalItemsHeight;
@@ -1119,7 +1211,7 @@ export default class Timeline extends React.Component {
       // create new empty group;
       // if the last row would be only partially visible, then we set the height of the row as the remaining
       // height (add `rowHeight` in group, which will be used in rowHeight() function)
-      let emptyGroup = {id: groupId, key: EMPTY_GROUP_KEY + groupId};
+      let emptyGroup = {id: EMPTY_GROUP_ID_PREFIX + groupId};
       if (heightToFillIn < this.props.itemHeight) {
         emptyGroup.rowHeight = heightToFillIn;
       }
@@ -1130,6 +1222,10 @@ export default class Timeline extends React.Component {
       groupId--;
     }
     this.setState({groups: [...groups, ...fillInGroups]});
+  }
+
+  isEmptyGroup(groupId) {
+    return typeof groupId === 'string' && groupId.startsWith(EMPTY_GROUP_ID_PREFIX);
   }
 
   /**
@@ -1172,6 +1268,9 @@ export default class Timeline extends React.Component {
   changeGroup(item, curRow, newRow) {
     curRowId = this.state.groups[curRow].id;
     newRowId = this.state.groups[newRow].id;
+    if (this.isEmptyGroup(newRowId)) {
+      return;
+    }
     item.row = newRowId;
     this.itemRowMap[item.key] = newRowId;
     this.rowItemMap[curRowId] = this.rowItemMap[curRowId].filter(i => i.key !== item.key);
@@ -1705,7 +1804,7 @@ export default class Timeline extends React.Component {
       this._selectRectangleInteractable
         .draggable({
           enabled: true,
-          ignoreFrom: '.item_draggable, .rct9k-group, .rct9k-timebar'
+          ignoreFrom: '.rct9k-group, .rct9k-timebar'
         })
         .styleCursor(false)
         .on('dragstart', e => {
@@ -1734,6 +1833,14 @@ export default class Timeline extends React.Component {
     if (this.selecting) {
       return;
     }
+
+    if (e.type === 'mouseout') {
+      // We wait till the next mouseover event to see if the mouseout happened
+      // because we exit the segment or because we entered on a child element of the same segment
+      this.lastMouseOutEvent = e;
+      return;
+    }
+
     let row;
     let target = e.target;
     while (target) {
@@ -1742,12 +1849,39 @@ export default class Timeline extends React.Component {
       }
       target = target.parentElement;
     }
+
+    // In case the segment contains children the mouseout/mouseover events are triggered also
+    // for those children. We want to threat only the mouseover/mouseout events
+    // from the current segment to other segments or to no segment at all
+    if (e.type === 'mouseover') {
+      const currentMouseOverItem = target ? target.getAttribute('data-item-index') : undefined;
+      if (this.lastMouseOverItem !== currentMouseOverItem) {
+        if (this.lastMouseOverItem) {
+          this.props.onItemLeave(this.lastMouseOutEvent, this.lastMouseOverItem);
+        }
+        this.lastMouseOverItem = currentMouseOverItem;
+        // This is a mouseover event on a new segment. Continue the usual processing of this event
+      } else {
+        // Avoid processing the current mouseover event
+        // and the last mouseout event on the same segment
+        return;
+      }
+    }
+
     if (target) {
       row = target.parentElement.getAttribute('data-row-index');
       let itemKey = target.getAttribute('data-item-index');
       itemKey = isNaN(Number(itemKey)) ? itemKey : Number(itemKey);
       itemCallback && itemCallback(e, itemKey);
-      if (e.type == 'mousedown' || (this.isTouchDevice() && e.type == 'tap')) {
+      // When a drag to create starts (at mousedown) above an item
+      // we want to avoid that item to be selected,
+      // so we postpone the selection till an actual click/right click happens
+      const isDragToCreate = this.getDragToCreateMode();
+      if (
+        (!isDragToCreate && e.type === 'mousedown') ||
+        (isDragToCreate && (e.type === 'click' || e.type === 'contextmenu')) ||
+        (this.isTouchDevice() && e.type === 'tap')
+      ) {
         // Calculate new selection by delegating to selection component
         this._selectionHolder.addRemoveItems([itemKey], e);
       }
@@ -1814,7 +1948,7 @@ export default class Timeline extends React.Component {
       const layersInRow = this.props.rowLayers.filter(r => r.rowNumber === rowIndex);
       let rowHeight = this.props.itemHeight;
       if (this.rowHeightCache[rowId]) {
-        rowHeight = rowHeight * this.rowHeightCache[rowId];
+        rowHeight = this.getNonEmptyRowHeight(rowId);
       }
       var props = this.props;
       return (
@@ -1859,6 +1993,8 @@ export default class Timeline extends React.Component {
             this.getEndFromItem,
             timelineTestids,
             this.props.displayItemOnSeparateRowIfOverlap,
+            this.props.verticalGapBetweenOverlappingItems,
+            this.props.rowTopBottomPadding,
             this.props.zIndexFunction,
             rowIndex
           )}
@@ -1889,11 +2025,19 @@ export default class Timeline extends React.Component {
     let group = this.state.groups[index];
     // only for empty rows (EMPTY_GROUP_KEY), if the group has a custom row height,
     // we will return that height
-    if (group.rowHeight && group.key.startsWith(EMPTY_GROUP_KEY)) {
+    if (group.rowHeight && this.isEmptyGroup(group.id)) {
       return group.rowHeight;
     }
-    let rh = this.rowHeightCache[group.id] ? this.rowHeightCache[group.id] : 1;
-    return rh * this.props.itemHeight;
+    return this.getNonEmptyRowHeight(group.id);
+  }
+
+  getNonEmptyRowHeight(rowId) {
+    let rh = this.rowHeightCache[rowId] ? this.rowHeightCache[rowId] : 1;
+    return (
+      rh * this.props.itemHeight +
+      (rh - 1) * this.props.verticalGapBetweenOverlappingItems +
+      2 * this.props.rowTopBottomPadding
+    );
   }
 
   /**
@@ -1913,7 +2057,7 @@ export default class Timeline extends React.Component {
     }
     var tableRowHeight = this.rowHeight({index});
     let group = this.state.groups[index];
-    if (group.rowHeight && group.key.startsWith(EMPTY_GROUP_KEY)) {
+    if (group.rowHeight && this.isEmptyGroup(group.id)) {
       tableRowHeight = Math.round(tableRowHeight) + (this.state.hasHorizontalScrollbar ? SCROLLBAR_SIZE : 0) - 2;
     }
     return tableRowHeight;
@@ -2215,57 +2359,21 @@ export default class Timeline extends React.Component {
     if (this.props.onDragToCreateEnded && this.props.forceDragToCreateMode == undefined) {
       // If the user doesn't forces the enter/exit from dragToCreateMode =>
       // a default mechanism is implemented via an action that enters the drag to create mode
-      let that = this;
-      actions.push({
-        label: DRAG_TO_CREATE_ACTION_LABEL,
-        run: param => {
-          that.setDragToCreateMode(true);
-          param.closeContextMenu();
-        }
-      });
+      actions.push(this.DRAG_TO_CREATE_ACTION);
     }
     if (this.props.showZoomShortcuts) {
-      let that = this;
-      actions.push({
-        label: ZOOM_IN_ACTION_LABEL,
-        icon: 'zoom-in',
-        run: param => {
-          let event = new MouseEvent('wheel', {
-            ctrlKey: true,
-            clientX: that._gridDomNode.getBoundingClientRect().x + that._grid.props.width / 2,
-            bubbles: true,
-            cancelable: true
-          });
-          event.deltaY = -1;
-          that._gridDomNode.dispatchEvent(event);
-          param.closeContextMenu();
-          that.startFadeOutEffect('Zommed in');
-        }
-      });
-      actions.push({
-        label: ZOOM_OUT_ACTION_LABEL,
-        icon: 'zoom-out',
-        run: param => {
-          let event = new MouseEvent('wheel', {
-            ctrlKey: true,
-            clientX: that._gridDomNode.getBoundingClientRect().x + that._grid.props.width / 2,
-            bubbles: true,
-            cancelable: true
-          });
-          event.deltaY = 1;
-          that._gridDomNode.dispatchEvent(event);
-          param.closeContextMenu();
-          that.startFadeOutEffect('Zommed out');
-        }
-      });
+      actions.push(this.ZOOM_IN_ACTION);
+      actions.push(this.ZOOM_OUT_ACTION);
     }
-
     return (
-      <ContextMenu
-        paramsForAction={actionParam}
-        positionToOpen={actions.length > 0 ? this.state.openedContextMenuCoordinates : undefined}
-        actions={actions}
-      />
+      actions.length > 0 &&
+      this.state.openedContextMenuCoordinates && (
+        <ContextMenu
+          paramsForAction={actionParam}
+          positionToOpen={this.state.openedContextMenuCoordinates}
+          actions={actions}
+        />
+      )
     );
   }
 
@@ -2505,7 +2613,7 @@ export default class Timeline extends React.Component {
     }
 
     const lastRow = this.state.groups[this.state.groups.length - 1];
-    const hasEmptyRows = lastRow && lastRow.key && lastRow.key.startsWith(EMPTY_GROUP_KEY);
+    const hasEmptyRows = lastRow && this.isEmptyGroup(lastRow.id);
     {
       /* Instead of <Measure .../>, in the past <AutoSizer ... /> was used. However it would round with/height, which generated and endless
     scrollbar appear/disappear, depending on the parent, depending on the resolution. */
@@ -2640,5 +2748,42 @@ export default class Timeline extends React.Component {
       this._selectBox.end();
       this.dragEnd();
     }
+  }
+
+  verticalScrollTo(verticalScrollPosition) {
+    this.setState(
+      {
+        tableScrollTop: verticalScrollPosition,
+        avoidCallingTableScrollHandlers: true,
+        avoidCallingGanttScrollHandlers: true
+      },
+      () => {
+        this._grid.scrollToPosition({scrollTop: verticalScrollPosition});
+      }
+    );
+  }
+
+  scrollToItem(id) {
+    const item = this.props.items ? this.props.items.find(item => item.key == id) : undefined;
+    if (!item) {
+      return;
+    }
+
+    // Horizontal scroll so that the item is in the left part of the diagram with a 10% left padding from the display interval
+    const displayIntervalInMiliseconds = this.getEndDate().diff(this.getStartDate(), 'milliseconds');
+    let scrollTime = this.getStartFromItem(item).valueOf() - displayIntervalInMiliseconds * 0.1;
+    this.setState({startDate: moment(scrollTime), endDate: moment(scrollTime + displayIntervalInMiliseconds)});
+
+    // Vertical scoll so that the item is on the first row
+    const rowIndex = this.props.groups ? this.props.groups.findIndex(group => group.id === item.row) : -1;
+    if (rowIndex >= 0) {
+      let exactTop = 0;
+      for (let i = 0; i < rowIndex; i++) {
+        exactTop += this.tableRowHeight(i);
+      }
+      this.verticalScrollTo(exactTop);
+    }
+
+    this._selectionHolder.setSelection([item.key]);
   }
 }

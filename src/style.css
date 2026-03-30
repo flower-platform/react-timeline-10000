@@ -219,7 +219,6 @@
   display: flex;
   padding: 3px;
   /* this value change the inner item height, see rowItemsRenderer from itemUtils.js:68 */
-  margin: 5px 0;
   width: 100%;
   white-space: nowrap;
   overflow: hidden;

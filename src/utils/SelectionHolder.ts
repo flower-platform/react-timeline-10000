@@ -90,15 +90,20 @@ export class SelectionHolder extends React.Component<SelectionHolderProps, Selec
         }
       });
     }
-    this.setState( {selectedItems: newSelection});
+    this.setSelection(newSelection);
+  }
+  
+  setSelection(itemsKeys: (number | string)[]) {
+    this.setState({ selectedItems: itemsKeys });
 
     // Notify the host component about selection change
     if (this.props.selectionChangedHandler) {
-      this.props.selectionChangedHandler(newSelection);
+      this.props.selectionChangedHandler(itemsKeys);
     }
   }
 
   render(): React.ReactNode {
     return null;
   }
+
 }
