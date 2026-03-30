@@ -720,6 +720,7 @@ export default class Timeline extends React.Component {
     this.getRowClassName = this.getRowClassName.bind(this);
     this.wheelHandler = this.wheelHandler.bind(this);
     this.startFadeOutEffect = this.startFadeOutEffect.bind(this);
+    this.onNowMarkerUpdate = this.onNowMarkerUpdate.bind(this);
     this.lastMouseOverItem = undefined;
     this.lastMouseOutEvent = undefined;
 
@@ -2417,6 +2418,10 @@ export default class Timeline extends React.Component {
     });
   }
 
+  onNowMarkerUpdate(delta) {
+    this._scrollbar.scrollWithPxDelta(delta);
+  }
+
   renderGanttPart({bodyHeight, timebarHeight}) {
     const {
       showCursorTime,
@@ -2570,7 +2575,8 @@ export default class Timeline extends React.Component {
                       leftOffset: 0,
                       height: bodyHeight - (this.state.hasHorizontalScrollbar ? SCROLLBAR_SIZE : 0),
                       topOffset: timebarHeight,
-                      verticalGridLines: this.state.verticalGridLines
+                      verticalGridLines: this.state.verticalGridLines,
+                      onNowMarkerUpdate: this.onNowMarkerUpdate
                     })}
                   <div className="rct9k-menu-div">{this.renderMenuButton()}</div>
                 </div>
