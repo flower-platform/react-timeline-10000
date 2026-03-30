@@ -982,11 +982,23 @@ export default class Timeline extends React.Component {
    * @returns {moment}
    */
   getMaxDate() {
+    let end;
     if (this.props.maxDate) {
-      return convertDateToMoment(this.props.maxDate, this.props.useMoment);
+      end = convertDateToMoment(this.props.maxDate, this.props.useMoment);
     } else {
-      return convertDateToMoment(this.props.endDate, this.props.useMoment);
+      end = convertDateToMoment(this.props.endDate, this.props.useMoment);
     }
+    const width = this.state.gridWidth;
+    // This calculation is fragile as it depends on the internal DOM structure of react-virtualized's Grid.
+    const virtualizedGridFirstChild = this._gridDomNode ? this._gridDomNode.firstChild : undefined;
+    const vScrollbarWidth = virtualizedGridFirstChild
+      ? this._gridDomNode.getBoundingClientRect().width - virtualizedGridFirstChild.getBoundingClientRect().width
+      : 0;
+
+    if (!vScrollbarWidth || !width) return end;
+
+    const extraMs = getDurationFromPixels(vScrollbarWidth, this.getStartDate(), this.getEndDate(), width);
+    return end.clone().add(extraMs, 'milliseconds');
   }
 
   /**
@@ -1793,7 +1805,7 @@ export default class Timeline extends React.Component {
       this._selectRectangleInteractable
         .draggable({
           enabled: true,
-          ignoreFrom: '.item_draggable, .rct9k-group, .rct9k-timebar'
+          ignoreFrom: '.rct9k-group, .rct9k-timebar'
         })
         .styleCursor(false)
         .on('dragstart', e => {
@@ -1862,7 +1874,15 @@ export default class Timeline extends React.Component {
       let itemKey = target.getAttribute('data-item-index');
       itemKey = isNaN(Number(itemKey)) ? itemKey : Number(itemKey);
       itemCallback && itemCallback(e, itemKey);
-      if (e.type == 'mousedown' || (this.isTouchDevice() && e.type == 'tap')) {
+      // When a drag to create starts (at mousedown) above an item
+      // we want to avoid that item to be selected,
+      // so we postpone the selection till an actual click/right click happens
+      const isDragToCreate = this.getDragToCreateMode();
+      if (
+        (!isDragToCreate && e.type === 'mousedown') ||
+        (isDragToCreate && (e.type === 'click' || e.type === 'contextmenu')) ||
+        (this.isTouchDevice() && e.type === 'tap')
+      ) {
         // Calculate new selection by delegating to selection component
         this._selectionHolder.addRemoveItems([itemKey], e);
       }

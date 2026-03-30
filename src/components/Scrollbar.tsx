@@ -63,7 +63,7 @@ export enum Direction {
     VERTICAL
 }
 
-export const SCROLLBAR_SIZE = 10;
+export const SCROLLBAR_SIZE = 16;
 const ROUND_FACTOR = 4;
 
 export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarSize: number }> {
@@ -214,7 +214,6 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
                     this.isScrollbarNeeded(this.props) ?
                     <div data-testid={scrollbarTestIds.div}
                         className={this.getOutterDivClassName()}
-                        style={this.props.direction == Direction.HORIZONTAL ? {height: SCROLLBAR_SIZE} : {width: SCROLLBAR_SIZE}}
                         ref={(node) => {
                             measureRef(node);
                             this._outterDiv = node;
