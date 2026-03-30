@@ -1,5 +1,7 @@
 ## Unreleased
 
+* [Drag to create can start on top of an existing item](https://github.com/flower-platform/react-timeline-10000/pull/101)
+* 
 ## v2.12.0
 
 * [Fix exception when zooming or resizing window due to undefined grid reference](https://github.com/flower-platform/react-timeline-10000/pull/107)
