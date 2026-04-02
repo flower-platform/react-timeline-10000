@@ -25,9 +25,9 @@ export const Main = () => {
 
     const tasks: Item[] = [
         { key: 0, row: 0, start: d(anchor.clone().subtract(30, 'seconds')), end: d(anchor.clone().add(30, 'seconds')) },
-        { key: 0, row: 1, start: d(anchor.clone().subtract(60, 'seconds')), end: d(anchor.clone().add(30, 'seconds')) },
-        { key: 0, row: 2, start: d(anchor.clone().subtract(30, 'seconds')), end: d(anchor.clone().add(60, 'seconds')) },
-        { key: 0, row: 3, start: d(anchor.clone().subtract(40, 'seconds')), end: d(anchor.clone().add(10, 'seconds')) },
+        { key: 1, row: 1, start: d(anchor.clone().subtract(60, 'seconds')), end: d(anchor.clone().add(30, 'seconds')) },
+        { key: 2, row: 2, start: d(anchor.clone().subtract(30, 'seconds')), end: d(anchor.clone().add(60, 'seconds')) },
+        { key: 3, row: 3, start: d(anchor.clone().subtract(40, 'seconds')), end: d(anchor.clone().add(10, 'seconds')) },
     ];
 
     return (
@@ -47,8 +47,7 @@ export const Main = () => {
                             type="number"
                             label="Now marker live update interval"
                             value={nowMarkerLiveUpdateInterval}
-                            onChange={(e, { value }) => {
-                                setNowMarkerLiveUpdateInterval(Number(value))} }
+                            onChange={(e, { value }) => setNowMarkerLiveUpdateInterval(Number(value)) }
                         />
                     </Form.Field>
                 </Form>
