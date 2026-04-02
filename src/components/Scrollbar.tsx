@@ -63,6 +63,8 @@ export enum Direction {
     VERTICAL
 }
 
+// We use this default size in order for this scrollbar to have the same size as the native one.
+// Additionally there are styles in the css file that makes this scrollbar to have the same look as the native one.
 export const SCROLLBAR_SIZE = 16;
 const ROUND_FACTOR = 4;
 

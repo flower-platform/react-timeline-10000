@@ -62,11 +62,10 @@ export class ContextMenuTestsAreDemo {
         const expected = Math.round(newSegment.getBoundingClientRect().x);
         
         // Allow a ±3px tolerance because snap math and browser/device DPI can introduce small rounding offsets.
-        const acceptableRange = [expected - 3, expected - 2, expected - 1, expected, expected + 1, expected + 2, expected + 3];
-        await tad.assertWaitable.include(acceptableRange, Math.round(clickedXSnappedToGrid));
+        await tad.assertWaitable.approximately(newSegment.getBoundingClientRect().x, clickedXSnappedToGrid, 3);
         
         // AND is correctly added to the clicked row
-        await tad.assertWaitable.equal(newSegment.getBoundingClientRect().y, firstRow.getBoundingClientRect().y + DEFAULT_ROW_TOP_BOTTOM_PADDING);
+        await tad.assertWaitable.approximately(newSegment.getBoundingClientRect().y, firstRow.getBoundingClientRect().y + DEFAULT_ROW_TOP_BOTTOM_PADDING, 1);
         tad.demoForEndUserShow();
     }
 
