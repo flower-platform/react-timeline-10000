@@ -1,17 +1,24 @@
 import React from "react"
-import { IconProps, SemanticShorthandItem } from "semantic-ui-react"
+import { IconProps, SemanticShorthandItem, StrictPopupProps } from "semantic-ui-react"
 import { Point } from "./ContextMenu"
 
 // TODO RM34271 let's get rid of IActionParamForRun. It overcomplicates the inheritance. We'll have here closeContextMenu() that won't do anything.
 // export interface IActionParam<S> {
 // selection: S[]
+type Position = StrictPopupProps["position"];
+
 export interface IActionParam {
     selection: any[]
 }
 
 export interface IActionParamForRun extends IActionParam {
-    closeContextMenu: () => void,
-    
+    /**
+     * Function to close the context menu.
+     * This is marked as optional because users will pass their actionParamForRun without this field.
+     * However, it will ALWAYS be populated internally by the ContextMenu component before being passed to action handlers.
+     */
+    closeContextMenu?: () => void,
+
     /**
      * By default the context menu closes immediately after the action is run
      * If the user wants to avoid the closing of the menu after action runs he needs to set this property to true
@@ -23,6 +30,10 @@ export interface IActionParamForRun extends IActionParam {
      * It contains the mouse coordinates, obtained from onClick event of an action
      */
     eventPoint?: Point
+    
+    position?: Position;
+    
+    [key: string]: any;
 }
 
 // TODO RM34271 CS: for the moment it's not clear why we need this. It's not used by the lib. And currently, the task of opening
