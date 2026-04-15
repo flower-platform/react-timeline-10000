@@ -1,16 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Timeline, BackgroundLayer, HighlightedInterval, Marker, Item } from '@famiprog-foundation/react-gantt';
 import { startOfCurrentMonth, endOfCurrentMonth, dateAndHourOfCurrentMonth, manyHumanResources, dateAndHourOfMonth, d } from '../sampleData';
 import { backgroundLayerScenarios } from './BackgroundLayerScenarios';
 import { Table, Column, DataCell} from 'fixed-data-table-2';
 import moment from 'moment';
+import { NowMarker } from '../../../../src/components/NowMarker';
+import { Checkbox, Form } from 'semantic-ui-react';
+import { createTestids } from '@famiprog-foundation/tests-are-demo';
 
 export default {
   title: 'Features/Background Layer',
   includeStories: /^[A-Z]/
 };
 
+export const backgroundLayerStoriesTestIds = createTestids('BackgroundLayerStory', {liveUpdateCheckbox:''});
+
 export const month = moment("2023 11", "YYYY MM");
+console.log(month);
 
 const tasks: Item[] = [
   {key: 11, row: 1, title: 'Task JD1', start: dateAndHourOfMonth(month, 20, 8), end: dateAndHourOfMonth(month, 28, 11)},
@@ -19,29 +25,49 @@ const tasks: Item[] = [
 ];
 
 export const Main = () => {
+  const [nowMarkerLiveUpdate, setNowMarkerLiveUpdate] = useState(false);
   return (
-    <Timeline startDate={d(month.startOf('month'))}
-      endDate={d(month.endOf('month'))} groups={manyHumanResources} items={tasks}
-      table={<Table width={115} >
-                <Column
-                    columnKey="title"
-                    width={100}
-                    header={<DataCell>Title</DataCell>}
-                    cell={({rowIndex}) => <DataCell>{rowIndex < manyHumanResources.length ? manyHumanResources[rowIndex].title : ""}</DataCell>}/>
-            </Table>}
-      backgroundLayer={
-        <BackgroundLayer verticalGrid nowMarker highlightWeekends
-          highlightedIntervals={[
-            <HighlightedInterval start={dateAndHourOfMonth(month, 1)} end={dateAndHourOfMonth(month, 2)} />,
-            <HighlightedInterval start={dateAndHourOfMonth(month, 15)} end={dateAndHourOfMonth(month, 18)} />,
-            <HighlightedInterval start={dateAndHourOfMonth(month, 20, 19)} end={dateAndHourOfMonth(month, 21, 10)} />
-          ]}
-          markers={[
-            <Marker date={dateAndHourOfMonth(month, 10, 12)} />,
-            <Marker date={dateAndHourOfMonth(month, 15, 12)} />
-          ]}
-        />}
-    />
+    <>
+      <div style={{ margin: 24 }}>
+        <Form size="mini">
+            <Form.Field>
+                <Checkbox 
+                    label='Now marker live update'
+                    checked={nowMarkerLiveUpdate}
+                    onChange={() => setNowMarkerLiveUpdate(!nowMarkerLiveUpdate)}
+                    data-testid={backgroundLayerStoriesTestIds.liveUpdateCheckbox}
+                />
+            </Form.Field>
+        </Form>
+      </div>
+      <Timeline
+        showCursorTime={false} 
+        startDate={d(month.startOf('month').add(7, 'day'))}
+        endDate={d(month.endOf('month').subtract(5, 'day'))} groups={manyHumanResources} 
+        minDate={d(month.startOf('month'))}
+        maxDate={d(month.endOf('month'))}
+        items={tasks}
+        table={<Table width={115} >
+                  <Column
+                      columnKey="title"
+                      width={100}
+                      header={<DataCell>Title</DataCell>}
+                      cell={({rowIndex}) => <DataCell>{rowIndex < manyHumanResources.length ? manyHumanResources[rowIndex].title : ""}</DataCell>}/>
+              </Table>}
+        backgroundLayer={
+          <BackgroundLayer verticalGrid nowMarker nowMarkerLiveUpdate={nowMarkerLiveUpdate} nowMarkerLiveUpdateInterval={1000} highlightWeekends
+            highlightedIntervals={[
+              <HighlightedInterval start={dateAndHourOfMonth(month, 1)} end={dateAndHourOfMonth(month, 2)} />,
+              <HighlightedInterval start={dateAndHourOfMonth(month, 15)} end={dateAndHourOfMonth(month, 18)} />,
+              <HighlightedInterval start={dateAndHourOfMonth(month, 20, 19)} end={dateAndHourOfMonth(month, 21, 10)} />
+            ]}
+            markers={[
+              <Marker date={dateAndHourOfMonth(month, 10, 12)} />,
+              <Marker date={dateAndHourOfMonth(month, 15, 12)} />
+            ]}
+          />}
+      />
+    </>
   );
 };
 
