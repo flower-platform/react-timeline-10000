@@ -17,6 +17,7 @@ import {DynamicConfigurationTestsAreDemo} from './testsAreDemo/DynamicConfigurat
 import { BackgroundLayersTestsAreDemo } from './testsAreDemo/BackgroundLayersTestsAreDemo';
 import { DisplayItemOnSeparateRowIfOverlapTestsAreDemo } from './testsAreDemo/DisplayItemOnSeparateRowIfOverlapTestsAreDemo';
 import { ZoomTestsAreDemo } from './testsAreDemo/ZoomTestsAreDemo';
+import { NowMarkerTestsAreDemo } from './testsAreDemo/NowMarkerTestsAreDemo';
 
 ReactDOM.render(
   <TestsAreDemoAppWrapper
@@ -30,6 +31,7 @@ ReactDOM.render(
         TableTestsAreDemo,
         DynamicConfigurationTestsAreDemo,
         BackgroundLayersTestsAreDemo,
+        NowMarkerTestsAreDemo,
         DisplayItemOnSeparateRowIfOverlapTestsAreDemo,
         ZoomTestsAreDemo
       );

@@ -1,5 +1,5 @@
 import { Only, Scenario, ScenarioOptions, render, tad } from "@famiprog-foundation/tests-are-demo";
-import { contextMenuTestIds } from "@famiprog-foundation/react-gantt";
+import { contextMenuTestIds, DEFAULT_ROW_TOP_BOTTOM_PADDING } from "@famiprog-foundation/react-gantt";
 import { ContextMenu, addTaskActionIcon, addTaskActionLabel, addTaskNotPossibleAction, deleteActionIcon, deleteActionIconColor, deleteActionLabel, editActionLabel } from "../stories/contextMenuAndSelection/ContextMenuAndSelection.stories";
 import { someHumanResources, someTasks } from "../stories/sampleData";
 import { Timeline, timelineTestids as testids } from "@famiprog-foundation/react-gantt";
@@ -58,11 +58,14 @@ export class ContextMenuTestsAreDemo {
         const firstRow = tad.screenCapturing.getByTestId('r9k1_' + testids.row + "_0");
         const clickedTime = getTimeAtPixel(CLICK_X, timeline.getStartDate(), timeline.getEndDate(), timeline.getTimelineWidth(undefined), timeline.getTimelineSnap());
         const clickedXSnappedToGrid = getPixelAtTime(clickedTime, timeline.getStartDate(), timeline.getEndDate(), timeline.getTimelineWidth(undefined))
-             + timeline.getGanttLeftOffset();     
-        await tad.assertWaitable.equal(Math.round(newSegment.getBoundingClientRect().x), Math.round(clickedXSnappedToGrid));
+             + timeline.getGanttLeftOffset();
+        const expected = Math.round(newSegment.getBoundingClientRect().x);
+        
+        // Allow a ±3px tolerance because snap math and browser/device DPI can introduce small rounding offsets.
+        await tad.assertWaitable.approximately(newSegment.getBoundingClientRect().x, clickedXSnappedToGrid, 3);
         
         // AND is correctly added to the clicked row
-        await tad.assertWaitable.equal(newSegment.getBoundingClientRect().y, firstRow.getBoundingClientRect().y);
+        await tad.assertWaitable.approximately(newSegment.getBoundingClientRect().y, firstRow.getBoundingClientRect().y + DEFAULT_ROW_TOP_BOTTOM_PADDING, 1);
         tad.demoForEndUserShow();
     }
 

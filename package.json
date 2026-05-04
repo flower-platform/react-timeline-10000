@@ -1,6 +1,6 @@
 {
   "name": "@crispico/react-timeline-10000",
-  "version": "v2.8.1",
+  "version": "v2.12.0",
   "description": "Performance focused timeline for react",
   "private": false,
   "types": "./types/index.d.ts",
@@ -38,6 +38,7 @@
     "@babel/preset-env": "^7.23.2",
     "@babel/preset-react": "^7.22.15",
     "@babel/preset-typescript": "^7.23.2",
+    "@types/lodash": "^4.17.20",
     "babel-loader": "^8.2.5",
     "chai": "^4.1.2",
     "core-js": "^2.4.0",
@@ -62,13 +63,13 @@
     "style-loader": "^0.21.0",
     "tern": "^0.21.0",
     "ts-loader": "^9.4.2",
-    "typescript": "~4.6.0"
+    "typescript": "~5.3.0"
   },
   "dependencies": {
-    "@famiprog-foundation/tests-are-demo": "^1.2.1",
+    "@famiprog-foundation/tests-are-demo": "^1.4.1",
     "color": "^4.2.3",
     "core-js": "^2.4.0",
-    "fixed-data-table-2": "^1.2.17",
+    "fixed-data-table-2": "2.0.6",
     "interactjs": "^1.6.2",
     "lodash": "^4.17.19",
     "moment": "^2.22.2",

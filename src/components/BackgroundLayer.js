@@ -2,8 +2,8 @@ import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import {convertDateToMoment} from '../utils/timeUtils';
-import {Marker} from './Marker';
 import {HighlightedInterval} from './HighlightedInterval';
+import {NowMarker} from './NowMarker';
 import moment from 'moment';
 
 /**
@@ -143,7 +143,25 @@ export class BackgroundLayer extends React.Component {
      *
      * @type { Array.<object>}
      */
-    verticalGridLines: PropTypes.arrayOf(PropTypes.object)
+    verticalGridLines: PropTypes.arrayOf(PropTypes.object),
+
+    /**
+     * When true, if the now marker is in the display interval, a timer updates the now marker position every second.
+     * Also the gantt scrolls accordingly to maintain the now indicator in the visible area.
+     * @type { boolean }
+     */
+    nowMarkerLiveUpdate: PropTypes.bool,
+    /**
+     * Interval in milliseconds for the now marker live update. Defaults to 3*60*1000 (3 minutes).
+     * @type { number }
+     */
+    nowMarkerLiveUpdateInterval: PropTypes.number,
+
+    /**
+     * Internal (passed by parent).
+     * @type {(delta: number) => void}
+     */
+    onNowMarkerUpdate: PropTypes.func
   };
 
   static defaultProps = {
@@ -164,7 +182,10 @@ export class BackgroundLayer extends React.Component {
     width: undefined,
     leftOffset: undefined,
     startDateTimeline: undefined,
-    endDateTimeline: undefined
+    endDateTimeline: undefined,
+    nowMarkerLiveUpdate: false,
+    nowMarkerLiveUpdateInterval: undefined,
+    onNowMarkerUpdate: () => {}
   };
 
   constructor(props) {
@@ -213,7 +234,7 @@ export class BackgroundLayer extends React.Component {
       startAsMoment,
       'milliseconds'
     );
-    const left = this.props.leftOffset + offset * pixelsPerMillis;
+    const left = Math.round(this.props.leftOffset + offset * pixelsPerMillis);
     let width = Math.round(duration * pixelsPerMillis);
     return {left, width};
   }
@@ -318,35 +339,29 @@ export class BackgroundLayer extends React.Component {
     );
   }
 
-  renderNowMarker() {
-    const {nowMarker, height, topOffset, nowMarkerClassName} = this.props;
-    const currentDate = moment();
-    const overlappsDisplayedInterval =
-      this.props.startDateTimeline.isSameOrBefore(currentDate) && this.props.endDateTimeline.isSameOrAfter(currentDate);
-    return (
-      <Fragment>
-        {nowMarker && overlappsDisplayedInterval && (
-          <Marker
-            date={currentDate}
-            top={0}
-            height={height + topOffset}
-            shouldUpdate={this.state.shouldUpdate}
-            calculateHorizontalPosition={this.calculateHorizontalPosition}
-            className={`rct9k-background-layer-now-marker ${nowMarkerClassName}`}
-            style={this.props.nowMarkerStyle}
-          />
-        )}
-      </Fragment>
-    );
-  }
-
   render() {
     return (
       <div className="rct9k-background-layer-wrapper">
         <div className="rct9k-background-layer">
           {this.renderHighlightedWeekends()}
           {this.renderCustomComponents(this.props.highlightedIntervals)}
-          {this.renderNowMarker()}
+          {this.props.nowMarker && (
+            <NowMarker
+              // Use a negative number to differentiate from the other markers testIds that starts from 0
+              id={-1}
+              nowMarkerClassName={this.props.nowMarkerClassName}
+              nowMarkerStyle={this.props.nowMarkerStyle}
+              height={this.props.height}
+              topOffset={this.props.topOffset}
+              startDateTimeline={this.props.startDateTimeline}
+              endDateTimeline={this.props.endDateTimeline}
+              calculateHorizontalPosition={this.calculateHorizontalPosition}
+              shouldUpdate={this.state.shouldUpdate}
+              liveUpdate={this.props.nowMarkerLiveUpdate}
+              liveUpdateInterval={this.props.nowMarkerLiveUpdateInterval}
+              onUpdate={this.props.onNowMarkerUpdate}
+            />
+          )}
           {this.renderCustomComponents(this.props.markers)}
           {this.renderVerticalGrid()}
         </div>

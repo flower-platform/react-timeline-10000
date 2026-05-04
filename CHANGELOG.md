@@ -1,6 +1,31 @@
 ## Unreleased
 
 * [Small fix for selection box](https://github.com/flower-platform/react-timeline-10000/pull/84/files)
+* [Add `nowMarkerLiveUpdate` property that live updates the now marker](https://github.com/flower-platform/react-timeline-10000/pull/108)
+* [Fix scrollbars that hide content on gantt/table](https://github.com/flower-platform/react-timeline-10000/pull/103)
+* [Drag to create can start on top of an existing item](https://github.com/flower-platform/react-timeline-10000/pull/101)
+
+## v2.12.0
+
+* [Fix exception when zooming or resizing window due to undefined grid reference](https://github.com/flower-platform/react-timeline-10000/pull/107)
+* [Add public api for zoom in/out](https://github.com/flower-platform/react-timeline-10000/pull/106)
+
+## v2.11.0
+
+* [Prevented wrong segments on empty rows by giving them IDs with a special prefix](https://github.com/flower-platform/react-timeline-10000/pull/102)
+* [Fix to avoid rendering of the context menu and scrollbar at every mouse move](https://github.com/flower-platform/react-timeline-10000/pull/99)
+* [Add `scrollToItem` feature](https://github.com/flower-platform/react-timeline-10000/pull/100)
+* [Fix `onItemHover` and `onItemLeave` firing too often on items with children](https://github.com/flower-platform/react-timeline-10000/pull/98)
+* [Change color used for BackgroundGradient](https://github.com/flower-platform/react-timeline-10000/pull/96)
+* [Add `verticalGapBetweenOverlappingItems` and `rowTopBottomPadding` properties](https://github.com/flower-platform/react-timeline-10000/pull/97)
+
+## v2.10.0
+
+* [Default split size](https://github.com/flower-platform/react-timeline-10000/pull/94/files)
+
+## v2.9.0
+
+* [Fix to allow variable row heights + programmatic scroll](https://github.com/flower-platform/react-timeline-10000/pull/69/files) 
 * [Small fix for resize cursor size](https://github.com/flower-platform/react-timeline-10000/pull/89/files)
 
 ## v2.8.0, v2.8.1

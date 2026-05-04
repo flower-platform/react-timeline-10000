@@ -1,6 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {convertDateToMoment} from '../utils/timeUtils';
+import {createTestids} from '@famiprog-foundation/tests-are-demo';
+
+const testIds = createTestids('Marker', {marker: ''});
+export const markerTestIds = testIds;
 
 /**
  * A `Marker` is a component draws a vertical line.
@@ -57,7 +61,14 @@ export class Marker extends React.Component {
      *
      * @type { boolean }
      */
-    shouldUpdate: PropTypes.bool
+    shouldUpdate: PropTypes.bool,
+
+    /**
+     * Internal (passed by parent). `Marker` uses this to set data-testid of the underlying element
+     *
+     * @type { number }
+     */
+    id: PropTypes.number
   };
 
   static defaultProps = {
@@ -66,7 +77,8 @@ export class Marker extends React.Component {
     height: undefined,
     top: undefined,
     calculateHorizontalPosition: () => {},
-    shouldUpdate: false
+    shouldUpdate: false,
+    id: undefined
   };
 
   shouldComponentUpdate(nextProps) {
@@ -103,6 +115,12 @@ export class Marker extends React.Component {
   }
 
   render() {
-    return <hr className={this.getClassName()} style={this.getStyle()} />;
+    return (
+      <hr
+        className={this.getClassName()}
+        style={this.getStyle()}
+        data-testid={'r9k1_' + testIds.marker + '_' + this.props.id}
+      />
+    );
   }
 }

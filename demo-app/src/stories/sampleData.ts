@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 import { Group, Item } from '@famiprog-foundation/react-gantt';
 
 ////////////////////////////////////////////////////////
@@ -85,3 +85,66 @@ export const manyHumanResources: Employee[] = [...someHumanResources, { id: 4, t
 { id: 25, title: 'David D. Brown', job: 'Developer'},
 { id: 26, title: 'Michael E. Smith', job: 'Developer'},
 { id: 27, title: 'David E. Brown', job: 'Developer'}];
+
+const ITEM_DURATIONS = [moment.duration(6, 'hours'), moment.duration(12, 'hours'), moment.duration(18, 'hours')];
+const COLORS = ['#0099cc', '#f03a36', '#06ad96', '#fce05b', '#dd5900', '#cc6699'];
+
+export const [lotsOfGroups, lotsOfItems] = generateRandomRowsAndItems(100, 30, true, 60, moment('2018-07-31'),  moment('2018-10-30'));
+
+export function generateRandomRowsAndItems(numberOfRows, numberOfItemsPerRow: number, useMoment: boolean, snap: number, minDate: Moment, maxDate: Moment): [Group[], Item[]] {
+  const lotsOfGroups:Group[] = [];
+  const lotsOfItems:Item[] = [];
+
+  if (lotsOfGroups.length == 0) {
+    for (let i = 0; i < numberOfRows; i++) {
+      const randomGroupWithItems = generateRandomRow(i, numberOfItemsPerRow, useMoment, snap, minDate,  maxDate);  
+      lotsOfGroups.push(randomGroupWithItems[0]);
+      lotsOfItems.push(...randomGroupWithItems[1]);
+    }
+  }
+  return [lotsOfGroups, lotsOfItems];
+}
+
+export function generateRandomRow(rowIndex:number, numberOfItemsPerRow: number, useMoment: boolean, snap: number, minDate: Moment, maxDate: Moment): [Group, Item[]] {
+  const row = {id: rowIndex, title: `Row ${rowIndex}`, description: `Description for row ${rowIndex}`};
+  const items = [];
+  let key = rowIndex * numberOfItemsPerRow - 1;
+  for (let j = 0; j < numberOfItemsPerRow; j++) {
+    key += 1;
+    const colorIndex = (rowIndex + j) % (COLORS.length + 1);
+    const color = colorIndex != COLORS.length + 1 ? COLORS[colorIndex] : '';
+    const gradientStop = Math.random() * 100;
+    let glowOnHover = false;
+    let tooltip;
+    if ((rowIndex + j) % 3 === 0) {
+      glowOnHover = true;
+      tooltip = 'Item with key=' + key;
+    }
+    const duration = ITEM_DURATIONS[Math.floor(Math.random() * ITEM_DURATIONS.length)];
+    let start = moment(
+      Math.floor(
+        Math.random() * (maxDate.valueOf() - minDate.valueOf()) + minDate.valueOf()
+      )
+    );
+    let end = start.clone().add(duration);
+
+    // Round to the nearest snap distance
+    const roundedStartSeconds = Math.floor(start.second() / snap) * snap;
+    const roundedEndSeconds = Math.floor(end.second() / snap) * snap;
+    start.second(roundedStartSeconds);
+    end.second(roundedEndSeconds);
+
+    items.push({
+      key: key,
+      title: duration.humanize(),
+      color,
+      row: rowIndex,
+      start: useMoment ? start : start.valueOf(),
+      end: useMoment ? end : end.valueOf(),
+      glowOnHover,
+      gradientStop,
+      tooltip
+    });
+  }
+  return [row, items]
+}    
