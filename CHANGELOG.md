@@ -1,5 +1,6 @@
 ## Unreleased
 
+* [Small fix for selection box](https://github.com/flower-platform/react-timeline-10000/pull/84/files)
 * [Add `nowMarkerLiveUpdate` property that live updates the now marker](https://github.com/flower-platform/react-timeline-10000/pull/108)
 * [Fix scrollbars that hide content on gantt/table](https://github.com/flower-platform/react-timeline-10000/pull/103)
 * [Drag to create can start on top of an existing item](https://github.com/flower-platform/react-timeline-10000/pull/101)

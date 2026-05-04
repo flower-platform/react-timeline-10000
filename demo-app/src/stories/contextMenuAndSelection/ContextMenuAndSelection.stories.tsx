@@ -143,3 +143,7 @@ export const Selection = () => {
         ...Object.keys(selectionScenarios).map(key => selectionScenarios[key])
     ]
 };
+
+export const SelectionInModal = () => {
+    return (<ModalExt style={{ width: '70%', height: '70%' }} open={true} content={<Selection />} />);
+};

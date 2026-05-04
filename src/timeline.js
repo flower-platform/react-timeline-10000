@@ -2,7 +2,7 @@
 
 import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
-import ReactDOM from 'react-dom';
+import ReactDOM, {createPortal} from 'react-dom';
 import Measure from 'react-measure';
 
 import interact from 'interactjs';
@@ -2497,10 +2497,13 @@ export default class Timeline extends React.Component {
                   onTouchStart={this.onTouchStart}
                   onTouchMove={this.onTouchMove}
                   onTouchEnd={this.onTouchEnd}>
-                  <SelectBox
-                    ref={this.select_ref_callback}
-                    className={this.getDragToCreateMode() ? 'rct9k-selector-outer-add' : ''}
-                  />
+                  {createPortal(
+                    <SelectBox
+                      ref={this.select_ref_callback}
+                      className={this.getDragToCreateMode() ? 'rct9k-selector-outer-add' : ''}
+                    />,
+                    document.body
+                  )}
                   <Timebar
                     componentId={this.props.componentId}
                     cursorTime={this.getCursor()}
