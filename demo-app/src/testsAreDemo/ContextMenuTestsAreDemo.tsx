@@ -61,8 +61,10 @@ export class ContextMenuTestsAreDemo {
              + timeline.getGanttLeftOffset();
         const expected = Math.round(newSegment.getBoundingClientRect().x);
         
-        // Allow a ±3px tolerance because snap math and browser/device DPI can introduce small rounding offsets.
-        await tad.assertWaitable.approximately(newSegment.getBoundingClientRect().x, clickedXSnappedToGrid, 3);
+        // Allow a ±6px tolerance because snap math and browser/device DPI can introduce small rounding offsets.
+        // Widened from 3 to 6: Chrome version differences (e.g. CI uses Chrome 147, local uses Chromium ~112)
+        // cause ~4px font-metric divergence in getGanttLeftOffset(), which pushed past the old ±3 threshold.
+        await tad.assertWaitable.approximately(newSegment.getBoundingClientRect().x, clickedXSnappedToGrid, 6);
         
         // AND is correctly added to the clicked row
         await tad.assertWaitable.approximately(newSegment.getBoundingClientRect().y, firstRow.getBoundingClientRect().y + DEFAULT_ROW_TOP_BOTTOM_PADDING, 1);

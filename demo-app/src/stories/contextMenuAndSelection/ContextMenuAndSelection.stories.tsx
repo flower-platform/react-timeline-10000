@@ -2,7 +2,7 @@ import { createTestids } from '@famiprog-foundation/tests-are-demo';
 import { Alert } from 'antd';
 import moment from 'moment';
 import { useState } from 'react';
-import { Button, Icon, Menu } from 'semantic-ui-react';
+import { Button, Icon, Menu, Modal } from 'semantic-ui-react';
 import { Timeline, IGanttAction, IGanttOnContextMenuShowParam, Item } from '@famiprog-foundation/react-gantt';
 import { d, someHumanResources, someTasks } from '../sampleData';
 import { contextMenuScenarios, selectionScenarios } from './ContextMenuAndSelectionScenarios';
@@ -145,5 +145,5 @@ export const Selection = () => {
 };
 
 export const SelectionInModal = () => {
-    return (<ModalExt style={{ width: '70%', height: '70%' }} open={true} content={<Selection />} />);
+    return (<Modal style={{ width: '70%', height: '70%' }} open={true} content={<Selection />} />);
 };

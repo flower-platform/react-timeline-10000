@@ -5,7 +5,6 @@ import { Table, Column, DataCell } from 'fixed-data-table-2';
 import Timeline from '../../../../src/timeline';
 import SplitPane from 'react-split-pane';
 import { Checkbox, Form, Radio } from 'semantic-ui-react';
-import { Zoom } from '@crispico/foundation-react/components/Zoom/Zoom';
 import { createTestids } from '@famiprog-foundation/tests-are-demo';
 
 export default {

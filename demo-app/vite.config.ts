@@ -53,11 +53,25 @@ export default defineConfig({
     alias: {
       // duplicated in tsconfig.json
       "@famiprog-foundation/react-gantt": "/../src",
-      // W/ this line, we use foundation as a linked dir. To switch to "use as lib", comment this, and add in package.json, in dependencies:
-      // "@crispico/foundation-react": "link:../../foundation-jhipster-gwt/foundation-react/dist/foundation-react",
-      // For the "storybook" script, I think "yarn docs" needs to be removed. There seems to be a dependency issue, which I didn't look into
-      "@crispico/foundation-react": "/../../foundation-jhipster-gwt/foundation-react/src/foundation-react"
+      
+      // TODO RM41475
+      // // W/ this line, we use foundation as a linked dir. To switch to "use as lib", comment this, and add in package.json, in dependencies:
+      // // "@crispico/foundation-react": "link:../../foundation-jhipster-gwt/foundation-react/dist/foundation-react",
+      // // For the "storybook" script, I think "yarn docs" needs to be removed. There seems to be a dependency issue, which I didn't look into
+      // "@crispico/foundation-react": "/../../foundation-jhipster-gwt/foundation-react/src/foundation-react"
     }
+  },
+  build: {
+    // Required for TestsAreDemo: the TAD UI displays source code and the @Scenario decorator fetches .map files
+    // at runtime to resolve comments/sourceFile info. Without sourcemaps the fetch returns a 404 HTML page,
+    // JSON.parse fails, getSourceCodeState() returns undefined, and the promise executor silently hangs =>
+    // testClassDescriptors is never set => 0 tests shown.
+    sourcemap: true,
+  },
+  esbuild: {
+    // Preserve class/function names so TestsAreDemo can identify test classes by name (testClass.name) in production builds.
+    // Without this, minification mangles class names (e.g. TableTestsAreDemo → t), breaking the test registry.
+    keepNames: true,
   },
   // JSX in .js files, part 2
   optimizeDeps: {

@@ -1,0 +1,30 @@
+name: Demo App Test
+
+# Runs when the event matches a listed branch (push / PR base branch). Forks: enable Actions under
+# Repo Settings → Actions → General, or workflows never run.
+on:
+  push:
+    branches:
+      - master
+      - main
+      - master-flower-platform
+  pull_request:
+    branches:
+      - master
+      - main
+      - master-flower-platform
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/puppeteer/puppeteer:latest
+      options: --user root
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run demo-app tests
+        working-directory: demo-app
+        run: . ./docker/setup-puppeteer.sh && yarn test
