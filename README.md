@@ -64,6 +64,14 @@ The solution for this problem was mentioned here: https://dev.to/hontas/using-vi
 
 Even the above solution worked for our case, we don't understand very good from were the old library version was taken from. Because in our case, even if we removed the ```node_modules/.cached```, an old version of the library was used (could be that it was requested from the npm registry, because in ```package.json``` the old version was referenced). 
 
+## Testing (TAD)
+
+The `demo-app` uses `TAD` (see `*TestsAreDemo.tsx`).
+
+For numbers derived from **layout** (pixel positions/sizes, or time from pixel math), prefer **`approximately`** with a small tolerance (usually **`delta = 1`**) instead of strict **`equal`**. Browsers, resolution, and DPI often cause differences of **≤ 1 px** without a logic bug.
+
+Use a **larger delta** (e.g. **2–3 px**) only after you’ve verified there isn’t a real bug. Document *why* a wider tolerance is acceptable so it doesn’t hide incorrect behavior.
+
 ## Tracking of the pull requests submitted to the upstream repo
 
 We prefix our issues in the upstream repo w/ `[rt10000]`.

@@ -2,10 +2,11 @@ import { Timeline, getPixelAtTime, getTimeAtPixel, timebarTestIds } from "@famip
 import { Scenario, render, tad } from "@famiprog-foundation/tests-are-demo";
 import moment from "moment";
 import { markerTestIds } from "../../../src/components/Marker";
-import { Main, backgroundLayerStoriesTestIds, month } from "../stories/backgroundLayer/BackgroundLayer.stories";
+import { Main, nowMarkerStoriesTestIds } from "../stories/nowMarker/NowMarker.stories";
 
-const TIME1 = month.clone().add(2, 'day');
-const TIME2 = month.clone().add(4, 'day');
+const now = moment(Date.now());
+const TIME1 = now.clone();
+const TIME2 = now.clone().add(2, 'minute');
 
 export class NowMarkerTestsAreDemo {
 
@@ -75,7 +76,7 @@ export class NowMarkerTestsAreDemo {
             const initialNowMarkerPosition = Math.round(nowMarker.getBoundingClientRect().x - ganttLeftOffset);
 
             tad.ref('GIVEN');
-            await tad.userEventWaitable.click(tad.screenCapturing.getByTestId(backgroundLayerStoriesTestIds.liveUpdateCheckbox));
+            await tad.userEventWaitable.click(tad.screenCapturing.getByTestId(nowMarkerStoriesTestIds.liveUpdateCheckbox));
             await new Promise(r => setTimeout(r, 1000));
 
             tad.ref('WHEN');
@@ -88,7 +89,7 @@ export class NowMarkerTestsAreDemo {
             const time2Px = Math.round(this.getPixelsAtTime(TIME2));
             // If we put the focus on the now marker, the popup from the tad library appears below the now indicator
             // A extra scrollbar to appears causing a 9px difference from the expected
-            tad.screenCapturing.getByTestId("r9k1_" + timebarTestIds.timebarItem + "_12") as HTMLElement | null;
+            tad.screenCapturing.getByTestId("r9k1_" + timebarTestIds.timebarItem + "_0") as HTMLElement | null;
             await tad.assertWaitable.equal(Math.round(nowMarker.getBoundingClientRect().x - ganttLeftOffset), time2Px);
 
             tad.ref('AND');
@@ -99,7 +100,7 @@ export class NowMarkerTestsAreDemo {
             // Rest the time back to Time1
             this.nowMockUp(moment(TIME1));
             await tad.cc("Reset the live update checkbox");
-            await tad.userEventWaitable.click(tad.screenCapturing.getByTestId(backgroundLayerStoriesTestIds.liveUpdateCheckbox));
+            await tad.userEventWaitable.click(tad.screenCapturing.getByTestId(nowMarkerStoriesTestIds.liveUpdateCheckbox));
         }
     }
 
@@ -121,14 +122,14 @@ export class NowMarkerTestsAreDemo {
         const initialX = getNowMarkerX();
 
         tad.ref('GIVEN');
-        await tad.userEventWaitable.click(tad.screenCapturing.getByTestId(backgroundLayerStoriesTestIds.liveUpdateCheckbox));
+        await tad.userEventWaitable.click(tad.screenCapturing.getByTestId(nowMarkerStoriesTestIds.liveUpdateCheckbox));
         await new Promise(r => setTimeout(r, 1000));
 
         tad.ref('WHEN1');
         await tad.showSpotlight({ message: "The now marker updates but not instantly (only after nowMarkerLiveUpdateInterval i.e. 1 second)", focusOnLastElementCaptured: false });
         this.nowMockUp(moment(TIME2));
         await new Promise(r => setTimeout(r, 200)); // < 1000ms
-        tad.screenCapturing.getByTestId("r9k1_" + timebarTestIds.timebarItem + "_12") as HTMLElement | null;
+        tad.screenCapturing.getByTestId("r9k1_" + timebarTestIds.timebarItem + "_0") as HTMLElement | null;
         
         tad.ref('THEN1');
         await tad.assertWaitable.equal(Math.round(nowMarker.getBoundingClientRect().x - ganttLeftOffset), Math.round(initialX));
@@ -141,7 +142,7 @@ export class NowMarkerTestsAreDemo {
         const expectedLeft = this.getPixelsAtTime(TIME2);
         await tad.assertWaitable.equal(Math.round(getNowMarkerX()), Math.round(expectedLeft));
 
-        await tad.userEventWaitable.click(tad.screenCapturing.getByTestId(backgroundLayerStoriesTestIds.liveUpdateCheckbox));
+        await tad.userEventWaitable.click(tad.screenCapturing.getByTestId(nowMarkerStoriesTestIds.liveUpdateCheckbox));
     }
 
     getPixelsAtTime(date) {

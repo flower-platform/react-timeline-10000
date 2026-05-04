@@ -83,8 +83,12 @@ export class NowMarker extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.liveUpdate !== prevProps.liveUpdate) {
+    if (
+      this.props.liveUpdate !== prevProps.liveUpdate ||
+      this.props.liveUpdateInterval !== prevProps.liveUpdateInterval
+    ) {
       if (this.props.liveUpdate) {
+        this.clearTimer();
         this.startTimer();
       } else {
         this.clearTimer();

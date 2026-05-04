@@ -90,6 +90,11 @@
   padding-top: 2px;
 }
 
+/* 
+  These inline SVGs used below mimics the browser default scrollbar arrows in order for our custom horizontal scrollbar to look the same as the native one.
+  This inline declaration allows to tweak its color/size easily without maintaining separate image assets.  
+*/
+
 .rct9k-horizontal-scrollbar-outter.rct9k-scrollbar-with-arrows::-webkit-scrollbar-button:horizontal:decrement {
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpolygon fill='%23ACACAC' points='12,3 4,8 12,13'/%3E%3C/svg%3E")
     no-repeat center;
