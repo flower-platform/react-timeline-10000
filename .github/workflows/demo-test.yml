@@ -15,6 +15,12 @@ on:
       - master-flower-platform
   workflow_dispatch:
 
+# Required for GitHub Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -28,3 +34,22 @@ jobs:
       - name: Run demo-app tests
         working-directory: demo-app
         run: . ./docker/setup-puppeteer.sh && yarn test
+
+      # demo-app/dist is produced by "yarn build" inside "yarn test"
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: demo-app/dist
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    # Only deploy on push events, not on PRs (avoids publishing unreviewed code)
+    if: github.event_name != 'pull_request'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
