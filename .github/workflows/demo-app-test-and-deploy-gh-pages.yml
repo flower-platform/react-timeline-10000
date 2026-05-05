@@ -1,4 +1,4 @@
-name: Demo App Test
+name: demo-app-test-and-deploy-gh-pages
 
 # Runs when the event matches a listed branch (push / PR base branch). Forks: enable Actions under
 # Repo Settings → Actions → General, or workflows never run.
