@@ -1,6 +1,6 @@
 # React Timeline 10000 (forked by the Flower Platform team)
 
-## About `demo-app`
+## About `demo-app` (available at: https://flower-platform.github.io/react-timeline-10000/)
 
 Previously, there was a single project containing the lib + demo app. Now, the demo, scenarios, tests are demo: exist in the `demo-app` subproject. 
 
