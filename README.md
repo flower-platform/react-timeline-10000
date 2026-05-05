@@ -86,6 +86,18 @@ We prefix our issues in the upstream repo w/ `[rt10000]`.
 | minor | React9k/react-timeline-9000#260 | yes |
 | React9k/react-timeline-9000#271 | React9k/react-timeline-9000#272 |  |
 
+## Deps from `@famiprog-foundation/...`, `@crispico/...`
+
+Are published in an internal NPM repo. If the test fails complaining about this, here is the process:
+
+```sh
+# if on a PC w/ access to the internal NPM repo, this will download it from that repo
+npm pack @famiprog-foundation/utils@1.0.0
+tar zxf famiprog-foundation-scriptable-ui-2.0.1.tgz
+cd package
+npm publish --access public --@famiprog-foundation:registry=https://registry.npmjs.org/
+```
+
 ## Original `README.md` of the upstream repo is below
 
 ---

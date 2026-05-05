@@ -1120,13 +1120,13 @@
 
 "@crispico/foundation-gwt-js@^1.4.0":
   version "1.4.0"
-  resolved "http://csp-dev-tools.lan/nexus/repository/npm-public/@crispico/foundation-gwt-js/-/foundation-gwt-js-1.4.0.tgz#f8006fa4bde7b4cd10de2b769c5e98815f35df1c"
-  integrity sha512-p7j+OxT3dcO6fOxS1ISIvsJuiteIMjkXBrjHetwajUKFoDDsyJ+Pe/Enog3yzLxg/6PcfQ+jNbtheEWK9sI2rQ==
+  resolved "https://registry.yarnpkg.com/@crispico/foundation-gwt-js/-/foundation-gwt-js-1.4.0.tgz#f65f282166edff3e2287559d2cf58ebd10a07b2c"
+  integrity sha512-TMCjnpv+pE/tJ9EYrkIjSb1cwVvouUR/8tWzeDLfhJm/C8tMqMFA62uMwdwzxQVTUlVI5NWccEBm85ueAVn13g==
 
 "@famiprog-foundation/scriptable-ui@^2.0.1":
   version "2.0.1"
-  resolved "http://csp-dev-tools.lan/nexus/repository/npm-public/@famiprog-foundation/scriptable-ui/-/scriptable-ui-2.0.1.tgz#ce8e8266db8aeecfcca2f72b8c130032930aa9b1"
-  integrity sha512-+tqGfKxs9kvlAygrKzOHX5Zb7BeNXJid+JIdyuPD9G7UJqABIm2y9Q32DnJJXA0y51n7oJmF0RiHPX0/ffqwmw==
+  resolved "https://registry.yarnpkg.com/@famiprog-foundation/scriptable-ui/-/scriptable-ui-2.0.1.tgz#5a366136ffecbc1adb1617bf08ed0a48f808824b"
+  integrity sha512-S25Wh36lIg91qpj+1XaNkG9wQlBuGL0zTAPKLySuXTeZBPyaJsmeXcLqyszoPNYR2XWQGS/J1nUIMUCgV9ic3A==
   dependencies:
     "@crispico/foundation-gwt-js" "^1.4.0"
     "@famiprog-foundation/utils" "^1.0.0"
@@ -1138,8 +1138,8 @@
 
 "@famiprog-foundation/tests-are-demo@^1.4.1":
   version "1.4.1"
-  resolved "https://nexus.xops-online.com/repository/npm-public/@famiprog-foundation/tests-are-demo/-/tests-are-demo-1.4.1.tgz#f7b0da07cac726deccd140c5598800969647cc89"
-  integrity sha512-UbkqoFheGJ8tebo5yOl8EmqTxKCOici04YPqcJ9IGl5oTsZONlwwPnXESKxS8eSYzyGoGYmbULkffkKai23LYQ==
+  resolved "https://registry.yarnpkg.com/@famiprog-foundation/tests-are-demo/-/tests-are-demo-1.4.1.tgz#4d578bfa54ab6da2b571a134ffc0f6b5ead426ec"
+  integrity sha512-SkLHXSvMjk3hfWd8aMoAKf/SBmoV+afr2oBqMH0RqoIwyWjDvu6p6vOXQrqNNKnD2UlyOlhOCc5EAsqbfA3j7w==
   dependencies:
     "@famiprog-foundation/scriptable-ui" "^2.0.1"
     "@famiprog-foundation/utils" "^1.0.0"
@@ -1163,8 +1163,8 @@
 
 "@famiprog-foundation/utils@^1.0.0":
   version "1.0.0"
-  resolved "http://csp-dev-tools.lan/nexus/repository/npm-public/@famiprog-foundation/utils/-/utils-1.0.0.tgz#bba2d4481ccb45c1bdea4cb72e7d924cb37b41c4"
-  integrity sha512-Z62/zh2PYTRwn2pxY72/FtlOI703abyd8KmqIkmJH59V3AIunQKJafvAppey2Vace3/819xilX05nuKOBe4HNQ==
+  resolved "https://registry.yarnpkg.com/@famiprog-foundation/utils/-/utils-1.0.0.tgz#02a92a825244c5865cf044a56d46d89548ea09f0"
+  integrity sha512-GRBMtKWxrkmgDNpt5trgPYXLW88u71OWw0KsfI5i6Lr01C6wfIywRINnOaFEnSOO9bls7bxc0nGj/kR7bQJPhw==
 
 "@fluentui/react-component-event-listener@~0.63.0":
   version "0.63.1"
