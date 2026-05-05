@@ -1,6 +1,6 @@
 ## Unreleased
 
-## v2.12.0
+## v2.13.0
 
 * Added script to run tests in CI/CD of GitHub. And then deploy the result to GH Pages, i.e. https://flower-platform.github.io/react-timeline-10000/
 * [Small fix for selection box](https://github.com/flower-platform/react-timeline-10000/pull/84/files)
