@@ -35,7 +35,14 @@ jobs:
         working-directory: demo-app
         run: . ./docker/setup-puppeteer.sh && yarn test
 
-      # demo-app/dist is produced by "yarn build" inside "yarn test"
+      # Tests ran with base='/' (so puppeteer hits localhost:4173/ directly).
+      # Now rebuild with the GitHub Pages subpath so asset URLs are correct in the deployment.
+      - name: Rebuild for GitHub Pages (correct base path)
+        working-directory: demo-app
+        env:
+          VITE_BASE_URL: /react-timeline-10000/
+        run: yarn build
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

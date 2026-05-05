@@ -4,6 +4,9 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // When building for GitHub Pages (served at a subpath), set VITE_BASE_URL to the subpath,
+  // e.g. VITE_BASE_URL=/react-timeline-10000/. Defaults to '/' for local dev and test builds.
+  base: process.env.VITE_BASE_URL || '/',
   plugins: [
     // because some lib was accessing "global"
     nodePolyfills({
