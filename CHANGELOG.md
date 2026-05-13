@@ -1,5 +1,7 @@
 ## Unreleased
 
+* [Add `allowSelectionRectangleFromItems` property]()
+
 ## v2.13.0
 
 * Added script to run tests in CI/CD of GitHub. And then deploy the result to GH Pages, i.e. https://flower-platform.github.io/react-timeline-10000/
