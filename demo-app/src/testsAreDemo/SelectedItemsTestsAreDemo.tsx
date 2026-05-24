@@ -1,8 +1,8 @@
-import { Only, Scenario, ScenarioOptions, render, tad } from "@famiprog-foundation/tests-are-demo";
+import { Timeline, timelineTestids as testids } from "@famiprog-foundation/react-gantt";
+import { Scenario, ScenarioOptions, render, tad } from "@famiprog-foundation/tests-are-demo";
 import { assert } from "chai";
 import { Selection, selectionStoryTestIds } from "../stories/contextMenuAndSelection/ContextMenuAndSelection.stories";
 import { someTasks } from "../stories/sampleData";
-import { Timeline, timelineTestids as testids } from "@famiprog-foundation/react-gantt";
 import { rightClick } from "./testUtils";
 
 /**
@@ -10,6 +10,11 @@ import { rightClick } from "./testUtils";
 */
 export class SelectedItemsTestsAreDemo {
     async before() {
+        // Forces any previous TAD story (e.g. DragToCreate's Main) before mounting Selection.
+        // Going straight to render (<Selection />) leave interact.js in a bad state 
+        // and interact drag events aren't triggered by tad.drag() 
+        // Drag to select doesn't work without rendering this empty component.
+        render(<></>);
         render(<Selection />);
     }
 
@@ -287,37 +292,57 @@ export class SelectedItemsTestsAreDemo {
         tad.demoForEndUserShow();
     }
 
+    /**
+     * * GIVEN The `allowSelectionRectangleFromItems` checkbox is toggled (default)
+     * * WHEN I drag to select an item starting from an item
+     * * THEN that item is selected 
+     */
+    @Scenario() 
+    @ScenarioOptions({linkWithNextScenario: true}) 
+    async whenDragASelectionRectangleStartingFromAnItem1() {
+        // reset the selection first
+        await tad.userEventWaitable.click(tad.screenCapturing.getByTestId('r9k1_' + testids.row + "_0"));
+        tad.ref("GIVEN");
+        tad.ref("WHEN");
+        await this.dragToSelect(0, 1, 0, 3, false, false, false, true);
+        tad.ref("THEN");
+        await this.assertOnlyExpectedSegmentsAreSelected([0, 3], true);
+    }
+    
+    /**
+     * * GIVEN The `allowSelectionRectangleFromItems` checkbox is untoggled
+     * * WHEN I drag to select an item starting from an item
+     * * THEN nothing is selected
+     */
+    @Scenario() 
+    @ScenarioOptions({linkWithNextScenario: true}) 
+    async whenDragASelectionRectangleStartingFromAnItem2() {
+        // await tad.userEventWaitable.click(tad.screenCapturing.getByTestId('r9k1_' + testids.row + "_0"));
+        tad.ref("GIVEN");
+        await tad.userEventWaitable.click(tad.screenCapturing.getByTestId(selectionStoryTestIds.allowSelectionRectangleFromItemsCheckbox));
+        tad.ref("WHEN");
+        await this.dragToSelect(0, 1, 0, 3, false, false, false, true);
+        tad.ref("THEN");
+        await this.assertOnlyExpectedSegmentsAreSelected([0], true);
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////
     ////// Helper methods
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    async dragToSelect(startingRowIndex, endingRowIndex, startingSegmentIndex, endingSegmentIndex, rightClick?, ctrlKey = false, shiftKey = false) {
+    async dragToSelect(startingRowIndex, endingRowIndex, startingSegmentIndex, endingSegmentIndex, rightClick?, ctrlKey = false, shiftKey = false, startOnTopOfSegment = false) {
         let startingRow = tad.screenCapturing.getByTestId('r9k1_' + testids.row + "_" + startingRowIndex);
-        let startingRowRect = startingRow.getBoundingClientRect();
         let endingRow = tad.screenCapturing.getByTestId('r9k1_' + testids.row + "_" + endingRowIndex);
-        let endingRowRect = endingRow.getBoundingClientRect();
-        const startingSegmentRect = tad.screenCapturing.getByTestId('r9k1_' + testids.item + "_" + startingSegmentIndex).getBoundingClientRect();
+        let startingSegment = tad.screenCapturing.getByTestId('r9k1_' + testids.item + "_" + startingSegmentIndex);
         const endingSegmentRect = tad.screenCapturing.getByTestId('r9k1_' + testids.item + "_" + endingSegmentIndex).getBoundingClientRect();
-        const deltaX = endingSegmentRect.x + endingSegmentRect.width - startingSegmentRect.x;
-        const deltaY = endingRowRect.y + endingRowRect.height - startingRowRect.y;
-
-        // The drag to select with right click is not a nativelly supported type of drag. So the timeline uses two implementations for supporting
-        // 1. Drag to select on left click: based on interact js library triggered by native events dragStart, dragMove, dragEnd. 
-        // These events can not be tested using testing-library (we have tried using fireEvent.mouseDown, mouseOver, and mouseUp, but with no success). That's why the "cheat" was needed
-        // 2. Drag to select on right click: triggered by mouseDown, mouseMove, mouseUp events
-        if (rightClick) {
-            // There was a bug when having a large DPI of the screen e.g. 170
-            // Don't know why then the startingRowRect.y was not an integer (e.g. 256.789). Even if the TAD.drag() triggers the mouse event on this y floating value,
-            // when interactjs library catched this event it sees the Y as an integer (e.g. 256). Because 256.789 was the exact begining of the
-            // row, when timeline searches the row at position 256 it gets the previous row instead of the correct row. So applying Math.ceil fixed the problem 
-            await tad.drag(startingRow, {from: {x: startingSegmentRect.x, y: Math.ceil(startingRowRect.y)}, to: {x: endingSegmentRect.x + endingSegmentRect.width, y: endingRowRect.y + endingRowRect.height - 5}, options: {button: 2, ctrlKey: ctrlKey, shiftKey: shiftKey}});
-        } else {
-            // 150 is the group offset
-            // we needed to subtract -5 because else the selection rectangle (that snapps to row) will get till the endingRow + 1, instead endingRow
-            tad.getObjectViaCheat(Timeline, 'r9k1').dragStart(startingRow, startingSegmentRect.x - 150);
-            await tad.getObjectViaCheat(Timeline, 'r9k1').dragMove(deltaX, deltaY - 5, 5);
-            tad.getObjectViaCheat(Timeline, 'r9k1').dragEnd({ ctrlKey: ctrlKey, shiftKey: shiftKey });
+        
+        const dragParams = { 
+            from: { x: startingSegment.getBoundingClientRect().x, y: Math.ceil(startingRow.getBoundingClientRect().y) }, 
+            to: { x: endingSegmentRect.x + endingSegmentRect.width, y: endingRow.getBoundingClientRect().y + endingRow.getBoundingClientRect().height - 5 }, 
+            options: { button: rightClick ? 2 : 0, ctrlKey: ctrlKey, shiftKey: shiftKey } 
         }
+        const dragTarget = startOnTopOfSegment ? startingSegment : startingRow;
+        await tad.drag(dragTarget, dragParams);  
     }
 
     async assertOnlyExpectedSegmentsAreSelected(expectedSelectedSegments: number[], demoForEndUserHide?) {
