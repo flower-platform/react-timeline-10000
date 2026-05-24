@@ -1,5 +1,7 @@
 ## Unreleased
 
+## v2.14.0
+
 * [Add `allowSelectionRectangleFromItems` property](https://github.com/flower-platform/react-timeline-10000/pull/112)
 
 ## v2.13.0
