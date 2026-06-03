@@ -34,25 +34,20 @@ export class ZoomTestsAreDemo {
             deltaInterval *= -1;
         }
         let startDate = moment(Math.max((this.timeline.getMinDate() as unknown as moment.Moment).valueOf(), moment(start).valueOf() + delta * deltaInterval));
-        let endDate = moment(Math.min((this.timeline.getMaxDate() as unknown as moment.Moment).valueOf(), moment(end).valueOf() - (1 - delta) * deltaInterval));
+        let endDate = moment(Math.min((this.timeline.getMaxDateWithExtraMsForScrollbar() as unknown as moment.Moment).valueOf(), moment(end).valueOf() - (1 - delta) * deltaInterval));
         return { expetedStartDate: startDate, expetedEndDate: endDate };
     }
 
     @Scenario("WHEN the gantt was maxim zoom out AND click on zoom out, THEN the startDate and endDate not changed")
     async whenMaxZoomOutClickZoomOut() {
-        // When initially opened, the gantt has a small horizontal scroll to be able to see what is behind the vertical scroll
-        // That's why you can zoom out once
+        const initialStartDate = this.timeline.state.startDate;
+        const initialEndDate = this.timeline.state.endDate;
+        
         this.openContextMenu();
         const popup = tad.screenCapturing.getByTestId(contextMenuTestIds.popup);
         await tad.userEventWaitable.click(tad.withinCapturing(popup).getByTestId(contextMenuTestIds.menuItem + "_1"));
         
         // Here the gantt is maximum zoomed out
-        const initialStartDate = this.timeline.state.startDate;
-        const initialEndDate = this.timeline.state.endDate;
-        
-        this.openContextMenu();
-        await tad.userEventWaitable.click(tad.withinCapturing(popup).getByTestId(contextMenuTestIds.menuItem + "_1"));
-        this.focusOnTimebar();
         await tad.assertWaitable.equal(moment(initialStartDate).valueOf(), moment(this.timeline.state.startDate).valueOf());
         await tad.assertWaitable.equal(moment(initialEndDate).valueOf(), moment(this.timeline.state.endDate).valueOf());
     }
