@@ -1,7 +1,7 @@
 'use strict';
 
-import React, {Fragment} from 'react';
 import PropTypes from 'prop-types';
+import React, {Fragment} from 'react';
 import ReactDOM, {createPortal} from 'react-dom';
 import Measure from 'react-measure';
 
@@ -40,14 +40,14 @@ import {
 
 // startsWith polyfill for IE11 support
 import 'core-js/fn/string/starts-with';
-import SplitPane, {Size, SplitPaneProps} from 'react-split-pane';
 import 'fixed-data-table-2/dist/fixed-data-table.css';
-import ItemRenderer from './components/ItemRenderer';
-import {SelectionHolder} from './utils/SelectionHolder';
-import {IGanttAction} from './types';
-import {ContextMenu} from './components/ContextMenu/ContextMenu';
 import moment from 'moment';
-import {Direction, SCROLLBAR_SIZE, Scrollbar} from './components/Scrollbar';
+import SplitPane, {Size, SplitPaneProps} from 'react-split-pane';
+import {ContextMenu} from './components/ContextMenu/ContextMenu';
+import ItemRenderer from './components/ItemRenderer';
+import {SCROLLBAR_SIZE, Scrollbar} from './components/Scrollbar';
+import {IGanttAction} from './types';
+import {SelectionHolder} from './utils/SelectionHolder';
 
 const testids = createTestids('Timeline', {
   menuButton: '',
@@ -348,6 +348,15 @@ export default class Timeline extends React.Component {
     timelineMode: PropTypes.number,
 
     /**
+     * When true, the gesture for creating the selection / drag-to-create rectangle
+     * can start also from item segments (`.item_draggable`) not only from empty gantt area.
+     *
+     * @default true
+     * @type { boolean }
+     */
+    allowSelectionRectangleFromItems: PropTypes.bool,
+
+    /**
      * @type { object }
      */
     timebarFormat: PropTypes.object,
@@ -559,6 +568,7 @@ export default class Timeline extends React.Component {
     showCursorTime: true,
     itemRenderer: ItemRenderer,
     timelineMode: Timeline.TIMELINE_MODES.SELECT | Timeline.TIMELINE_MODES.DRAG | Timeline.TIMELINE_MODES.RESIZE,
+    allowSelectionRectangleFromItems: true,
     // in rtl9k
     // shallowUpdateCheck: false,
     shallowUpdateCheck: true,
@@ -850,8 +860,10 @@ export default class Timeline extends React.Component {
     const {timelineMode, selectedItems} = this.props;
     const selectionChange = !_.isEqual(prevProps.selectedItems, selectedItems);
     const timelineModeChange = !_.isEqual(prevProps.timelineMode, timelineMode);
+    const allowSelectionRectangleFromItemsChange =
+      prevProps.allowSelectionRectangleFromItems !== this.props.allowSelectionRectangleFromItems;
 
-    if (timelineModeChange || selectionChange) {
+    if (timelineModeChange || selectionChange || allowSelectionRectangleFromItemsChange) {
       const canSelect = Timeline.isBitSet(Timeline.TIMELINE_MODES.SELECT, timelineMode);
       const canDrag = Timeline.isBitSet(Timeline.TIMELINE_MODES.DRAG, timelineMode);
       const canResize = Timeline.isBitSet(Timeline.TIMELINE_MODES.RESIZE, timelineMode);
@@ -1827,7 +1839,9 @@ export default class Timeline extends React.Component {
       this._selectRectangleInteractable
         .draggable({
           enabled: true,
-          ignoreFrom: '.rct9k-group, .rct9k-timebar'
+          ignoreFrom: this.props.allowSelectionRectangleFromItems
+            ? '.rct9k-group, .rct9k-timebar'
+            : '.item_draggable, .rct9k-group, .rct9k-timebar'
         })
         .styleCursor(false)
         .on('dragstart', e => {
