@@ -110,7 +110,7 @@ export const DRAG_TO_CREATE_ACTION_LABEL = 'Drag to create';
 export const ZOOM_IN_ACTION_LABEL = 'Zoom in';
 export const ZOOM_OUT_ACTION_LABEL = 'Zoom out';
 export const ZOOM_RESET_ACTION_LABEL = 'Zoom reset';
-const MINI_BUTTON_HEIGHT = 54;
+const MINI_BUTTON_HEIGHT = 27;
 /**
  * Timeline class
  * @extends React.Component<Timeline.propTypes>
@@ -778,7 +778,6 @@ export default class Timeline extends React.Component {
           startDate: this.props.useMoment ? moment(this.props.startDate) : this.props.startDate,
           endDate: this.props.useMoment ? moment(this.props.endDate) : this.props.endDate
         });
-        params.dontCloseContextMenuAfterRunAutomatically = true;
         that.startFadeOutEffect('Zoom reset');
       }
     };
@@ -1175,10 +1174,11 @@ export default class Timeline extends React.Component {
       });
     });
 
+    const maxDateWithExtraMs = this.getMaxDateWithExtraMsForScrollbar();
     let maxVisibleItems = _.filter(items, i => {
       return (
         this.getEndFromItem(i, useMoment) > this.getMinDate() &&
-        this.getStartFromItem(i, useMoment) < this.getMaxDateWithExtraMsForScrollbar()
+        this.getStartFromItem(i, useMoment) < maxDateWithExtraMs
       );
     });
     let maxVisibleItemsRows = _.groupBy(maxVisibleItems, 'row');
