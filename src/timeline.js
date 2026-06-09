@@ -109,6 +109,8 @@ const TableWithStyle = ({table}) => {
 export const DRAG_TO_CREATE_ACTION_LABEL = 'Drag to create';
 export const ZOOM_IN_ACTION_LABEL = 'Zoom in';
 export const ZOOM_OUT_ACTION_LABEL = 'Zoom out';
+export const ZOOM_RESET_ACTION_LABEL = 'Zoom reset';
+const MINI_BUTTON_HEIGHT = 27;
 /**
  * Timeline class
  * @extends React.Component<Timeline.propTypes>
@@ -749,7 +751,7 @@ export default class Timeline extends React.Component {
     this.ZOOM_IN_ACTION = {
       label: ZOOM_IN_ACTION_LABEL,
       icon: 'zoom-in',
-      run: param => {
+      run: params => {
         let event = new MouseEvent('wheel', {
           ctrlKey: true,
           clientX: that._gridDomNode.getBoundingClientRect().x + that._grid.props.width / 2,
@@ -758,14 +760,14 @@ export default class Timeline extends React.Component {
         });
         event.deltaY = -1;
         that._gridDomNode.dispatchEvent(event);
-        param.closeContextMenu();
+        params.dontCloseContextMenuAfterRunAutomatically = true;
         that.startFadeOutEffect('Zoomed in');
       }
     };
     this.ZOOM_OUT_ACTION = {
       label: ZOOM_OUT_ACTION_LABEL,
       icon: 'zoom-out',
-      run: param => {
+      run: params => {
         let event = new MouseEvent('wheel', {
           ctrlKey: true,
           clientX: that._gridDomNode.getBoundingClientRect().x + that._grid.props.width / 2,
@@ -774,8 +776,19 @@ export default class Timeline extends React.Component {
         });
         event.deltaY = 1;
         that._gridDomNode.dispatchEvent(event);
-        param.closeContextMenu();
+        params.dontCloseContextMenuAfterRunAutomatically = true;
         that.startFadeOutEffect('Zoomed out');
+      }
+    };
+    this.ZOOM_RESET_ACTION = {
+      label: ZOOM_RESET_ACTION_LABEL,
+      icon: 'search',
+      run: params => {
+        this.setState({
+          startDate: this.props.useMoment ? moment(this.props.startDate) : this.props.startDate,
+          endDate: this.props.useMoment ? moment(this.props.endDate) : this.props.endDate
+        });
+        that.startFadeOutEffect('Zoom reset');
       }
     };
   }
@@ -994,12 +1007,19 @@ export default class Timeline extends React.Component {
    * @returns {moment}
    */
   getMaxDate() {
-    let end;
     if (this.props.maxDate) {
-      end = convertDateToMoment(this.props.maxDate, this.props.useMoment);
+      return convertDateToMoment(this.props.maxDate, this.props.useMoment);
     } else {
-      end = convertDateToMoment(this.props.endDate, this.props.useMoment);
+      return convertDateToMoment(this.props.endDate, this.props.useMoment);
     }
+  }
+
+  /**
+   * Adds a buffer to the maximum time to prevent the vertical scrollbar from cutting off content.
+   * @returns {moment}
+   */
+  getMaxDateWithExtraMsForScrollbar() {
+    let end = this.getMaxDate();
     const width = this.state.gridWidth;
     // This calculation is fragile as it depends on the internal DOM structure of react-virtualized's Grid.
     const virtualizedGridFirstChild = this._gridDomNode ? this._gridDomNode.firstChild : undefined;
@@ -1166,9 +1186,11 @@ export default class Timeline extends React.Component {
       });
     });
 
+    const maxDateWithExtraMs = this.getMaxDateWithExtraMsForScrollbar();
     let maxVisibleItems = _.filter(items, i => {
       return (
-        this.getEndFromItem(i, useMoment) > this.getMinDate() && this.getStartFromItem(i, useMoment) < this.getMaxDate()
+        this.getEndFromItem(i, useMoment) > this.getMinDate() &&
+        this.getStartFromItem(i, useMoment) < maxDateWithExtraMs
       );
     });
     let maxVisibleItemsRows = _.groupBy(maxVisibleItems, 'row');
@@ -2300,7 +2322,7 @@ export default class Timeline extends React.Component {
   /**
    * @returns { JSX.Element }
    */
-  renderMenuButton() {
+  renderMenuButton(timebarHeight) {
     return (
       <Popup
         data-testid={this.props.componentId + '_' + testids.dragToCreatePopup}
@@ -2311,6 +2333,11 @@ export default class Timeline extends React.Component {
           <Button
             data-testid={this.props.componentId + '_' + testids.menuButton}
             size="mini"
+            /*
+            This `mini` button looks ok if it has smaller height than the timebar top bar.  
+            We shrink the button to a custom `micro` button when the top bar is smaller than a `mini` button (arround 27 px).
+            */
+            className={timebarHeight / 2 <= MINI_BUTTON_HEIGHT ? 'rct9k-micro-btn' : ''}
             circular
             primary
             icon="bars"
@@ -2379,6 +2406,7 @@ export default class Timeline extends React.Component {
     if (this.props.showZoomShortcuts) {
       actions.push(this.ZOOM_IN_ACTION);
       actions.push(this.ZOOM_OUT_ACTION);
+      actions.push(this.ZOOM_RESET_ACTION);
     }
     return (
       actions.length > 0 &&
@@ -2558,7 +2586,7 @@ export default class Timeline extends React.Component {
                   />
                   <Scrollbar
                     minScrollPosition={this.getMinDate().valueOf()}
-                    maxScrollPosition={this.getMaxDate().valueOf()}
+                    maxScrollPosition={this.getMaxDateWithExtraMsForScrollbar().valueOf()}
                     scrollPosition={this.getStartDate().valueOf()}
                     pageSize={this.getEndDate().valueOf() - this.getStartDate().valueOf()}
                     hasArrows={true}
@@ -2595,7 +2623,7 @@ export default class Timeline extends React.Component {
                       verticalGridLines: this.state.verticalGridLines,
                       onNowMarkerUpdate: this.onNowMarkerUpdate
                     })}
-                  <div className="rct9k-menu-div">{this.renderMenuButton()}</div>
+                  <div className="rct9k-menu-div">{this.renderMenuButton(timebarHeight)}</div>
                 </div>
               </div>
             );

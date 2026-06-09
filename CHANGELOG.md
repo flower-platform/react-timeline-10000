@@ -1,5 +1,7 @@
 ## Unreleased
 
+* [Smaller menu button when smaller timebar + new "Zoom reset" action + fix zoom out to maximum bug](https://github.com/flower-platform/react-timeline-10000/pull/113)
+
 ## v2.14.0
 
 * [Add `allowSelectionRectangleFromItems` property](https://github.com/flower-platform/react-timeline-10000/pull/112)

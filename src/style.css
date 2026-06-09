@@ -473,3 +473,9 @@
 .rct9k-timebar-item {
   border-left-color: #ccc !important;
 }
+
+.rct9k-micro-btn {
+  padding: 0.6em !important;
+  width: 24px;
+  height: 24px;
+}
