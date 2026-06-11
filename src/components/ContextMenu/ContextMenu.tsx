@@ -33,15 +33,15 @@ const testids = createTestids('ContextMenu', {
 });
 export const contextMenuTestIds = testids;
 
-const CONTEXT_MENU_ID = "CONTEXT_MENU_ID";
-
 export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: boolean, x: number, y: number }> {
+
+  id = _.uniqueId("ContextMenu");
 
   constructor(props) {
     super(props);
     this.close = this.close.bind(this);
     this.state = {
-      isOpened: props.positionToOpen ? true : false, x: 0, y: 0
+      isOpened: props.positionToOpen ? true : false, x: this.props.positionToOpen?.x ?? 0, y: this.props.positionToOpen?.y ?? 0
     }
   }
 
@@ -57,9 +57,9 @@ export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: 
   }
 
   componentDidMount(): void {
-    this.props.positionToOpen && this.setState({ x: this.props.positionToOpen.x, y: this.props.positionToOpen.y }, () => {
-      this.props.positionToOpen && this.adjustPopup(this.props.positionToOpen.x, this.props.positionToOpen.y)
-    });
+    if (this.props.positionToOpen) {
+      this.adjustPopup(this.props.positionToOpen.x, this.props.positionToOpen.y);
+    }
   }
 
   componentDidUpdate(prevProps: Readonly<ContextMenuProps>, prevState: Readonly<{}>, snapshot?: any): void {
@@ -83,7 +83,7 @@ export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: 
    */
   adjustPopup(x: number, y: number) {
     // Get the current dimensions of the popup element
-    const { width, height } = document.getElementById(CONTEXT_MENU_ID)?.getBoundingClientRect() || {} as DOMRect;
+    const { width = 0, height = 0 } = document.getElementById(this.id)?.getBoundingClientRect() || {} as DOMRect;
 
     let finalX = x, finalY = y;
     // If the popup overflows the right edge of the screen, flip it to the left side of the cursor
@@ -125,7 +125,7 @@ export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: 
     const visibleActions = this.getVisisbleActions(this.props.actions);
     return <>
       <TestsAreDemoCheat objectToPublish={this} />
-      <Popup id={CONTEXT_MENU_ID} basic wide='very' data-testid={testids.popup} context={this.getPopupContext()}
+      <Popup id={this.id} basic wide='very' data-testid={testids.popup} context={this.getPopupContext()}
         style={{ maxHeight: '80vh', maxWidth: '80vh', overflow: 'auto' }}
         positionFixed
         onClose={() => {
