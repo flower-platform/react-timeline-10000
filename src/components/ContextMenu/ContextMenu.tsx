@@ -98,8 +98,8 @@ export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: 
       finalY = Math.max(0, y - height);
     }
 
-    // Update the component state with the safe, adjusted coordinates
-    this.setState({ x: finalX, y: finalY })
+    // Update the component state with the safe, adjusted coordinates and mark as adjusted
+    this.setState({ x: finalX, y: finalY, isAdjusted: true })
   }
 
   getPopupContext(): HTMLElement {
