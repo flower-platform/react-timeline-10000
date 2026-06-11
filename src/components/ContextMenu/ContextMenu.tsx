@@ -41,7 +41,7 @@ export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: 
     super(props);
     this.close = this.close.bind(this);
     this.state = {
-      isOpened: props.positionToOpen ? true : false, x: this.props.positionToOpen?.x ?? 0, y: this.props.positionToOpen?.y ?? 0
+      isOpened: props.positionToOpen ? true : false, x: props.positionToOpen?.x ?? 0, y: props.positionToOpen?.y ?? 0
     }
   }
 
