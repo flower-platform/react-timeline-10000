@@ -73,7 +73,7 @@ export class ContextMenu extends React.Component<ContextMenuProps, ContextMenuSt
 
   componentDidUpdate(prevProps: Readonly<ContextMenuProps>, prevState: Readonly<{}>, snapshot?: any): void {
     if (!_.isEqual(this.props.positionToOpen, prevProps.positionToOpen)) {
-      this.setState({ isOpened: this.props.positionToOpen ? true : false, x: this.props.positionToOpen?.x ?? 0, y: this.props.positionToOpen?.y ?? 0 }, () => {
+      this.setState({ isAdjusted: false, isOpened: this.props.positionToOpen ? true : false, x: this.props.positionToOpen?.x ?? 0, y: this.props.positionToOpen?.y ?? 0 }, () => {
         this.props.positionToOpen && this.adjustPopup(this.props.positionToOpen.x, this.props.positionToOpen.y)
       });
     }
