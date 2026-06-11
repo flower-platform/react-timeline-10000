@@ -60,7 +60,8 @@ export class ContextMenu extends React.Component<ContextMenuProps, ContextMenuSt
       !_.isEqual(nextProps.paramsForAction, this.props.paramsForAction) ||
       nextState.x !== this.state.x ||
       nextState.y !== this.state.y ||
-      nextState.isOpened !== this.state.isOpened
+      nextState.isOpened !== this.state.isOpened ||
+      nextState.isAdjusted !== this.state.isAdjusted
     );
   }
 
