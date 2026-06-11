@@ -33,19 +33,27 @@ const testids = createTestids('ContextMenu', {
 });
 export const contextMenuTestIds = testids;
 
-export class ContextMenu extends React.Component<ContextMenuProps, { isOpened?: boolean, x: number, y: number }> {
+export type ContextMenuState = {
+  isOpened?: boolean,
+  isAdjusted: boolean,
+  x: number,
+  y: number,
+}
+
+export class ContextMenu extends React.Component<ContextMenuProps, ContextMenuState> {
 
   id = _.uniqueId("ContextMenu");
 
-  constructor(props) {
+  constructor(props: ContextMenuProps) {
     super(props);
     this.close = this.close.bind(this);
     this.state = {
-      isOpened: props.positionToOpen ? true : false, x: props.positionToOpen?.x ?? 0, y: props.positionToOpen?.y ?? 0
+      isOpened: props.positionToOpen ? true : false, isAdjusted: false,
+      x: props.positionToOpen?.x ?? 0, y: props.positionToOpen?.y ?? 0
     }
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps: ContextMenuProps, nextState: ContextMenuState) {
     return (
       !_.isEqual(this.props.positionToOpen, nextProps.positionToOpen) ||
       !_.isEqual(nextProps.actions, this.props.actions) ||
