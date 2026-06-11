@@ -137,6 +137,7 @@ export class ContextMenu extends React.Component<ContextMenuProps, ContextMenuSt
       <Popup id={this.id} basic wide='very' data-testid={testids.popup} context={this.getPopupContext()}
         style={{ maxHeight: '80vh', maxWidth: '80vw', overflow: 'auto', visibility: this.state.isAdjusted ? 'visible' : 'hidden' }}
         positionFixed
+        position='bottom left'
         onClose={() => {
           this.close();
         }} open={(this.state.isOpened && visibleActions.length > 0)}>
