@@ -1,6 +1,6 @@
 ## Unreleased
 
-* [Zoom shortcuts in context menu only on gantt area, not on item context menu]()
+* [Zoom shortcuts in context menu only on gantt area, not on item context menu](https://github.com/flower-platform/react-timeline-10000/pull/115)
 
 ## v2.15.0
 
