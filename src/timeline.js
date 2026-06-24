@@ -748,6 +748,11 @@ export default class Timeline extends React.Component {
         param.closeContextMenu();
       }
     };
+    const ZOOM_BASE_ACTION = {
+      isVisible(param) {
+        return param.selection.length === 0;
+      }
+    };
     this.ZOOM_IN_ACTION = {
       label: ZOOM_IN_ACTION_LABEL,
       icon: 'zoom-in',
@@ -762,7 +767,8 @@ export default class Timeline extends React.Component {
         that._gridDomNode.dispatchEvent(event);
         params.dontCloseContextMenuAfterRunAutomatically = true;
         that.startFadeOutEffect('Zoomed in');
-      }
+      },
+      ...ZOOM_BASE_ACTION
     };
     this.ZOOM_OUT_ACTION = {
       label: ZOOM_OUT_ACTION_LABEL,
@@ -778,7 +784,8 @@ export default class Timeline extends React.Component {
         that._gridDomNode.dispatchEvent(event);
         params.dontCloseContextMenuAfterRunAutomatically = true;
         that.startFadeOutEffect('Zoomed out');
-      }
+      },
+      ...ZOOM_BASE_ACTION
     };
     this.ZOOM_RESET_ACTION = {
       label: ZOOM_RESET_ACTION_LABEL,
@@ -789,7 +796,8 @@ export default class Timeline extends React.Component {
           endDate: this.props.useMoment ? moment(this.props.endDate) : this.props.endDate
         });
         that.startFadeOutEffect('Zoom reset');
-      }
+      },
+      ...ZOOM_BASE_ACTION
     };
   }
 
@@ -2033,7 +2041,8 @@ export default class Timeline extends React.Component {
             this.props.verticalGapBetweenOverlappingItems,
             this.props.rowTopBottomPadding,
             this.props.zIndexFunction,
-            rowIndex
+            rowIndex,
+            this.props.componentId
           )}
           {rowLayerRenderer(
             layersInRow,

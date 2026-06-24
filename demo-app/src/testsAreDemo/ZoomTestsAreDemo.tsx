@@ -3,7 +3,7 @@ import moment from "moment";
 import { rightClick } from "./testUtils";
 import { contextMenuTestIds } from "../../../src/components/ContextMenu/ContextMenu";
 import { zoomStoriesTestIds } from "../stories/zoom/Zoom.stories";
-import Timeline, { ZOOM_PERCENT, timelineTestids as testids } from "../../../src/timeline";
+import Timeline, { ZOOM_IN_ACTION_LABEL, ZOOM_OUT_ACTION_LABEL, ZOOM_PERCENT, ZOOM_RESET_ACTION_LABEL, timelineTestids as testids } from "../../../src/timeline";
 import { Main } from "../stories/zoom/Zoom.stories";
 
 export class ZoomTestsAreDemo {
@@ -41,6 +41,45 @@ export class ZoomTestsAreDemo {
         let endDate = moment(Math.min((this.timeline.getMaxDateWithExtraMsForScrollbar() as unknown as moment.Moment).valueOf(), moment(end).valueOf() - (1 - delta) * deltaInterval));
         return { expetedStartDate: startDate, expetedEndDate: endDate };
     }
+
+    /**
+     * * WHEN right click on gantt area
+     * * THEN the zoom actions are available on the CM
+     */
+    @Scenario()
+    async whenRightClickOnGanttArea() {
+        tad.ref("WHEN");
+        const firstRow = tad.screenCapturing.getByTestId('2_' + testids.row + "_0");
+        rightClick(firstRow, {
+            clientX: Math.round(firstRow.getBoundingClientRect().x) + 40,
+            clientY: Math.round(firstRow.getBoundingClientRect().y) + 40
+        });
+
+        tad.ref("THEN");
+        const popup = tad.screenCapturing.getByTestId(contextMenuTestIds.popup);
+        await tad.assertWaitable.exists(popup);
+        await tad.assertWaitable.equal(tad.withinCapturing(popup).getByTestId(contextMenuTestIds.menuItem + "_0").textContent, ZOOM_IN_ACTION_LABEL);
+        await tad.assertWaitable.equal(tad.withinCapturing(popup).getByTestId(contextMenuTestIds.menuItem + "_1").textContent, ZOOM_OUT_ACTION_LABEL);
+        await tad.assertWaitable.equal(tad.withinCapturing(popup).getByTestId(contextMenuTestIds.menuItem + "_2").textContent, ZOOM_RESET_ACTION_LABEL);
+    }
+
+    /**
+     * * WHEN right click on an item
+     * * THEN the zoom actions are not available on the CM
+     */
+    @Scenario()
+    async whenRightClickOnAnItem() {
+        tad.ref("WHEN");
+        const segment = tad.screenCapturing.getByTestId('2_' + testids.item + "_0");
+        const rect = segment.getBoundingClientRect();
+        rightClick(segment, {
+            clientX: Math.round(rect.x + rect.width / 2),
+            clientY: Math.round(rect.y + rect.height / 2)
+        });
+        tad.ref("THEN");
+        await tad.assertWaitable.notExists(tad.screenCapturing.queryByTestId(contextMenuTestIds.popup));
+    }
+
 
     @Scenario("WHEN the gantt was maxim zoom out AND click on zoom out, THEN the startDate and endDate not changed")
     async whenMaxZoomOutClickZoomOut() {
