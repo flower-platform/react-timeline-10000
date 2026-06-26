@@ -55,7 +55,7 @@ export class ContextMenu extends React.Component<ContextMenuProps, ContextMenuSt
 
   shouldComponentUpdate(nextProps: ContextMenuProps, nextState: ContextMenuState) {
     return (
-      this.props.positionToOpen != nextProps.positionToOpen ||
+       nextProps.positionToOpen !== this.props.positionToOpen ||
       !_.isEqual(nextProps.actions, this.props.actions) ||
       !_.isEqual(nextProps.paramsForAction, this.props.paramsForAction) ||
       nextState.x !== this.state.x ||
