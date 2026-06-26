@@ -222,7 +222,7 @@ export class BackgroundLayer extends React.Component {
    */
   calculateHorizontalPosition(start, end) {
     const intervalMillis = this.props.endDateTimeline.diff(this.props.startDateTimeline, 'milliseconds');
-    const pixelsPerMillis = (this.props.width - this.props.leftOffset) / intervalMillis;
+    const pixelsPerMillis = intervalMillis === 0 ? 0 : (this.props.width - this.props.leftOffset) / intervalMillis;
     const startAsMoment = convertDateToMoment(start);
     const endAsMoment = convertDateToMoment(end);
     if (endAsMoment.isBefore(this.props.startDateTimeline) || startAsMoment.isAfter(this.props.endDateTimeline)) {

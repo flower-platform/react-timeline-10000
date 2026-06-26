@@ -27,7 +27,7 @@ export function timeSnap(time, snapMilliseconds) {
  */
 export function pixelsPerMillisecond(vis_start, vis_end, total_width) {
   const start_end_ms = vis_end.diff(vis_start, 'milliseconds');
-  return total_width / start_end_ms;
+  return start_end_ms === 0 ? 0 : total_width / start_end_ms;
 }
 
 /**
@@ -84,7 +84,7 @@ export function getDurationFromPixels(pixels, vis_start, vis_end, total_width) {
   const start_end_ms = vis_end.diff(vis_start, 'milliseconds');
   if (start_end_ms === 0) return moment.duration(0, 'milliseconds');
   const pixels_per_ms = total_width / start_end_ms;
-  let millis = pixels / pixels_per_ms;
+  let millis = pixels_per_ms === 0 ? 0 : pixels / pixels_per_ms;
   return moment.duration(millis, 'milliseconds');
 }
 
