@@ -1,6 +1,6 @@
 ## Unreleased
 
-* [Fix blank page when resizing gantt to minimum width]()
+* [Fix blank page when resizing gantt to minimum width](https://github.com/flower-platform/react-timeline-10000/pull/116)
 
 ## v2.15.0
 
