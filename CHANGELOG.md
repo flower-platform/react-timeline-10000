@@ -1,5 +1,7 @@
 ## Unreleased
 
+* [ContextMenu: scrollable and always visible](https://github.com/flower-platform/react-timeline-10000/pull/114/changes)
+
 ## v2.15.0
 
 * [Smaller menu button when smaller timebar + new "Zoom reset" action + fix zoom out to maximum bug](https://github.com/flower-platform/react-timeline-10000/pull/113)
