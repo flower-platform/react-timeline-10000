@@ -35,7 +35,8 @@ export function rowItemsRenderer(
   verticalGapBetweenOverlappingItems,
   rowTopBottomPadding,
   zIndexFunction,
-  rowIndex
+  rowIndex,
+  timelineComponentId = 'r9k1'
 ) {
   const start_end_ms = vis_end.diff(vis_start, 'milliseconds');
   const pixels_per_ms = total_width / start_end_ms;
@@ -79,7 +80,7 @@ export function rowItemsRenderer(
 
     return (
       <span
-        data-testid={'r9k1_' + timelineTestids.item + '_' + i.key}
+        data-testid={timelineComponentId + '_' + timelineTestids.item + '_' + i.key}
         key={i.key}
         data-item-index={i.key}
         className={outerClassnames}
