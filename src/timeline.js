@@ -750,7 +750,7 @@ export default class Timeline extends React.Component {
     };
     const ZOOM_BASE_ACTION = {
       isVisible(param) {
-        return param.selection.length === 0;
+        return !param || !param.selection || param.selection.length === 0;
       }
     };
     this.ZOOM_IN_ACTION = {
