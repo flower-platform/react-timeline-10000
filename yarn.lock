@@ -1136,10 +1136,10 @@
     react-measure "^2.5.2"
     react-syntax-highlighter "^15.5.0"
 
-"@famiprog-foundation/tests-are-demo@^1.4.1":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@famiprog-foundation/tests-are-demo/-/tests-are-demo-1.4.1.tgz#4d578bfa54ab6da2b571a134ffc0f6b5ead426ec"
-  integrity sha512-SkLHXSvMjk3hfWd8aMoAKf/SBmoV+afr2oBqMH0RqoIwyWjDvu6p6vOXQrqNNKnD2UlyOlhOCc5EAsqbfA3j7w==
+"@famiprog-foundation/tests-are-demo@^1.4.2":
+  version "1.4.2"
+  resolved "https://nexus.xops-online.com/repository/npm-public/@famiprog-foundation/tests-are-demo/-/tests-are-demo-1.4.2.tgz#90896eab40aef6e0e422335010b6a12aaac83529"
+  integrity sha512-EsJIvZXWEEn/Jk86h/MU/0Jzq/XITfw6Ra2tbFZJbDTJL+ONSGBI0yoPLRQKnPbFZfDW2CKx6ktXDm42MP4TRw==
   dependencies:
     "@famiprog-foundation/scriptable-ui" "^2.0.1"
     "@famiprog-foundation/utils" "^1.0.0"

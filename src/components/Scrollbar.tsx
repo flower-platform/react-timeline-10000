@@ -170,7 +170,7 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
     onScroll() {
         const unit_per_px = this.state.scrollbarSize === 0 ? 0 : this.props.pageSize / this.state.scrollbarSize;
         const scrollPositionInPixels = this.props.direction == Direction.HORIZONTAL ? this._outterDiv.scrollLeft : this._outterDiv.scrollTop;
-        this.props.onScroll(this.props.minScrollPosition + unit_per_px * scrollPositionInPixels);
+        this.props.onScroll?.(this.props.minScrollPosition + unit_per_px * scrollPositionInPixels);
     }
 
     getInnerDivSize(): number {
