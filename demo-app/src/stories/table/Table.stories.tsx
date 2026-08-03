@@ -84,4 +84,3 @@ export const ProvidingCustomTable: ComponentStory<typeof Timeline> = () => {
 ProvidingCustomTable.parameters = {
     scenarios: [...Object.keys(tableScenarios).map(key => tableScenarios[key])]
 }
-

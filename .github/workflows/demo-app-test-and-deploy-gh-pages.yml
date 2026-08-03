@@ -1,0 +1,62 @@
+name: demo-app-test-and-deploy-gh-pages
+
+# Runs when the event matches a listed branch (push / PR base branch). Forks: enable Actions under
+# Repo Settings → Actions → General, or workflows never run.
+on:
+  push:
+    branches:
+      - master
+      - main
+      - master-flower-platform
+  pull_request:
+    branches:
+      - master
+      - main
+      - master-flower-platform
+  workflow_dispatch:
+
+# Required for GitHub Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/puppeteer/puppeteer:latest
+      options: --user root
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run demo-app tests
+        working-directory: demo-app
+        run: . ./docker/setup-puppeteer.sh && yarn test
+
+      # Tests ran with base='/' (so puppeteer hits localhost:4173/ directly).
+      # Now rebuild with the GitHub Pages subpath so asset URLs are correct in the deployment.
+      - name: Rebuild for GitHub Pages (correct base path)
+        working-directory: demo-app
+        env:
+          VITE_BASE_URL: /react-timeline-10000/
+        run: yarn build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: demo-app/dist
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    # Only deploy on push events, not on PRs (avoids publishing unreviewed code)
+    if: github.event_name != 'pull_request'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

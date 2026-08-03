@@ -4,6 +4,9 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // When building for GitHub Pages (served at a subpath), set VITE_BASE_URL to the subpath,
+  // e.g. VITE_BASE_URL=/react-timeline-10000/. Defaults to '/' for local dev and test builds.
+  base: process.env.VITE_BASE_URL || '/',
   plugins: [
     // because some lib was accessing "global"
     nodePolyfills({
@@ -53,14 +56,31 @@ export default defineConfig({
     alias: {
       // duplicated in tsconfig.json
       "@famiprog-foundation/react-gantt": "/../src",
-      // W/ this line, we use foundation as a linked dir. To switch to "use as lib", comment this, and add in package.json, in dependencies:
-      // "@crispico/foundation-react": "link:../../foundation-jhipster-gwt/foundation-react/dist/foundation-react",
-      // For the "storybook" script, I think "yarn docs" needs to be removed. There seems to be a dependency issue, which I didn't look into
-      "@crispico/foundation-react": "/../../foundation-jhipster-gwt/foundation-react/src/foundation-react"
+      
+      // TODO RM41475
+      // // W/ this line, we use foundation as a linked dir. To switch to "use as lib", comment this, and add in package.json, in dependencies:
+      // // "@crispico/foundation-react": "link:../../foundation-jhipster-gwt/foundation-react/dist/foundation-react",
+      // // For the "storybook" script, I think "yarn docs" needs to be removed. There seems to be a dependency issue, which I didn't look into
+      // "@crispico/foundation-react": "/../../foundation-jhipster-gwt/foundation-react/src/foundation-react"
     }
+  },
+  build: {
+    // Required for TestsAreDemo: the TAD UI displays source code and the @Scenario decorator fetches .map files
+    // at runtime to resolve comments/sourceFile info. Without sourcemaps the fetch returns a 404 HTML page,
+    // JSON.parse fails, getSourceCodeState() returns undefined, and the promise executor silently hangs =>
+    // testClassDescriptors is never set => 0 tests shown.
+    sourcemap: true,
+  },
+  esbuild: {
+    // Preserve class/function names so TestsAreDemo can identify test classes by name (testClass.name) in production builds.
+    // Without this, minification mangles class names (e.g. TableTestsAreDemo → t), breaking the test registry.
+    keepNames: true,
   },
   // JSX in .js files, part 2
   optimizeDeps: {
+    // This exclude was needed because working with fixed-data-table-2 as a yarn link (for development purpose) was not working.
+    // Because of some caching the modifications made in fixed-data-table-2, were not seen when starting the storybook script
+    exclude: ["fixed-data-table-2"],
     force: true,
     esbuildOptions: {
       loader: {

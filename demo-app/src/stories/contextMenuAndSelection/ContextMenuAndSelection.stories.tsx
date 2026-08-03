@@ -2,7 +2,7 @@ import { createTestids } from '@famiprog-foundation/tests-are-demo';
 import { Alert } from 'antd';
 import moment from 'moment';
 import { useState } from 'react';
-import { Button, Icon, Menu } from 'semantic-ui-react';
+import { Button, Checkbox, Icon, Menu, Modal } from 'semantic-ui-react';
 import { Timeline, IGanttAction, IGanttOnContextMenuShowParam, Item } from '@famiprog-foundation/react-gantt';
 import { d, someHumanResources, someTasks } from '../sampleData';
 import { contextMenuScenarios, selectionScenarios } from './ContextMenuAndSelectionScenarios';
@@ -105,12 +105,15 @@ ContextMenu.parameters = {
 };
 
 export const selectionStoryTestIds = createTestids('SelectionStory', {
-    selectedItemsSpan: ''
+    selectedItemsSpan: '',
+    allowSelectionRectangleFromItemsCheckbox: ''
 });
 
 export const Selection = () => {
     const [selectedItems, setSelectedItems] = useState<(number|string)[]>([]);
     const [isSelectionForced, setIsSelectionForced] = useState<boolean>(false);
+    const [allowSelectionRectangleFromItems, setAllowSelectionRectangleFromItems] = useState<boolean>(true);
+    
     return (
       <>
         <span>
@@ -119,12 +122,19 @@ export const Selection = () => {
             </Button>
             (The user cannot change the selection via interaction)
         </span>
+        <Checkbox
+            label="Allow starting the selection rectangle from a segment"
+            checked={allowSelectionRectangleFromItems}
+            onChange={(_, { checked }) => setAllowSelectionRectangleFromItems(!!checked)}
+            data-testid={selectionStoryTestIds.allowSelectionRectangleFromItemsCheckbox}
+        />
         <Alert message={<>Selected segments: <span data-testid={selectionStoryTestIds.selectedItemsSpan}>{selectedItems.sort().join(", ")}</span></>}/>
         {/* This is an example illustrates: 
             1.adding onSelectionChange handler 
             2.setting selectedItems property */}
         <div style={{ display: 'flex', height: '400px' }}>
           <Timeline startDate={d('2018-09-20')} endDate={d('2018-09-21')} groups={someHumanResources} items={someTasks} 
+                    allowSelectionRectangleFromItems={allowSelectionRectangleFromItems}
                     selectedItems={isSelectionForced ? [0, 1] : undefined} onSelectionChange={selectedItems => setSelectedItems(selectedItems)}
                     table={<Table width={100} >
                                     <Column
@@ -142,4 +152,8 @@ export const Selection = () => {
     scenarios: [
         ...Object.keys(selectionScenarios).map(key => selectionScenarios[key])
     ]
+};
+
+export const SelectionInModal = () => {
+    return (<Modal style={{ width: '70%', height: '70%' }} open={true} content={<Selection />} />);
 };

@@ -1,6 +1,9 @@
+import { createTestids } from "@famiprog-foundation/tests-are-demo";
 import React from "react";
 import Measure from 'react-measure';
 
+const testIds = createTestids('Scrollbar', { div: '' });
+export const scrollbarTestIds = testIds;
 export interface ScrollbarProperties {
     /**
      * A number which represents the maximum scroll position
@@ -60,7 +63,9 @@ export enum Direction {
     VERTICAL
 }
 
-export const SCROLLBAR_SIZE = 10;
+// We use this default size in order for this scrollbar to have the same size as the native one.
+// Additionally there are styles in the css file that makes this scrollbar to have the same look as the native one.
+export const SCROLLBAR_SIZE = 16;
 const ROUND_FACTOR = 4;
 
 export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarSize: number }> {
@@ -82,11 +87,14 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
     
     /**
      * Designed to be call by the parent component
-     * (for example when parent component whats to implement scroll by touching the scrollable container on the mobile devices)
+     * (for example when parent component wants to implement scroll by touching the scrollable container on the mobile devices)
      * 
      * @param delta 
      */
     scrollwithDelta(delta: number) {
+        if (!this._outterDiv) {
+            return;
+        }
         const unit_per_px = this.props.pageSize / this.state.scrollbarSize;
         const pixels_per_unit = this.state.scrollbarSize / this.props.pageSize;
         const scrollPositionInPixels = this.props.direction == Direction.HORIZONTAL ? this._outterDiv.scrollLeft : this._outterDiv.scrollTop;
@@ -100,7 +108,15 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
 
         this.setScrollPositionInPx((newScrollPosition - this.props.minScrollPosition) * pixels_per_unit);
     }
-
+    
+    scrollWithPxDelta(delta: number) {
+        if (!this._outterDiv) {
+            return;
+        }
+        const scrollPositionInPixels = this.props.direction == Direction.HORIZONTAL ? this._outterDiv.scrollLeft : this._outterDiv.scrollTop;
+        this.setScrollPositionInPx(scrollPositionInPixels + delta);
+    }
+    
     componentDidMount(): void {
         if (this.props.onVisibilityChange) {
             this.props.onVisibilityChange(this.isScrollbarNeeded(this.props));
@@ -171,6 +187,21 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
         return className + (this.props.hasArrows ? " rct9k-scrollbar-with-arrows" : "");
     }
 
+    shouldComponentUpdate(nextProps: Readonly<ScrollbarProperties>, nextState: Readonly<{ scrollbarSize: number }>) {
+        const { props, state } = this;
+        if (nextProps.minScrollPosition !== props.minScrollPosition
+            || nextProps.maxScrollPosition !== props.maxScrollPosition
+            || nextProps.pageSize !== props.pageSize
+            || nextProps.direction !== props.direction
+            || nextProps.hasArrows !== props.hasArrows) {
+            return true;
+        }
+        if (nextState.scrollbarSize !== state.scrollbarSize) {
+            return true;
+        }
+        return false;
+    }
+
     render(): React.ReactNode {
         return <Measure
             bounds
@@ -183,9 +214,8 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
             {({ measureRef }) => {
                 return (
                     this.isScrollbarNeeded(this.props) ?
-                    <div
+                    <div data-testid={scrollbarTestIds.div}
                         className={this.getOutterDivClassName()}
-                        style={this.props.direction == Direction.HORIZONTAL ? {height: SCROLLBAR_SIZE} : {width: SCROLLBAR_SIZE}}
                         ref={(node) => {
                             measureRef(node);
                             this._outterDiv = node;

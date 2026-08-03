@@ -1,5 +1,52 @@
 ## Unreleased
 
+* [ContextMenu: scrollable and always visible](https://github.com/flower-platform/react-timeline-10000/pull/114/changes)
+
+## v2.15.0
+
+* [Smaller menu button when smaller timebar + new "Zoom reset" action + fix zoom out to maximum bug](https://github.com/flower-platform/react-timeline-10000/pull/113)
+
+## v2.14.0
+
+* [Add `allowSelectionRectangleFromItems` property](https://github.com/flower-platform/react-timeline-10000/pull/112)
+
+## v2.13.0
+
+* Added script to run tests in CI/CD of GitHub. And then deploy the result to GH Pages, i.e. https://flower-platform.github.io/react-timeline-10000/
+* [Small fix for selection box](https://github.com/flower-platform/react-timeline-10000/pull/84/files)
+* [Add `nowMarkerLiveUpdate` property that live updates the now marker](https://github.com/flower-platform/react-timeline-10000/pull/108)
+* [Fix scrollbars that hide content on gantt/table](https://github.com/flower-platform/react-timeline-10000/pull/103)
+* [Drag to create can start on top of an existing item](https://github.com/flower-platform/react-timeline-10000/pull/101)
+
+## v2.12.0
+
+* [Fix exception when zooming or resizing window due to undefined grid reference](https://github.com/flower-platform/react-timeline-10000/pull/107)
+* [Add public api for zoom in/out](https://github.com/flower-platform/react-timeline-10000/pull/106)
+
+## v2.11.0
+
+* [Prevented wrong segments on empty rows by giving them IDs with a special prefix](https://github.com/flower-platform/react-timeline-10000/pull/102)
+* [Fix to avoid rendering of the context menu and scrollbar at every mouse move](https://github.com/flower-platform/react-timeline-10000/pull/99)
+* [Add `scrollToItem` feature](https://github.com/flower-platform/react-timeline-10000/pull/100)
+* [Fix `onItemHover` and `onItemLeave` firing too often on items with children](https://github.com/flower-platform/react-timeline-10000/pull/98)
+* [Change color used for BackgroundGradient](https://github.com/flower-platform/react-timeline-10000/pull/96)
+* [Add `verticalGapBetweenOverlappingItems` and `rowTopBottomPadding` properties](https://github.com/flower-platform/react-timeline-10000/pull/97)
+
+## v2.10.0
+
+* [Default split size](https://github.com/flower-platform/react-timeline-10000/pull/94/files)
+
+## v2.9.0
+
+* [Fix to allow variable row heights + programmatic scroll](https://github.com/flower-platform/react-timeline-10000/pull/69/files) 
+* [Small fix for resize cursor size](https://github.com/flower-platform/react-timeline-10000/pull/89/files)
+
+## v2.8.0, v2.8.1
+
+* [Add `zoomEnabled` flag](https://github.com/flower-platform/react-timeline-10000/pull/90/files)
+* [Small fix for context menu on mobile and item leave event](https://github.com/flower-platform/react-timeline-10000/pull/86/files)
+* [Update comment for rct9k-items-inner style class](https://github.com/flower-platform/react-timeline-10000/pull/88/files)
+
 ## v2.7.5
 
 * [Allow group.id to be any number (remove the "consecutive numbers starting from 0" restriction)](https://github.com/flower-platform/react-timeline-10000/pull/74/files)

@@ -1,10 +1,8 @@
 # React Timeline 10000 (forked by the Flower Platform team)
 
-## About `demo-app`
+## About `demo-app` (available at: https://flower-platform.github.io/react-timeline-10000/)
 
-Previously, there was a single project containing the lib + demo app. Now, the demo, scenarios, tests are demo: exist in the `demo-app` subproject. This way, `demo-app` can depend on `foundation`, which itself depends on this lib. Thanks to the separation, we don't have a dependency cycle.
-
-Currently the dependency towards `foundation` is done by using its source dir. Hence 1/ `foundation` needs to be cloned from git, next to this repo. And 2/ one should run from `foundation-react`: `yarn install`. `foundation` can be also be used as a lib. This is experimental. Look in `demo-app/vite.config.ts` for info.
+Previously, there was a single project containing the lib + demo app. Now, the demo, scenarios, tests are demo: exist in the `demo-app` subproject. 
 
 In `demo-app/tsconfig.json` and `demo-app/vite.config.ts`, we created the `@famiprog-foundation/react-gantt` alias. This means that from `demo-app` source files:
 
@@ -15,6 +13,32 @@ import { Timeline, ItemRenderer } from "@famiprog-foundation/react-gantt";
 // instead of this 
 import { ItemRenderer } from "../../src";
 ```
+
+### Relation w/ `foundation`
+
+<details>
+
+#### Dependency towards foundation
+
+TODO RM41475  
+UPDATE: the following has been disabled, in order to allow building the project in CI/CD w/o dep needing foundation. See `demo-app/src/stories/table/TreeFixedDataTableGantt.stories.tsx`.
+
+`demo-app` depends on `foundation`, which itself depends on this lib. Thanks to the separation, we don't have a dependency cycle.
+
+Currently the dependency towards `foundation` is done by using its source dir. Hence 1/ `foundation` needs to be cloned from git, next to this repo. And 2/ one should run from `foundation-react`: `yarn install`. `foundation` can be also be used as a lib. This is experimental. Look in `demo-app/vite.config.ts` for info.
+
+#### Deps from `@famiprog-foundation/...`, `@crispico/...`
+
+Are published in an internal NPM repo. If the test fails complaining about this, here is the process:
+
+```sh
+# if on a PC w/ access to the internal NPM repo, this will download it from that repo
+npm pack @famiprog-foundation/utils@1.0.0
+tar zxf famiprog-foundation-scriptable-ui-2.0.1.tgz
+cd package
+npm publish --access public --@famiprog-foundation:registry=https://registry.npmjs.org/
+```
+</details>
 
 ---
 
@@ -54,6 +78,23 @@ New work is always done on new branches. E.g. `my-new-branch`. At the end of the
 * we don't need to wait for their approval of the PR;
 * we make a PR and/or merge it into `master-flower-platform`;
 * then, we increment *fp-ver-N* to *fp-ver-N+1* cf. above.
+
+## Working with linked libraries in development
+
+Sometimes even if I ```yarn link``` a library, when running storybook it doesn't take into account the linked library. 
+This was noticed working with the ```fixed-data-table-2``` libray as a linked library.
+
+The solution for this problem was mentioned here: https://dev.to/hontas/using-vite-with-linked-dependencies-37n7: it should be added in the ```vite.config.ts``` file, on the ```optimizeDeps``` section: ```exclude: ["fixed-data-table-2"]```
+
+Even the above solution worked for our case, we don't understand very good from were the old library version was taken from. Because in our case, even if we removed the ```node_modules/.cached```, an old version of the library was used (could be that it was requested from the npm registry, because in ```package.json``` the old version was referenced). 
+
+## Testing (TAD)
+
+The `demo-app` uses `TAD` (see `*TestsAreDemo.tsx`).
+
+For numbers derived from **layout** (pixel positions/sizes, or time from pixel math), prefer **`approximately`** with a small tolerance (usually **`delta = 1`**) instead of strict **`equal`**. Browsers, resolution, and DPI often cause differences of **≤ 1 px** without a logic bug.
+
+Use a **larger delta** (e.g. **2–3 px**) only after you’ve verified there isn’t a real bug. Document *why* a wider tolerance is acceptable so it doesn’t hide incorrect behavior.
 
 ## Tracking of the pull requests submitted to the upstream repo
 

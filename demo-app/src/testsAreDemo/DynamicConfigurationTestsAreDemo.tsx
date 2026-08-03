@@ -17,7 +17,7 @@ export class DynamicConfigurationTestsAreDemo {
         
         // THEN the new interval is displayed
         const timebarBottom = tad.screenCapturing.getByTestId('r9k1_' + timebarTestIds.timebarInnerBottom);
-        await tad.assertWaitable.oneOf(tad.withinCapturing(timebarBottom).getByTestId('r9k1_' + timebarTestIds.timebarItem + "_" + 0).textContent, ["01", "01:00"]);
-        await tad.assertWaitable.oneOf(tad.withinCapturing(timebarBottom).getByTestId('r9k1_' + timebarTestIds.timebarItem + "_" + 23).textContent, ["00", "00:00"]);
+        await tad.assertWaitable.equal(tad.withinCapturing(timebarBottom).getByTestId('r9k1_' + timebarTestIds.timebarItem + "_" + 0).textContent, "1");
+        await tad.assertWaitable.equal(tad.withinCapturing(timebarBottom).getByTestId('r9k1_' + timebarTestIds.timebarItem + "_" + 29).textContent, "30");
     }
 }
