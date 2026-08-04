@@ -48,6 +48,7 @@ import ItemRenderer from './components/ItemRenderer';
 import {SCROLLBAR_SIZE, Scrollbar} from './components/Scrollbar';
 import {IGanttAction} from './types';
 import {SelectionHolder} from './utils/SelectionHolder';
+import {Timebar as NewTimebar} from './components/timebar/Timebar';
 
 const testids = createTestids('Timeline', {
   menuButton: '',
@@ -2546,6 +2547,12 @@ export default class Timeline extends React.Component {
                     />,
                     document.body
                   )}
+                  <NewTimebar
+                    cursorTime={this.getCursor()}
+                    start={this.getStartDate()}
+                    end={this.getEndDate()}
+                    width={this.state.gridWidth}
+                  />
                   <Timebar
                     componentId={this.props.componentId}
                     cursorTime={this.getCursor()}
