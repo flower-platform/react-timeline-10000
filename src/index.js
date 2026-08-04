@@ -23,6 +23,7 @@ export {BackgroundLayer} from './components/BackgroundLayer';
 export {HighlightedInterval} from './components/HighlightedInterval';
 export {Scrollbar, Direction} from './components/Scrollbar';
 export {ContextMenu} from './components/ContextMenu/ContextMenu';
+export * from './components/timebar/Timebar';
 
 // consts
 export {timebarFormat} from './consts/timebarConsts';

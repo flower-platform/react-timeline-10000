@@ -4,12 +4,11 @@ import React from "react";
 import { intToPix } from "../../utils/commonUtils";
 
 const SECOND_IN_MILLISECONDS: number = 1000;
-const MINUTE_IN_MILLISECONDS: number = 60000;
-const HOUR_IN_MILLISECONDS: number = 3600000;
-const DAY_IN_MILLISECONDS: number = 86400000;
-const MONTH_IN_MILLISECONDS: number = 2592000000;
-const YEAR_IN_MILLISECONDS: number = 31104000000;
-
+const MINUTE_IN_MILLISECONDS: number = 60 * SECOND_IN_MILLISECONDS;
+const HOUR_IN_MILLISECONDS: number = 60 * MINUTE_IN_MILLISECONDS;
+const DAY_IN_MILLISECONDS: number = 24 * HOUR_IN_MILLISECONDS;
+const MONTH_IN_MILLISECONDS: number = 30 * DAY_IN_MILLISECONDS;
+const YEAR_IN_MILLISECONDS: number = 365 * DAY_IN_MILLISECONDS;
 
 export class TimeUnit {
     label!: string;
@@ -157,117 +156,119 @@ export type TimebarProps = {
     bottomMinLabelSizeInPixels?: number;
 }
 
-export class Timebar extends React.Component<TimebarProps> {
+type Interval = {
+    label: string,
+    width: number,
+}
+
+export class Timebar extends React.Component<TimebarProps, { topIntervals: Interval[], bottomIntervals: Interval[] }> {
 
     static defaultProps = {
         topTimeUnits: [
-            new SecondTimeUnit(),
-            new MinuteTimeUnit(),
-            new HourTimeUnit(),
-            new DayTimeUnit(),
-            new MonthTimeUnit(),
             new YearTimeUnit(),
-        ],
-        topMinLabelSizeInPixels: 15,
-        bottomTimeUnits: [
-            new SecondTimeUnit(),
-            new MinuteTimeUnit(),
-            new HourTimeUnit(),
+            new MonthTimeUnit(),
             new DayTimeUnit(),
-
-            // new MonthTimeUnit(),
-            // new YearTimeUnit(),
+            new HourTimeUnit(),
+            new HourTimeUnit(),
+            new MinuteTimeUnit(),
+            new SecondTimeUnit(),
         ],
-        bottomMinLabelSizeInPixels: 5,
+        topMinLabelSizeInPixels: 50,
+        bottomTimeUnits: [
+            new YearTimeUnit(),
+            new MonthTimeUnit(),
+            new HourTimeUnit(),
+            new MinuteTimeUnit(),
+            new MinuteTimeUnit(),
+            new SecondTimeUnit(),
+        ],
+        bottomMinLabelSizeInPixels: 20,
     }
 
-    // render() {
-    // render 2 timbars,
-    // the timeUnits to get the segments on timebars
-    // width for component
-    // minLabelSizeInPixels, ce facem cand e mai mare si nu incap toate intervalele, incrementam unitatea?
-    // return null;
-    // }
+    constructor(props: TimebarProps) {
+        super(props);
+        this.state = {
+            topIntervals: [],
+            bottomIntervals: []
+        }
+    }
 
-    protected getIntervals(timeUnits: TimeUnit[], minLabelSizeInPixels: number): { label: string, size: number, isSelected?: boolean, key?: string }[] {
-        const topBarComponent: { label: string, size: number, isSelected?: boolean, key?: string }[] = [];
+    componentDidMount(): void {
+        this.calculateIntervals();
+    }
+
+    componentDidUpdate(prevProps: Readonly<TimebarProps>, prevState: Readonly<{}>, snapshot?: any): void {
+        if (prevProps.start != this.props.start
+            || prevProps.end != this.props.end
+            || prevProps.width != this.props.width
+            || prevProps.topTimeUnits != this.props.topTimeUnits
+            || prevProps.topMinLabelSizeInPixels != this.props.topMinLabelSizeInPixels
+            || prevProps.bottomTimeUnits != this.props.bottomTimeUnits
+            || prevProps.bottomMinLabelSizeInPixels != this.props.bottomMinLabelSizeInPixels
+        ) {
+            this.calculateIntervals();
+        }
+    }
+
+    protected getIntervals(timeUnits: TimeUnit[], minLabelSizeInPixels: number, averageSegmentPeriod?: number): { intervals: Interval[], timeUnit?: TimeUnit } {
+        const intervals: Interval[] = [];
 
         const duration = this.props.end.diff(this.props.start);
         const pixels_per_ms = this.props.width / duration;
 
-        let timeUnit: TimeUnit = new SecondTimeUnit({ multiple: 1 });
+        let timeUnit: TimeUnit | undefined = undefined;
         for (let key in timeUnits) {
-            // trebuie sa ma folosesc de minLabelSizeInPixels pentru a putea seta...
-            // if (timeUnits[Number(key)].averageSegmentPeriod() <= duration) {
-            //     timeUnit = timeUnits[Number(key)];
-            //     break;
-            // }
-            if (timeUnits[Number(key)].averageSegmentPeriod() / pixels_per_ms >= minLabelSizeInPixels) {
+            if (timeUnits[Number(key)].averageSegmentPeriod() * 1.5 < duration && timeUnits[Number(key)].averageSegmentPeriod() * pixels_per_ms >= minLabelSizeInPixels
+                && (!averageSegmentPeriod || timeUnits[Number(key)].averageSegmentPeriod() < averageSegmentPeriod)
+            ) {
                 timeUnit = timeUnits[Number(key)];
                 break;
             }
-            // if (duration / timeUnits[Number(key)].averageSegmentPeriod() * pixels_per_ms >= minLabelSizeInPixels) {
-            //     timeUnit = timeUnits[Number(key)];
-            //     break;
-            // }
         }
-        const diff = duration / timeUnit.averageSegmentPeriod();
+        if (!timeUnit) {
+            return { intervals: [] }
+        }
         let currentDate = timeUnit.roundFirstSegmentStartDate(this.props.start);
-
 
         for (let i = 0; i < this.props.width;) {
             const endSegment = timeUnit.computeSegmentEnd(currentDate);
-            let size = endSegment.diff(i == 0 ? this.props.start : currentDate) * pixels_per_ms;
-            if (i + size > this.props.width) {
-                size = this.props.width - i;
+            let width = endSegment.diff(i == 0 ? this.props.start : currentDate) * pixels_per_ms;
+            if (i + width > this.props.width) {
+                width = this.props.width - i;
             }
-            topBarComponent.push({
-                label: currentDate.format(timeUnit.label),
-                size
-            });
+            intervals.push({ label: currentDate.format(timeUnit.label), width });
             currentDate = endSegment;
-            i += size;
+            i += width;
         }
-        return topBarComponent;
+        return { intervals, timeUnit };
     }
 
+    protected calculateIntervals() {
+        // the bottom interval need to be less that upper intervals
+        const top = this.getIntervals(this.props.topTimeUnits!, this.props.topMinLabelSizeInPixels!);
+        const bottom = this.getIntervals(this.props.bottomTimeUnits!, this.props.bottomMinLabelSizeInPixels!, top.timeUnit?.averageSegmentPeriod());
+        this.setState({ topIntervals: top.intervals, bottomIntervals: bottom.intervals });
+    }
 
     render() {
-        const topBarComponent = this.getIntervals(this.props.topTimeUnits!, this.props.topMinLabelSizeInPixels!);
-        const bottomBarComponent = this.getIntervals(this.props.bottomTimeUnits!, this.props.bottomMinLabelSizeInPixels!);
-
-
+        const { topIntervals, bottomIntervals } = this.state;
         return <div className="rct9k-timebar"
             style={{ width: this.props.width }}>
             <div className="rct9k-timebar-outer" style={{ width: this.props.width }}>
                 <div className="rct9k-timebar-inner rct9k-timebar-inner-top">
-                    {_.map(topBarComponent, i => {
-                        let topLabel = i.label;
-                        // if (cursorTime && i.key === topBarCursorKey) {
-                        //     topLabel += ` [${cursorTime}]`;
-                        // }
-                        let className = 'rct9k-timebar-item';
-                        if (i.isSelected) className += ' rct9k-timebar-item-selected';
+                    {topIntervals.map(interval => {
                         return (
-                            <span className={className} key={i.key} style={{ width: intToPix(i.size) }}>
-                                {topLabel}
+                            <span className='rct9k-timebar-item' style={{ width: intToPix(interval.width) }}>
+                                {interval.label}
                             </span>
                         );
                     })}
                 </div>
-                <div
-                    className="rct9k-timebar-inner rct9k-timebar-inner-bottom"
-                >
-                    {_.map(bottomBarComponent, (i, index) => {
-                        let className = 'rct9k-timebar-item';
-                        if (i.isSelected) className += ' rct9k-timebar-item-selected';
+                <div className="rct9k-timebar-inner rct9k-timebar-inner-bottom">
+                    {bottomIntervals.map(interval => {
                         return (
-                            <span
-                                className={className}
-                                key={i.key}
-                                style={{ width: intToPix(i.size) }}
-                            >
-                                {i.label}
+                            <span className='rct9k-timebar-item' style={{ width: intToPix(interval.width) }}>
+                                {interval.label}
                             </span>
                         );
                     })}

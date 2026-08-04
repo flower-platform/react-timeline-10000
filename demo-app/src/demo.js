@@ -49,8 +49,8 @@ export default class DemoTimeline extends Component {
       snap: 60,
       startDate,
       endDate,
-      minDate: now.clone().subtract(600, "day"),
-      maxDate: now.clone().add(600, "day"),
+      minDate: now.clone().subtract(2, "day"),
+      maxDate: now.clone().add(3, "day"),
       message: '',
       timelineMode: TIMELINE_MODES.SELECT | TIMELINE_MODES.DRAG | TIMELINE_MODES.RESIZE,
       useTable: true,
@@ -443,6 +443,7 @@ export default class DemoTimeline extends Component {
           minDate={useMoment ? minDate : minDate.valueOf()}
           maxDate={useMoment ? maxDate : maxDate.valueOf()}
           showZoomShortcuts={true}
+          timebarProps={{}}
           backgroundLayer={
             <BackgroundLayer
               nowMarker={true}

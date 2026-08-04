@@ -557,7 +557,17 @@ export default class Timeline extends React.Component {
      *
      * @type {boolean | (() => boolean)}
      */
-    zoomEnabled: PropTypes.oneOfType([PropTypes.bool, PropTypes.func])
+    zoomEnabled: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
+
+    /**
+     * @type { TimebarProps }
+     */
+    timebarProps: PropTypes.shape({
+      topTimeUnits: [PropTypes.object],
+      topMinLabelSizeInPixels: PropTypes.number,
+      bottomTimeUnits: [PropTypes.object],
+      bottomMinLabelSizeInPixels: PropTypes.number
+    })
   };
 
   static defaultProps = {
@@ -615,7 +625,8 @@ export default class Timeline extends React.Component {
       return 3;
     },
     showZoomShortcuts: false,
-    zoomEnabled: true
+    zoomEnabled: true,
+    timebarProps: undefined
   };
 
   /**
@@ -2547,23 +2558,27 @@ export default class Timeline extends React.Component {
                     />,
                     document.body
                   )}
-                  <NewTimebar
-                    cursorTime={this.getCursor()}
-                    start={this.getStartDate()}
-                    end={this.getEndDate()}
-                    width={this.state.gridWidth}
-                  />
-                  <Timebar
-                    componentId={this.props.componentId}
-                    cursorTime={this.getCursor()}
-                    start={this.getStartDate()}
-                    end={this.getEndDate()}
-                    width={this.state.gridWidth}
-                    leftOffset={0}
-                    selectedRanges={this.state.selection}
-                    setVerticalGridLines={this.setVerticalGridLines}
-                    {...varTimebarProps}
-                  />
+                  {this.props.timebarProps ? (
+                    <NewTimebar
+                      cursorTime={this.getCursor()}
+                      start={this.getStartDate()}
+                      end={this.getEndDate()}
+                      width={this.state.gridWidth}
+                      {...this.props.timebarProps}
+                    />
+                  ) : (
+                    <Timebar
+                      componentId={this.props.componentId}
+                      cursorTime={this.getCursor()}
+                      start={this.getStartDate()}
+                      end={this.getEndDate()}
+                      width={this.state.gridWidth}
+                      leftOffset={0}
+                      selectedRanges={this.state.selection}
+                      setVerticalGridLines={this.setVerticalGridLines}
+                      {...varTimebarProps}
+                    />
+                  )}
                   {markers.map(m => (
                     <Marker
                       key={m.key}
