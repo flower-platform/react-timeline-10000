@@ -2274,7 +2274,9 @@ export default class Timeline extends React.Component {
    * @param { object } verticalGridLines
    */
   setVerticalGridLines(verticalGridLines) {
-    this.setState({verticalGridLines});
+    if (!_.isEqual(this.state.verticalGridLines, verticalGridLines)) {
+      this.setState({verticalGridLines});
+    }
   }
 
   handleScrollTable = scrollPos => {
