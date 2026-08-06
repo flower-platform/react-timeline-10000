@@ -1,5 +1,7 @@
 ## Unreleased
 
+## v2.16.0
+
 * [Fix blank page when resizing gantt to minimum width](https://github.com/flower-platform/react-timeline-10000/pull/116)
 
 * [ContextMenu: scrollable and always visible](https://github.com/flower-platform/react-timeline-10000/pull/114/changes)
