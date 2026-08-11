@@ -35,13 +35,19 @@ export default class Timebar extends React.Component {
     this.setState({topBarComponent, bottomBarComponent});
   }
 
+  setResolutionIfNeeded(resolution) {
+    if (this.state.resolution.top !== resolution.top || this.state.resolution.bottom !== resolution.bottom) {
+      this.setState({resolution});
+    }
+  }
+
   /**
    * On new props we check if a resolution is given, and if not we guess one
    * @param {Object} nextProps Props coming in
    */
   componentWillReceiveProps(nextProps) {
     if (nextProps.top_resolution && nextProps.bottom_resolution) {
-      this.setState({resolution: {top: nextProps.top_resolution, bottom: nextProps.bottom_resolution}});
+      this.setResolutionIfNeeded({top: nextProps.top_resolution, bottom: nextProps.bottom_resolution});
     } else {
       this.guessResolution(nextProps.start, nextProps.end);
     }
@@ -59,7 +65,12 @@ export default class Timebar extends React.Component {
     ) {
       const bottomBarComponent = this.getBottomBar();
       const topBarComponent = this.getTopBar();
-      this.setState({topBarComponent, bottomBarComponent});
+      if (
+        !_.isEqual(this.state.bottomBarComponent, bottomBarComponent) ||
+        !_.isEqual(this.state.topBarComponent, topBarComponent)
+      ) {
+        this.setState({topBarComponent, bottomBarComponent});
+      }
     }
   }
 
@@ -76,20 +87,19 @@ export default class Timebar extends React.Component {
     }
     const durationMilliSecs = end.diff(start);
     /// 1ms -> 1s
-    if (durationMilliSecs <= 1000) this.setState({resolution: {top: 'second', bottom: 'millisecond'}});
+    if (durationMilliSecs <= 1000) this.setResolutionIfNeeded({top: 'second', bottom: 'millisecond'});
     // 1s  -> 2m
-    else if (durationMilliSecs <= 60 * 2 * 1000) this.setState({resolution: {top: 'minute', bottom: 'second'}});
+    else if (durationMilliSecs <= 60 * 2 * 1000) this.setResolutionIfNeeded({top: 'minute', bottom: 'second'});
     // 2m -> 2h
-    else if (durationMilliSecs <= 60 * 60 * 2 * 1000) this.setState({resolution: {top: 'hour', bottom: 'minute'}});
+    else if (durationMilliSecs <= 60 * 60 * 2 * 1000) this.setResolutionIfNeeded({top: 'hour', bottom: 'minute'});
     // 2h -> 3d
-    else if (durationMilliSecs <= 24 * 60 * 60 * 3 * 1000) this.setState({resolution: {top: 'day', bottom: 'hour'}});
+    else if (durationMilliSecs <= 24 * 60 * 60 * 3 * 1000) this.setResolutionIfNeeded({top: 'day', bottom: 'hour'});
     // 1d -> 30d
-    else if (durationMilliSecs <= 30 * 24 * 60 * 60 * 1000) this.setState({resolution: {top: 'month', bottom: 'day'}});
+    else if (durationMilliSecs <= 30 * 24 * 60 * 60 * 1000) this.setResolutionIfNeeded({top: 'month', bottom: 'day'});
     //30d -> 1y
-    else if (durationMilliSecs <= 365 * 24 * 60 * 60 * 1000)
-      this.setState({resolution: {top: 'year', bottom: 'month'}});
+    else if (durationMilliSecs <= 365 * 24 * 60 * 60 * 1000) this.setResolutionIfNeeded({top: 'year', bottom: 'month'});
     // 1y ->
-    else this.setState({resolution: {top: 'year', bottom: 'year'}});
+    else this.setResolutionIfNeeded({top: 'year', bottom: 'year'});
   }
 
   /**
