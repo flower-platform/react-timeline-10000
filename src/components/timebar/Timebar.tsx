@@ -13,7 +13,7 @@ const YEAR_IN_MILLISECONDS: number = 365 * DAY_IN_MILLISECONDS;
 export class TimeUnit {
     multiple!: number;
     milliseconds!: number;
-    label!: string;
+    timeFormat!: string;
 
     constructor(values?: Partial<TimeUnit>) {
         this.multiple = 1;
@@ -37,7 +37,7 @@ export class TimeUnit {
 export class SecondTimeUnit extends TimeUnit {
 
     constructor(values?: Partial<SecondTimeUnit>) {
-        super({ milliseconds: SECOND_IN_MILLISECONDS, label: "ss", ...values });
+        super({ milliseconds: SECOND_IN_MILLISECONDS, timeFormat: "ss", ...values });
     }
 
     public roundFirstSegmentStartDate(date: moment.Moment) {
@@ -76,7 +76,7 @@ export class ThirtySecondTimeUnit extends SecondTimeUnit {
 export class MinuteTimeUnit extends TimeUnit {
 
     constructor(values?: Partial<MinuteTimeUnit>) {
-        super({ milliseconds: MINUTE_IN_MILLISECONDS, label: "mm", ...values });
+        super({ milliseconds: MINUTE_IN_MILLISECONDS, timeFormat: "mm", ...values });
     }
 
     public roundFirstSegmentStartDate(date: moment.Moment) {
@@ -115,7 +115,7 @@ export class ThirtyMinuteTimeUnit extends MinuteTimeUnit {
 export class HourTimeUnit extends TimeUnit {
 
     constructor(values?: Partial<HourTimeUnit>) {
-        super({ milliseconds: HOUR_IN_MILLISECONDS, label: "HH", ...values });
+        super({ milliseconds: HOUR_IN_MILLISECONDS, timeFormat: "HH", ...values });
     }
 
     public roundFirstSegmentStartDate(date: moment.Moment) {
@@ -154,7 +154,7 @@ export class TwelveHourTimeUnit extends HourTimeUnit {
 export class DayTimeUnit extends TimeUnit {
 
     constructor(values?: Partial<DayTimeUnit>) {
-        super({ milliseconds: DAY_IN_MILLISECONDS, label: "ddd, DD", ...values });
+        super({ milliseconds: DAY_IN_MILLISECONDS, timeFormat: "ddd, DD", ...values });
     }
 
     public roundFirstSegmentStartDate(date: moment.Moment) {
@@ -193,7 +193,7 @@ export class TwoWeekTimeUnit extends DayTimeUnit {
 export class MonthTimeUnit extends TimeUnit {
 
     constructor(values?: Partial<MonthTimeUnit>) {
-        super({ milliseconds: MONTH_IN_MILLISECONDS, label: "MMM. YYYY", ...values });
+        super({ milliseconds: MONTH_IN_MILLISECONDS, timeFormat: "MMM. YYYY", ...values });
     }
 
     public roundFirstSegmentStartDate(date: moment.Moment) {
@@ -226,7 +226,7 @@ export class SixMonthTimeUnit extends MonthTimeUnit {
 export class YearTimeUnit extends TimeUnit {
 
     constructor(values?: Partial<YearTimeUnit>) {
-        super({ milliseconds: YEAR_IN_MILLISECONDS, label: "YYYY", ...values });
+        super({ milliseconds: YEAR_IN_MILLISECONDS, timeFormat: "YYYY", ...values });
     }
 
     public roundFirstSegmentStartDate(date: moment.Moment) {
@@ -365,7 +365,7 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
             if (i + width > this.props.width) {
                 width = this.props.width - i;
             }
-            intervals.push({ label: currentDate.format(timeUnit.label), width });
+            intervals.push({ label: currentDate.format(timeUnit.timeFormat), width });
             currentDate = endSegment;
             i += width;
         }
@@ -384,9 +384,9 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
         return <div className="rct9k-timebar"
             style={{ width: this.props.width }}>
             <div className="rct9k-timebar-outer" style={{ width: this.props.width }}>
-                {topIntervals.length === 0 && bottomIntervals.length === 0 && this.props.cursorTime ?
+                {topIntervals.length === 0 && bottomIntervals.length === 0 && this.props.unsupportedSizeMessage ?
                     <div style={{ textAlign: 'center' }}>
-                        {this.props.cursorTime}
+                        {this.props.unsupportedSizeMessage}
                     </div>
                     : null}
                 {topIntervals.length ? <div className="rct9k-timebar-inner rct9k-timebar-inner-top">
