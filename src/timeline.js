@@ -566,7 +566,8 @@ export default class Timeline extends React.Component {
       topTimeUnits: [PropTypes.object],
       topMinLabelSizeInPixels: PropTypes.number,
       bottomTimeUnits: [PropTypes.object],
-      bottomMinLabelSizeInPixels: PropTypes.number
+      bottomMinLabelSizeInPixels: PropTypes.number,
+      unsupportedSizeMessage: PropTypes.string
     })
   };
 
@@ -2562,7 +2563,7 @@ export default class Timeline extends React.Component {
                   )}
                   {this.props.timebarProps ? (
                     <NewTimebar
-                      cursorTime={this.getCursor()}
+                      unsupportedSizeMessage={this.getCursor()}
                       start={this.getStartDate()}
                       end={this.getEndDate()}
                       width={this.state.gridWidth}

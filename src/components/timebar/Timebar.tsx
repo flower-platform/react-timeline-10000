@@ -260,7 +260,7 @@ export type TimebarProps = {
     start: moment.Moment;
     end: moment.Moment;
     width: number;
-    cursorTime: string,
+    unsupportedSizeMessage: string,
     topTimeUnits?: TimeUnit[];
     topMinLabelSizeInPixels?: number;
     bottomTimeUnits?: TimeUnit[];
@@ -310,7 +310,7 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
         topMinLabelSizeInPixels: 60,
         bottomTimeUnits: ALL_TIME_UNITS,
         bottomMinLabelSizeInPixels: 30,
-        cursorTime: "Time scale unavailable for current view size"
+        unsupportedSizeMessage: "Time scale unavailable for current view size"
     }
 
     constructor(props: TimebarProps) {
@@ -342,12 +342,13 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
         const intervals: Interval[] = [];
 
         const duration = this.props.end.diff(this.props.start);
-        const pixels_per_ms = this.props.width / duration;
+        const pixelsPerMs = this.props.width / duration;
 
         let timeUnit: TimeUnit | undefined = undefined;
         for (let key in timeUnits) {
-            if (timeUnits[Number(key)].averageSegmentPeriod() <= duration && timeUnits[Number(key)].averageSegmentPeriod() * pixels_per_ms >= minLabelSizeInPixels
-                && (!averageSegmentPeriod || timeUnits[Number(key)].averageSegmentPeriod() < averageSegmentPeriod)
+            const msPerSegment = timeUnits[Number(key)].averageSegmentPeriod();
+            if (msPerSegment <= duration && msPerSegment * pixelsPerMs >= minLabelSizeInPixels
+                && (!averageSegmentPeriod || msPerSegment < averageSegmentPeriod)
             ) {
                 timeUnit = timeUnits[Number(key)];
                 break;
@@ -360,7 +361,7 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
 
         for (let i = 0; i < this.props.width;) {
             const endSegment = timeUnit.computeSegmentEnd(currentDate);
-            let width = endSegment.diff(i == 0 ? this.props.start : currentDate) * pixels_per_ms;
+            let width = endSegment.diff(i == 0 ? this.props.start : currentDate) * pixelsPerMs;
             if (i + width > this.props.width) {
                 width = this.props.width - i;
             }
@@ -372,7 +373,7 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
     }
 
     protected calculateIntervals() {
-        // the bottom interval need to be less that upper intervals
+        // the bottom intervals need to be less that upper intervals
         const top = this.getIntervals(this.props.topTimeUnits!, this.props.topMinLabelSizeInPixels!);
         const bottom = this.getIntervals(this.props.bottomTimeUnits!, this.props.bottomMinLabelSizeInPixels!, top.timeUnit?.averageSegmentPeriod());
         this.setState({ topIntervals: top.intervals, bottomIntervals: bottom.intervals });
