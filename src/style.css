@@ -355,7 +355,6 @@
 
 .rct9k-timebar-outer,
 .rct9k-timebar-group-title {
-  height: 60px;
   background-color: white;
   border: 1px solid #ccc;
   box-sizing: border-box;
@@ -369,7 +368,6 @@
 }
 
 .rct9k-timebar-inner {
-  height: 30px;
   white-space: nowrap;
   overflow: hidden;
 }

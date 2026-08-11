@@ -11,16 +11,18 @@ const MONTH_IN_MILLISECONDS: number = 30 * DAY_IN_MILLISECONDS;
 const YEAR_IN_MILLISECONDS: number = 365 * DAY_IN_MILLISECONDS;
 
 export class TimeUnit {
-    label!: string;
     multiple!: number;
+    milliseconds!: number;
+    label!: string;
 
     constructor(values?: Partial<TimeUnit>) {
         this.multiple = 1;
+        this.milliseconds = 1;
         Object.assign(this, values);
     }
 
     public averageSegmentPeriod(): number {
-        throw new Error("averageSegmentPeriod() not implemented");
+        return this.multiple * this.milliseconds;
     }
 
     public roundFirstSegmentStartDate(date: moment.Moment): moment.Moment {
@@ -35,11 +37,7 @@ export class TimeUnit {
 export class SecondTimeUnit extends TimeUnit {
 
     constructor(values?: Partial<SecondTimeUnit>) {
-        super({ label: "ss", ...values });
-    }
-
-    public averageSegmentPeriod(): number {
-        return this.multiple * SECOND_IN_MILLISECONDS;
+        super({ milliseconds: SECOND_IN_MILLISECONDS, label: "ss", ...values });
     }
 
     public roundFirstSegmentStartDate(date: moment.Moment) {
@@ -51,14 +49,34 @@ export class SecondTimeUnit extends TimeUnit {
     }
 }
 
+export class FiveSecondTimeUnit extends SecondTimeUnit {
+    constructor(values?: Partial<SecondTimeUnit>) {
+        super({ multiple: 5, ...values });
+    }
+}
+
+export class TenSecondTimeUnit extends SecondTimeUnit {
+    constructor(values?: Partial<SecondTimeUnit>) {
+        super({ multiple: 10, ...values });
+    }
+}
+
+export class FifteenSecondTimeUnit extends SecondTimeUnit {
+    constructor(values?: Partial<SecondTimeUnit>) {
+        super({ multiple: 15, ...values });
+    }
+}
+
+export class ThirtySecondTimeUnit extends SecondTimeUnit {
+    constructor(values?: Partial<SecondTimeUnit>) {
+        super({ multiple: 30, ...values });
+    }
+}
+
 export class MinuteTimeUnit extends TimeUnit {
 
     constructor(values?: Partial<MinuteTimeUnit>) {
-        super({ label: "mm", ...values });
-    }
-
-    public averageSegmentPeriod(): number {
-        return this.multiple * MINUTE_IN_MILLISECONDS;
+        super({ milliseconds: MINUTE_IN_MILLISECONDS, label: "mm", ...values });
     }
 
     public roundFirstSegmentStartDate(date: moment.Moment) {
@@ -70,14 +88,34 @@ export class MinuteTimeUnit extends TimeUnit {
     }
 }
 
+export class FiveMinuteTimeUnit extends MinuteTimeUnit {
+    constructor(values?: Partial<MinuteTimeUnit>) {
+        super({ multiple: 5, ...values });
+    }
+}
+
+export class TenMinuteTimeUnit extends MinuteTimeUnit {
+    constructor(values?: Partial<MinuteTimeUnit>) {
+        super({ multiple: 10, ...values });
+    }
+}
+
+export class FifteenMinuteTimeUnit extends MinuteTimeUnit {
+    constructor(values?: Partial<MinuteTimeUnit>) {
+        super({ multiple: 15, ...values });
+    }
+}
+
+export class ThirtyMinuteTimeUnit extends MinuteTimeUnit {
+    constructor(values?: Partial<MinuteTimeUnit>) {
+        super({ multiple: 30, ...values });
+    }
+}
+
 export class HourTimeUnit extends TimeUnit {
 
     constructor(values?: Partial<HourTimeUnit>) {
-        super({ label: "HH", ...values });
-    }
-
-    public averageSegmentPeriod(): number {
-        return this.multiple * HOUR_IN_MILLISECONDS;
+        super({ milliseconds: HOUR_IN_MILLISECONDS, label: "HH", ...values });
     }
 
     public roundFirstSegmentStartDate(date: moment.Moment) {
@@ -89,14 +127,34 @@ export class HourTimeUnit extends TimeUnit {
     }
 }
 
+export class TwoHourTimeUnit extends HourTimeUnit {
+    constructor(values?: Partial<HourTimeUnit>) {
+        super({ multiple: 2, ...values });
+    }
+}
+
+export class FourHourTimeUnit extends HourTimeUnit {
+    constructor(values?: Partial<HourTimeUnit>) {
+        super({ multiple: 4, ...values });
+    }
+}
+
+export class SixHourTimeUnit extends HourTimeUnit {
+    constructor(values?: Partial<HourTimeUnit>) {
+        super({ multiple: 6, ...values });
+    }
+}
+
+export class TwelveHourTimeUnit extends HourTimeUnit {
+    constructor(values?: Partial<HourTimeUnit>) {
+        super({ multiple: 12, ...values });
+    }
+}
+
 export class DayTimeUnit extends TimeUnit {
 
     constructor(values?: Partial<DayTimeUnit>) {
-        super({ label: "ddd, DD", ...values });
-    }
-
-    public averageSegmentPeriod(): number {
-        return this.multiple * DAY_IN_MILLISECONDS;
+        super({ milliseconds: DAY_IN_MILLISECONDS, label: "ddd, DD", ...values });
     }
 
     public roundFirstSegmentStartDate(date: moment.Moment) {
@@ -108,14 +166,34 @@ export class DayTimeUnit extends TimeUnit {
     }
 }
 
+export class TwoDayTimeUnit extends DayTimeUnit {
+    constructor(values?: Partial<DayTimeUnit>) {
+        super({ multiple: 2, ...values });
+    }
+}
+
+export class ThreeDayTimeUnit extends DayTimeUnit {
+    constructor(values?: Partial<DayTimeUnit>) {
+        super({ multiple: 3, ...values });
+    }
+}
+
+export class WeekTimeUnit extends DayTimeUnit {
+    constructor(values?: Partial<DayTimeUnit>) {
+        super({ multiple: 7, ...values });
+    }
+}
+
+export class TwoWeekTimeUnit extends DayTimeUnit {
+    constructor(values?: Partial<DayTimeUnit>) {
+        super({ multiple: 14, ...values });
+    }
+}
+
 export class MonthTimeUnit extends TimeUnit {
 
     constructor(values?: Partial<MonthTimeUnit>) {
-        super({ label: "MMM. YYYY", ...values });
-    }
-
-    public averageSegmentPeriod(): number {
-        return this.multiple * MONTH_IN_MILLISECONDS;
+        super({ milliseconds: MONTH_IN_MILLISECONDS, label: "MMM. YYYY", ...values });
     }
 
     public roundFirstSegmentStartDate(date: moment.Moment) {
@@ -127,14 +205,28 @@ export class MonthTimeUnit extends TimeUnit {
     }
 }
 
+export class TwoMonthTimeUnit extends MonthTimeUnit {
+    constructor(values?: Partial<MonthTimeUnit>) {
+        super({ multiple: 2, ...values });
+    }
+}
+
+export class ThreeMonthTimeUnit extends MonthTimeUnit {
+    constructor(values?: Partial<MonthTimeUnit>) {
+        super({ multiple: 3, ...values });
+    }
+}
+
+export class SixMonthTimeUnit extends MonthTimeUnit {
+    constructor(values?: Partial<MonthTimeUnit>) {
+        super({ multiple: 6, ...values });
+    }
+}
+
 export class YearTimeUnit extends TimeUnit {
 
     constructor(values?: Partial<YearTimeUnit>) {
-        super({ label: "YYYY", ...values });
-    }
-
-    public averageSegmentPeriod(): number {
-        return this.multiple * YEAR_IN_MILLISECONDS;
+        super({ milliseconds: YEAR_IN_MILLISECONDS, label: "YYYY", ...values });
     }
 
     public roundFirstSegmentStartDate(date: moment.Moment) {
@@ -146,10 +238,29 @@ export class YearTimeUnit extends TimeUnit {
     }
 }
 
+export class TwoYearTimeUnit extends YearTimeUnit {
+    constructor(values?: Partial<YearTimeUnit>) {
+        super({ multiple: 2, ...values });
+    }
+}
+
+export class FiveYearTimeUnit extends YearTimeUnit {
+    constructor(values?: Partial<YearTimeUnit>) {
+        super({ multiple: 5, ...values });
+    }
+}
+
+export class TenYearTimeUnit extends YearTimeUnit {
+    constructor(values?: Partial<YearTimeUnit>) {
+        super({ multiple: 10, ...values });
+    }
+}
+
 export type TimebarProps = {
     start: moment.Moment;
     end: moment.Moment;
     width: number;
+    cursorTime: string,
     topTimeUnits?: TimeUnit[];
     topMinLabelSizeInPixels?: number;
     bottomTimeUnits?: TimeUnit[];
@@ -161,28 +272,45 @@ type Interval = {
     width: number,
 }
 
+export const ALL_TIME_UNITS = [
+    new SecondTimeUnit(),
+    new FiveSecondTimeUnit(),
+    new TenSecondTimeUnit(),
+    new FifteenSecondTimeUnit(),
+    new ThirtySecondTimeUnit(),
+    new MinuteTimeUnit(),
+    new FiveMinuteTimeUnit(),
+    new TenMinuteTimeUnit(),
+    new FifteenMinuteTimeUnit(),
+    new ThirtyMinuteTimeUnit(),
+    new HourTimeUnit(),
+    new TwoHourTimeUnit(),
+    new FourHourTimeUnit(),
+    new SixHourTimeUnit(),
+    new TwelveHourTimeUnit(),
+    new DayTimeUnit(),
+    new TwoDayTimeUnit(),
+    new ThreeDayTimeUnit(),
+    new WeekTimeUnit(),
+    new TwoWeekTimeUnit(),
+    new MonthTimeUnit(),
+    new TwoMonthTimeUnit(),
+    new ThreeMonthTimeUnit(),
+    new SixMonthTimeUnit(),
+    new YearTimeUnit(),
+    new TwoYearTimeUnit(),
+    new FiveYearTimeUnit(),
+    new TenYearTimeUnit(),
+];
+
 export class Timebar extends React.Component<TimebarProps, { topIntervals: Interval[], bottomIntervals: Interval[] }> {
 
     static defaultProps = {
-        topTimeUnits: [
-            new YearTimeUnit(),
-            new MonthTimeUnit(),
-            new DayTimeUnit(),
-            new HourTimeUnit(),
-            new HourTimeUnit(),
-            new MinuteTimeUnit(),
-            new SecondTimeUnit(),
-        ],
-        topMinLabelSizeInPixels: 50,
-        bottomTimeUnits: [
-            new YearTimeUnit(),
-            new MonthTimeUnit(),
-            new HourTimeUnit(),
-            new MinuteTimeUnit(),
-            new MinuteTimeUnit(),
-            new SecondTimeUnit(),
-        ],
-        bottomMinLabelSizeInPixels: 20,
+        topTimeUnits: ALL_TIME_UNITS,
+        topMinLabelSizeInPixels: 60,
+        bottomTimeUnits: ALL_TIME_UNITS,
+        bottomMinLabelSizeInPixels: 30,
+        cursorTime: "Time scale unavailable for current view size"
     }
 
     constructor(props: TimebarProps) {
@@ -197,7 +325,7 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
         this.calculateIntervals();
     }
 
-    componentDidUpdate(prevProps: Readonly<TimebarProps>, prevState: Readonly<{}>, snapshot?: any): void {
+    componentDidUpdate(prevProps: Readonly<TimebarProps>): void {
         if (prevProps.start != this.props.start
             || prevProps.end != this.props.end
             || prevProps.width != this.props.width
@@ -218,7 +346,7 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
 
         let timeUnit: TimeUnit | undefined = undefined;
         for (let key in timeUnits) {
-            if (timeUnits[Number(key)].averageSegmentPeriod() * 1.5 < duration && timeUnits[Number(key)].averageSegmentPeriod() * pixels_per_ms >= minLabelSizeInPixels
+            if (timeUnits[Number(key)].averageSegmentPeriod() <= duration && timeUnits[Number(key)].averageSegmentPeriod() * pixels_per_ms >= minLabelSizeInPixels
                 && (!averageSegmentPeriod || timeUnits[Number(key)].averageSegmentPeriod() < averageSegmentPeriod)
             ) {
                 timeUnit = timeUnits[Number(key)];
@@ -226,7 +354,7 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
             }
         }
         if (!timeUnit) {
-            return { intervals: [] }
+            return { intervals: [] };
         }
         let currentDate = timeUnit.roundFirstSegmentStartDate(this.props.start);
 
@@ -255,7 +383,12 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
         return <div className="rct9k-timebar"
             style={{ width: this.props.width }}>
             <div className="rct9k-timebar-outer" style={{ width: this.props.width }}>
-                <div className="rct9k-timebar-inner rct9k-timebar-inner-top">
+                {topIntervals.length === 0 && bottomIntervals.length === 0 && this.props.cursorTime ?
+                    <div style={{ textAlign: 'center' }}>
+                        {this.props.cursorTime}
+                    </div>
+                    : null}
+                {topIntervals.length ? <div className="rct9k-timebar-inner rct9k-timebar-inner-top">
                     {topIntervals.map(interval => {
                         return (
                             <span className='rct9k-timebar-item' style={{ width: intToPix(interval.width) }}>
@@ -263,8 +396,9 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
                             </span>
                         );
                     })}
-                </div>
-                <div className="rct9k-timebar-inner rct9k-timebar-inner-bottom">
+                </div> : null
+                }
+                {bottomIntervals.length ? <div className="rct9k-timebar-inner rct9k-timebar-inner-bottom">
                     {bottomIntervals.map(interval => {
                         return (
                             <span className='rct9k-timebar-item' style={{ width: intToPix(interval.width) }}>
@@ -272,7 +406,8 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
                             </span>
                         );
                     })}
-                </div>
+                </div> : null
+                }
             </div>
         </div>
     }
