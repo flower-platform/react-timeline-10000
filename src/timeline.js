@@ -2064,7 +2064,7 @@ export default class Timeline extends React.Component {
   getCursor() {
     const {showCursorTime, cursorTimeFormat} = this.props;
     const {cursorTime} = this.state;
-    return showCursorTime && cursorTime ? cursorTime.clone().format(cursorTimeFormat) : null;
+    return showCursorTime && cursorTime ? cursorTime.clone().format(cursorTimeFormat) : undefined;
   }
 
   /**
