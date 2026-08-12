@@ -1,32 +1,43 @@
 import { Scenario, render } from "@famiprog-foundation/tests-are-demo";
 import { Main } from "../stories/basic/Basic.stories";
+import { DayTimeUnit, HourTimeUnit, MinuteTimeUnit, TimeBarProps, Timeline } from "@famiprog-foundation/react-gantt";
 
 export class TimeBarTad {
 
-    async before() {
-        render(<Main timeBarProps={{}} />)
+    render() {
+        return <Timeline timeBarProps={{
+             topTimeUnits: [
+                new DayTimeUnit({ multiple: 10, timeFormat: "MMM Do YY" }),
+                new HourTimeUnit({ timeFormat: 'h:mm' })
+            ],
+            bottomTimeUnits: [
+                new DayTimeUnit({ timeFormat: "MMM Do YY" }),
+                new MinuteTimeUnit({ multiple: 2, timeFormat: 'h:mm' }),
+                new MinuteTimeUnit({ multiple: 4, timeFormat: 'h:mm' })
+            ]
+        }} />
     }
 
     /**
      * The `TimeBar` component displays time intervals across two distinct header rows (top and bottom).
-     * * Note: The 2nd row `always` has a smaller time unit (interval) than the top row
+     * 
+     * **Note**: The 2nd row `always` has a smaller time unit (interval) than the top row.
      * 
      * @img timebar.png
      * 
-     * ## Available Time Units
+     * ## Available Time Units:
      * 
      * @img default.png
      * 
-     * ## Default Activation
-     * By default, both rows automatically calculate and select the optimal time unit based on the current view zoom level
+     * ## Default Activation:
+     * By default, both rows automatically calculate and select the optimal time unit based on the current view zoom level.
      *
-     *  @img activate.png
+     * @img activate.png
      * 
      * ## Customization:
-     * Can explicitly configure the time units, formatting, and multipliers for both the top and bottom rows using `timeBarProps`
+     * Can explicitly configure the time units, formatting, and multipliers for both the top and bottom rows using `timeBarProps`.
      *
      * @img customize.png
-     * 
      */
     @Scenario()
     async _quickInstructions() {
