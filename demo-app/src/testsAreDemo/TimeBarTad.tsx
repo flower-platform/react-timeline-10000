@@ -8,21 +8,23 @@ export class TimeBarTad {
     }
 
     /**
+     * The `TimeBar` component displays time intervals across two distinct header rows (top and bottom).
+     * * Note: The 2nd row `always` has a smaller time unit (interval) than the top row
+     * 
      * @img timebar.png
      * 
-     * * The 2nd line `always` has a smaller time unit (interval) than the upper line
      * 
-     * Default time units used:
+     * ## Available Time Units
      * 
      * @img default.png
      * 
-     * ## Activation
-     * Both lines use the default to determine the optimal time unit
-     * 
-     * @img activate.png
+     * ## Default Activation
+     * By default, both rows automatically calculate and select the optimal time unit based on the current view zoom level
+     *
+     *  @img activate.png
      * 
      * ## Customization:
-     * Can set the label, the multiplier, and the time units to be used for the top and bottom lines
+     * Can explicitly configure the time units, formatting, and multipliers for both the top and bottom rows using `timeBarProps`
      * @img customize.png
      * 
      */
