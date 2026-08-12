@@ -10,7 +10,7 @@ export default {
   title: 'Features/Basic'
 };
 
-export const Main = () => {
+export const Main = (props: any) => {
   // the rows (aka groups)
   // id is mandatory; should: be numeric, start from 0, have consecutive values
   const humanResources: Group[] = [...someHumanResources, { id: 4, title: 'George Walsh' }];
@@ -34,14 +34,15 @@ export const Main = () => {
       {/* 2/ You'll probably have a better flex-box layout, i.e. not hardcoded. 3/ Use CSS classes and not styles. */}
       <div style={{ display: 'flex', height: '400px' }}>
         <Timeline startDate={d('2018-09-20')} endDate={d('2018-09-21')} groups={humanResources} items={tasks}
-                  table={<Table width={100} >
-                            <Column
-                                columnKey="title"
-                                width={100}
-                                header={<DataCell>Title</DataCell>}
-                                cell={({rowIndex}) => <DataCell>{rowIndex < humanResources.length ? humanResources[rowIndex].title : ""}</DataCell>}/>
-                        </Table>}
-          />
+          table={<Table width={100} >
+            <Column
+              columnKey="title"
+              width={100}
+              header={<DataCell>Title</DataCell>}
+              cell={({ rowIndex }) => <DataCell>{rowIndex < humanResources.length ? humanResources[rowIndex].title : ""}</DataCell>} />
+          </Table>}
+          {...props}
+        />
       </div>
     </>
   );
@@ -78,15 +79,15 @@ export const AlternativeRowColoring: ComponentStory<typeof Timeline> = () => {
 
       */}
       <div style={{ display: 'flex', height: '400px' }}>
-        <Timeline startDate={d('2018-09-20')} endDate={d('2018-09-21')} groups={someHumanResources} items={someTasks} 
-                  rowClassName='story-custom-row' rowEvenClassName='story-custom-row-even' rowOddClassName='story-custom-row-odd'
-                  table={<Table width={100} >
-                            <Column
-                                columnKey="title"
-                                width={100}
-                                header={<DataCell>Title</DataCell>}
-                                cell={({rowIndex}) => <DataCell>{rowIndex < someHumanResources.length ? someHumanResources[rowIndex].title : ""}</DataCell>}/>
-                        </Table>}/>
+        <Timeline startDate={d('2018-09-20')} endDate={d('2018-09-21')} groups={someHumanResources} items={someTasks}
+          rowClassName='story-custom-row' rowEvenClassName='story-custom-row-even' rowOddClassName='story-custom-row-odd'
+          table={<Table width={100} >
+            <Column
+              columnKey="title"
+              width={100}
+              header={<DataCell>Title</DataCell>}
+              cell={({ rowIndex }) => <DataCell>{rowIndex < someHumanResources.length ? someHumanResources[rowIndex].title : ""}</DataCell>} />
+          </Table>} />
       </div>
     </>
   );
@@ -101,16 +102,16 @@ AlternativeRowColoring.parameters = {
 };
 
 export const HorizontalScroll = () => {
-const tasks: Item[] = [
+  const tasks: Item[] = [
     ...someTasks, // Tasks that are outside the display interval  
     { key: 11, row: 4, title: 'Task GW1', start: d('2018-09-19 7:00'), end: d('2018-09-19 8:00') },
     { key: 12, row: 4, title: 'Task GW2', start: d('2018-09-19 17:00'), end: d('2018-09-19 19:00') },
-	  { key: 14, row: 1, title: 'Task GW3', start: d('2018-09-21 12:00'), end: d('2018-09-21 14:00') },
+    { key: 14, row: 1, title: 'Task GW3', start: d('2018-09-21 12:00'), end: d('2018-09-21 14:00') },
     { key: 15, row: 1, title: 'Task GW4', start: d('2018-09-21 15:00'), end: d('2018-09-21 17:00') },
     { key: 16, row: 1, title: 'Task GW5', start: d('2018-09-19 12:00'), end: d('2018-09-19 14:00') },
     { key: 17, row: 1, title: 'Task GW6', start: d('2018-09-19 9:00'), end: d('2018-09-19 12:00') },
   ];
-  
+
   return (
     <>
       {/* This is a trivial example to illustrate how Timeline "glues" to its "flex" parent. Notes: */}
@@ -118,14 +119,14 @@ const tasks: Item[] = [
       {/* 2/ You'll probably have a better flex-box layout, i.e. not hardcoded. 3/ Use CSS classes and not styles. */}
       <div style={{ display: 'flex', height: '400px' }}>
         <Timeline startDate={d('2018-09-20')} endDate={d('2018-09-21')} minDate={d('2018-09-19')} maxDate={d('2018-09-22')} groups={someHumanResources} items={tasks}
-                  table={<Table width={100} >
-                            <Column
-                                columnKey="title"
-                                width={100}
-                                header={<DataCell>Title</DataCell>}
-                                cell={({rowIndex}) => <DataCell>{rowIndex < someHumanResources.length ? someHumanResources[rowIndex].title : ""}</DataCell>}/>
-                        </Table>}
-          />
+          table={<Table width={100} >
+            <Column
+              columnKey="title"
+              width={100}
+              header={<DataCell>Title</DataCell>}
+              cell={({ rowIndex }) => <DataCell>{rowIndex < someHumanResources.length ? someHumanResources[rowIndex].title : ""}</DataCell>} />
+          </Table>}
+        />
       </div>
     </>
   );

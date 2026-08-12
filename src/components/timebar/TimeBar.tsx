@@ -256,7 +256,7 @@ export class TenYearTimeUnit extends YearTimeUnit {
     }
 }
 
-export type TimebarProps = {
+export type TimeBarProps = {
     start: moment.Moment;
     end: moment.Moment;
     width: number;
@@ -303,7 +303,7 @@ export const ALL_TIME_UNITS = [
     new TenYearTimeUnit(),
 ];
 
-export class Timebar extends React.Component<TimebarProps, { topIntervals: Interval[], bottomIntervals: Interval[] }> {
+export class TimeBar extends React.Component<TimeBarProps, { topIntervals: Interval[], bottomIntervals: Interval[] }> {
 
     static defaultProps = {
         topTimeUnits: ALL_TIME_UNITS,
@@ -313,7 +313,7 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
         unsupportedSizeMessage: "Time scale unavailable for current view size"
     }
 
-    constructor(props: TimebarProps) {
+    constructor(props: TimeBarProps) {
         super(props);
         this.state = {
             topIntervals: [],
@@ -325,7 +325,7 @@ export class Timebar extends React.Component<TimebarProps, { topIntervals: Inter
         this.calculateIntervals();
     }
 
-    componentDidUpdate(prevProps: Readonly<TimebarProps>): void {
+    componentDidUpdate(prevProps: Readonly<TimeBarProps>): void {
         if (prevProps.start != this.props.start
             || prevProps.end != this.props.end
             || prevProps.width != this.props.width

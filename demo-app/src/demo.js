@@ -443,7 +443,7 @@ export default class DemoTimeline extends Component {
           minDate={useMoment ? minDate : minDate.valueOf()}
           maxDate={useMoment ? maxDate : maxDate.valueOf()}
           showZoomShortcuts={true}
-          timebarProps={{}}
+          timeBarProps={{}}
           backgroundLayer={
             <BackgroundLayer
               nowMarker={true}

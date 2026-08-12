@@ -48,7 +48,7 @@ import ItemRenderer from './components/ItemRenderer';
 import {SCROLLBAR_SIZE, Scrollbar} from './components/Scrollbar';
 import {IGanttAction} from './types';
 import {SelectionHolder} from './utils/SelectionHolder';
-import {Timebar as NewTimebar} from './components/timebar/Timebar';
+import {TimeBar} from './components/timebar/TimeBar';
 
 const testids = createTestids('Timeline', {
   menuButton: '',
@@ -560,9 +560,9 @@ export default class Timeline extends React.Component {
     zoomEnabled: PropTypes.oneOfType([PropTypes.bool, PropTypes.func]),
 
     /**
-     * @type { TimebarProps }
+     * @type { TimeBarProps }
      */
-    timebarProps: PropTypes.shape({
+    timeBarProps: PropTypes.shape({
       topTimeUnits: [PropTypes.object],
       topMinLabelSizeInPixels: PropTypes.number,
       bottomTimeUnits: [PropTypes.object],
@@ -627,7 +627,7 @@ export default class Timeline extends React.Component {
     },
     showZoomShortcuts: false,
     zoomEnabled: true,
-    timebarProps: undefined
+    timeBarProps: undefined
   };
 
   /**
@@ -2561,13 +2561,13 @@ export default class Timeline extends React.Component {
                     />,
                     document.body
                   )}
-                  {this.props.timebarProps ? (
-                    <NewTimebar
+                  {this.props.timeBarProps ? (
+                    <TimeBar
                       unsupportedSizeMessage={this.getCursor()}
                       start={this.getStartDate()}
                       end={this.getEndDate()}
                       width={this.state.gridWidth}
-                      {...this.props.timebarProps}
+                      {...this.props.timeBarProps}
                     />
                   ) : (
                     <Timebar
