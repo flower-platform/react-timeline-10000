@@ -13,7 +13,6 @@ export class TimeBarTad {
      * 
      * @img timebar.png
      * 
-     * 
      * ## Available Time Units
      * 
      * @img default.png
@@ -25,6 +24,7 @@ export class TimeBarTad {
      * 
      * ## Customization:
      * Can explicitly configure the time units, formatting, and multipliers for both the top and bottom rows using `timeBarProps`
+     *
      * @img customize.png
      * 
      */

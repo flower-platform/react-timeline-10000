@@ -20,7 +20,6 @@ The `TimeBar` component displays time intervals across two distinct header rows 
 
 ![timebar.png](../../featurebook-img/testsAreDemo/TimeBarTad/_quickInstructions/timebar.png)
 
-
 ## Available Time Units
 
 ![default.png](../../featurebook-img/testsAreDemo/TimeBarTad/_quickInstructions/default.png)
@@ -32,6 +31,7 @@ By default, both rows automatically calculate and select the optimal time unit b
 
 ## Customization:
 Can explicitly configure the time units, formatting, and multipliers for both the top and bottom rows using `timeBarProps`
+
 ![customize.png](../../featurebook-img/testsAreDemo/TimeBarTad/_quickInstructions/customize.png)
 
 </td></tr>
