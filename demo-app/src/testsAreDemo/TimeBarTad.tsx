@@ -4,18 +4,8 @@ import { DayTimeUnit, HourTimeUnit, MinuteTimeUnit, TimeBarProps, Timeline } fro
 
 export class TimeBarTad {
 
-    render() {
-        return <Timeline timeBarProps={{
-             topTimeUnits: [
-                new DayTimeUnit({ multiple: 10, timeFormat: "MMM Do YY" }),
-                new HourTimeUnit({ timeFormat: 'h:mm' })
-            ],
-            bottomTimeUnits: [
-                new DayTimeUnit({ timeFormat: "MMM Do YY" }),
-                new MinuteTimeUnit({ multiple: 2, timeFormat: 'h:mm' }),
-                new MinuteTimeUnit({ multiple: 4, timeFormat: 'h:mm' })
-            ]
-        }} />
+    async before() {
+        render(<Main timeBarProps={{}} />)
     }
 
     /**
