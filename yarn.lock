@@ -1139,7 +1139,7 @@
 "@famiprog-foundation/tests-are-demo@^1.4.2":
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/@famiprog-foundation/tests-are-demo/-/tests-are-demo-1.4.2.tgz#90896eab40aef6e0e422335010b6a12aaac83529"
-  integrity sha512-sGcF1ZMGLJZSMa/q/3fHU6AsjqSqMZIpZ/JbhRH6j9/77DmUl9F95FD4jKGplvUGzQiznVVITbHMhVClzhRYNQ==
+  integrity sha512-f910f60c683ed45e6d97433a05e9aff2e3171a0bc6fa564e9791f1140fe51761==
   dependencies:
     "@famiprog-foundation/scriptable-ui" "^2.0.1"
     "@famiprog-foundation/utils" "^1.0.0"
