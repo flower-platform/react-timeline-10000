@@ -1,6 +1,5 @@
 import { Scenario, render } from "@famiprog-foundation/tests-are-demo";
 import { Main } from "../stories/basic/Basic.stories";
-import { DayTimeUnit, HourTimeUnit, MinuteTimeUnit, TimeBarProps, Timeline } from "@famiprog-foundation/react-gantt";
 
 export class TimeBarTad {
 
