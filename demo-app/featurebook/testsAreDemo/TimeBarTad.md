@@ -17,7 +17,7 @@ Go to [Featurebook > Index](../FEATUREBOOK.md)
 
 ![timebar.png](../../featurebook-img/testsAreDemo/TimeBarTad/_quickInstructions/timebar.png)
 
-* The 2nd line always has a smaller period than the upper line
+* The 2nd line always has a smaller time unit(interval) than the upper line
 
 Default time units used:
 
