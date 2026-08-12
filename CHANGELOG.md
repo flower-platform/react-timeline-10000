@@ -1,6 +1,6 @@
 ## Unreleased
 
-[New Timebar with intermediate steps for intervals](https://github.com/flower-platform/react-timeline-10000/pull/85)
+[TimeBar with intermediate steps for intervals](https://github.com/flower-platform/react-timeline-10000/pull/85)
 
 ## v2.16.0
 
