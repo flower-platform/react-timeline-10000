@@ -1,5 +1,7 @@
 ## Unreleased
 
+[TimeBar with intermediate steps for intervals](https://github.com/flower-platform/react-timeline-10000/pull/85)
+
 ## v2.16.0
 
 * [Fix blank page when resizing gantt to minimum width](https://github.com/flower-platform/react-timeline-10000/pull/116)

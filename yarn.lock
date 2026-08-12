@@ -1138,8 +1138,8 @@
 
 "@famiprog-foundation/tests-are-demo@^1.4.2":
   version "1.4.2"
-  resolved "https://nexus.xops-online.com/repository/npm-public/@famiprog-foundation/tests-are-demo/-/tests-are-demo-1.4.2.tgz#90896eab40aef6e0e422335010b6a12aaac83529"
-  integrity sha512-EsJIvZXWEEn/Jk86h/MU/0Jzq/XITfw6Ra2tbFZJbDTJL+ONSGBI0yoPLRQKnPbFZfDW2CKx6ktXDm42MP4TRw==
+  resolved "https://registry.yarnpkg.com/@famiprog-foundation/tests-are-demo/-/tests-are-demo-1.4.2.tgz#c24db582f17eac8ea221c0eb2999b58aa13e6189"
+  integrity sha512-sGcF1ZMGLJZSMa/q/3fHU6AsjqSqMZIpZ/JbhRH6j9/77DmUl9F95FD4jKGplvUGzQiznVVITbHMhVClzhRYNQ==
   dependencies:
     "@famiprog-foundation/scriptable-ui" "^2.0.1"
     "@famiprog-foundation/utils" "^1.0.0"

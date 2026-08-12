@@ -1,23 +1,22 @@
 'use strict';
 
-import React from 'react';
 import ReactDOM from 'react-dom';
 
-import './stories/storybook.css';
 import '@famiprog-foundation/react-gantt/style.css';
+import './stories/storybook.css';
 
+import { tad, TestsAreDemoAppWrapper } from '@famiprog-foundation/tests-are-demo';
 import DemoTimeline from './demo';
-import {TestsAreDemoAppWrapper} from '@famiprog-foundation/tests-are-demo';
-import {tad} from '@famiprog-foundation/tests-are-demo';
-import {DragToCreateTestsAreDemo} from './testsAreDemo/DragToCreateTestsAreDemo';
-import {TableTestsAreDemo} from './testsAreDemo/TableTestsAreDemo';
-import {SelectedItemsTestsAreDemo} from './testsAreDemo/SelectedItemsTestsAreDemo';
-import {ContextMenuTestsAreDemo} from './testsAreDemo/ContextMenuTestsAreDemo';
-import {DynamicConfigurationTestsAreDemo} from './testsAreDemo/DynamicConfigurationTestsAreDemo';
 import { BackgroundLayersTestsAreDemo } from './testsAreDemo/BackgroundLayersTestsAreDemo';
+import { ContextMenuTestsAreDemo } from './testsAreDemo/ContextMenuTestsAreDemo';
 import { DisplayItemOnSeparateRowIfOverlapTestsAreDemo } from './testsAreDemo/DisplayItemOnSeparateRowIfOverlapTestsAreDemo';
-import { ZoomTestsAreDemo } from './testsAreDemo/ZoomTestsAreDemo';
+import { DragToCreateTestsAreDemo } from './testsAreDemo/DragToCreateTestsAreDemo';
+import { DynamicConfigurationTestsAreDemo } from './testsAreDemo/DynamicConfigurationTestsAreDemo';
 import { NowMarkerTestsAreDemo } from './testsAreDemo/NowMarkerTestsAreDemo';
+import { SelectedItemsTestsAreDemo } from './testsAreDemo/SelectedItemsTestsAreDemo';
+import { TableTestsAreDemo } from './testsAreDemo/TableTestsAreDemo';
+import { TimeBarTad } from './testsAreDemo/TimeBarTad';
+import { ZoomTestsAreDemo } from './testsAreDemo/ZoomTestsAreDemo';
 
 ReactDOM.render(
   <TestsAreDemoAppWrapper
@@ -25,14 +24,15 @@ ReactDOM.render(
     app={<DemoTimeline />}
     importTestsCallback={() => {
       tad.addTests(
-        DragToCreateTestsAreDemo,
-        SelectedItemsTestsAreDemo,
-        ContextMenuTestsAreDemo,
-        TableTestsAreDemo,
-        DynamicConfigurationTestsAreDemo,
         BackgroundLayersTestsAreDemo,
-        NowMarkerTestsAreDemo,
+        ContextMenuTestsAreDemo,
         DisplayItemOnSeparateRowIfOverlapTestsAreDemo,
+        DragToCreateTestsAreDemo,
+        DynamicConfigurationTestsAreDemo,
+        NowMarkerTestsAreDemo,
+        SelectedItemsTestsAreDemo,
+        TableTestsAreDemo,
+        TimeBarTad,
         ZoomTestsAreDemo
       );
     }}

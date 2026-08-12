@@ -10,7 +10,7 @@ export default {
   title: 'Features/Basic'
 };
 
-export const Main = () => {
+export const Main = (props:any) => {
   // the rows (aka groups)
   // id is mandatory; should: be numeric, start from 0, have consecutive values
   const humanResources: Group[] = [...someHumanResources, { id: 4, title: 'George Walsh' }];
@@ -41,6 +41,7 @@ export const Main = () => {
                                 header={<DataCell>Title</DataCell>}
                                 cell={({rowIndex}) => <DataCell>{rowIndex < humanResources.length ? humanResources[rowIndex].title : ""}</DataCell>}/>
                         </Table>}
+            {...props}
           />
       </div>
     </>
