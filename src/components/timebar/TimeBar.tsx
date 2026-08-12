@@ -35,7 +35,6 @@ export class TimeUnit {
 }
 
 export class SecondTimeUnit extends TimeUnit {
-
     constructor(values?: Partial<SecondTimeUnit>) {
         super({ milliseconds: SECOND_IN_MILLISECONDS, timeFormat: "ss", ...values });
     }
@@ -74,7 +73,6 @@ export class ThirtySecondTimeUnit extends SecondTimeUnit {
 }
 
 export class MinuteTimeUnit extends TimeUnit {
-
     constructor(values?: Partial<MinuteTimeUnit>) {
         super({ milliseconds: MINUTE_IN_MILLISECONDS, timeFormat: "mm", ...values });
     }
@@ -113,7 +111,6 @@ export class ThirtyMinuteTimeUnit extends MinuteTimeUnit {
 }
 
 export class HourTimeUnit extends TimeUnit {
-
     constructor(values?: Partial<HourTimeUnit>) {
         super({ milliseconds: HOUR_IN_MILLISECONDS, timeFormat: "HH", ...values });
     }
@@ -152,7 +149,6 @@ export class TwelveHourTimeUnit extends HourTimeUnit {
 }
 
 export class DayTimeUnit extends TimeUnit {
-
     constructor(values?: Partial<DayTimeUnit>) {
         super({ milliseconds: DAY_IN_MILLISECONDS, timeFormat: "ddd, DD", ...values });
     }
@@ -191,7 +187,6 @@ export class TwoWeekTimeUnit extends DayTimeUnit {
 }
 
 export class MonthTimeUnit extends TimeUnit {
-
     constructor(values?: Partial<MonthTimeUnit>) {
         super({ milliseconds: MONTH_IN_MILLISECONDS, timeFormat: "MMM. YYYY", ...values });
     }
@@ -224,7 +219,6 @@ export class SixMonthTimeUnit extends MonthTimeUnit {
 }
 
 export class YearTimeUnit extends TimeUnit {
-
     constructor(values?: Partial<YearTimeUnit>) {
         super({ milliseconds: YEAR_IN_MILLISECONDS, timeFormat: "YYYY", ...values });
     }
