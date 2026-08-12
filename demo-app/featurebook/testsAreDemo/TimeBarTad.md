@@ -17,18 +17,19 @@ Go to [Featurebook > Index](../FEATUREBOOK.md)
 
 ![timebar.png](../../featurebook-img/testsAreDemo/TimeBarTad/_quickInstructions/timebar.png)
 
-* The 2nd line always has a smaller time unit(interval) than the upper line
+* The 2nd line `always` has a smaller time unit (interval) than the upper line
 
 Default time units used:
 
 ![default.png](../../featurebook-img/testsAreDemo/TimeBarTad/_quickInstructions/default.png)
 
-Activation:
+## Activation
+Both lines use the default to determine the optimal time unit
 
 ![activate.png](../../featurebook-img/testsAreDemo/TimeBarTad/_quickInstructions/activate.png)
 
-Customization:
-
+## Customization:
+Can set the label, the multiplier, and the time units to be used for the top and bottom lines
 ![customize.png](../../featurebook-img/testsAreDemo/TimeBarTad/_quickInstructions/customize.png)
 
 </td></tr>

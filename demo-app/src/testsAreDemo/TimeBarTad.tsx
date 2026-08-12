@@ -10,18 +10,19 @@ export class TimeBarTad {
     /**
      * @img timebar.png
      * 
-     * * The 2nd line always has a smaller time unit(interval) than the upper line
+     * * The 2nd line `always` has a smaller time unit (interval) than the upper line
      * 
      * Default time units used:
      * 
      * @img default.png
      * 
-     * Activation:
+     * ## Activation
+     * Both lines use the default to determine the optimal time unit
      * 
      * @img activate.png
      * 
-     * Customization:
-     * 
+     * ## Customization:
+     * Can set the label, the multiplier, and the time units to be used for the top and bottom lines
      * @img customize.png
      * 
      */
