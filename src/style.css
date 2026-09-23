@@ -344,12 +344,9 @@
   border-right: 2px solid #ccc;
 }
 
-.rct9k-timebar {
-  display: flex;
-}
-
 /* Timeline top timebar */
-.rct9k-timebar {
+.rct9k-timebar,
+.rct9k-timebar-row {
   display: flex;
 }
 
@@ -394,6 +391,15 @@
 
 .rct9k-timebar-group-title {
   border-right: 2px solid #ccc;
+}
+
+.rct9k-timebar-scrollbar-gutter {
+  height: 60px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-left: 0;
+  background-image: linear-gradient(#fff, #efefef);
+  flex-shrink: 0;
 }
 
 .rct9k-timeline-div {
