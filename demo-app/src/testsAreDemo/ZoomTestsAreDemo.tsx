@@ -32,13 +32,14 @@ export class ZoomTestsAreDemo {
 
     private calculateExpetedStartEndDate(start: number | moment.Moment, end: number | moment.Moment, zoomOut: boolean) {
         const interval = moment(end).valueOf() - moment(start).valueOf();
-        const delta = (Math.floor((this.timeline._gridDomNode as Element).getBoundingClientRect().x + this.timeline._grid.props.width / 2) - this.timeline.getGanttLeftOffset()) / this.timeline._grid.props.width;
+        const timelineWidth = this.timeline.getTimelineWidth();
+        const delta = (Math.floor((this.timeline._gridDomNode as Element).getBoundingClientRect().x + timelineWidth / 2) - this.timeline.getGanttLeftOffset()) / timelineWidth;
         let deltaInterval = interval * ZOOM_PERCENT;
         if (zoomOut) {
             deltaInterval *= -1;
         }
         let startDate = moment(Math.max((this.timeline.getMinDate() as unknown as moment.Moment).valueOf(), moment(start).valueOf() + delta * deltaInterval));
-        let endDate = moment(Math.min((this.timeline.getMaxDateWithExtraMsForScrollbar() as unknown as moment.Moment).valueOf(), moment(end).valueOf() - (1 - delta) * deltaInterval));
+        let endDate = moment(Math.min((this.timeline.getMaxDate() as unknown as moment.Moment).valueOf(), moment(end).valueOf() - (1 - delta) * deltaInterval));
         return { expetedStartDate: startDate, expetedEndDate: endDate };
     }
 

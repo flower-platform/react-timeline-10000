@@ -684,7 +684,8 @@ export default class Timeline extends React.Component {
       touchPositionX: undefined,
       fadeEffectOpen: false,
       fadeEffectContent: undefined,
-      fadeEffectOpacity: 0
+      fadeEffectOpacity: 0,
+      gridVerticalScrollbarWidth: 0
     };
 
     // These functions need to be bound because they are passed as parameters.
@@ -754,7 +755,7 @@ export default class Timeline extends React.Component {
       run: params => {
         let event = new MouseEvent('wheel', {
           ctrlKey: true,
-          clientX: that._gridDomNode.getBoundingClientRect().x + that._grid.props.width / 2,
+          clientX: that._gridDomNode.getBoundingClientRect().x + that.getTimelineWidth() / 2,
           bubbles: true,
           cancelable: true
         });
@@ -770,7 +771,7 @@ export default class Timeline extends React.Component {
       run: params => {
         let event = new MouseEvent('wheel', {
           ctrlKey: true,
-          clientX: that._gridDomNode.getBoundingClientRect().x + that._grid.props.width / 2,
+          clientX: that._gridDomNode.getBoundingClientRect().x + that.getTimelineWidth() / 2,
           bubbles: true,
           cancelable: true
         });
@@ -889,6 +890,7 @@ export default class Timeline extends React.Component {
       this.fillInTimelineWithEmptyRows(this.props.groups);
       this.refreshGrid();
     }
+    this.calculateGridVerticalScrollbarWidth();
   }
 
   isTouchDevice() {
@@ -913,7 +915,7 @@ export default class Timeline extends React.Component {
       e.stopPropagation();
 
       const interval = this.getEndDate().valueOf() - this.getStartDate().valueOf();
-      const delta = (e.clientX - this.getGanttLeftOffset()) / this._grid.props.width;
+      const delta = (e.clientX - this.getGanttLeftOffset()) / this.getTimelineWidth();
       let deltaInterval = interval * ZOOM_PERCENT;
       if (e.deltaY > 0) {
         deltaInterval *= -1;
@@ -1012,25 +1014,6 @@ export default class Timeline extends React.Component {
     } else {
       return convertDateToMoment(this.props.endDate, this.props.useMoment);
     }
-  }
-
-  /**
-   * Adds a buffer to the maximum time to prevent the vertical scrollbar from cutting off content.
-   * @returns {moment}
-   */
-  getMaxDateWithExtraMsForScrollbar() {
-    let end = this.getMaxDate();
-    const width = this.state.gridWidth;
-    // This calculation is fragile as it depends on the internal DOM structure of react-virtualized's Grid.
-    const virtualizedGridFirstChild = this._gridDomNode ? this._gridDomNode.firstChild : undefined;
-    const vScrollbarWidth = virtualizedGridFirstChild
-      ? this._gridDomNode.getBoundingClientRect().width - virtualizedGridFirstChild.getBoundingClientRect().width
-      : 0;
-
-    if (!vScrollbarWidth || !width) return end;
-
-    const extraMs = getDurationFromPixels(vScrollbarWidth, this.getStartDate(), this.getEndDate(), width);
-    return end.clone().add(extraMs, 'milliseconds');
   }
 
   /**
@@ -1186,11 +1169,9 @@ export default class Timeline extends React.Component {
       });
     });
 
-    const maxDateWithExtraMs = this.getMaxDateWithExtraMsForScrollbar();
     let maxVisibleItems = _.filter(items, i => {
       return (
-        this.getEndFromItem(i, useMoment) > this.getMinDate() &&
-        this.getStartFromItem(i, useMoment) < maxDateWithExtraMs
+        this.getEndFromItem(i, useMoment) > this.getMinDate() && this.getStartFromItem(i, useMoment) < this.getMaxDate()
       );
     });
     let maxVisibleItemsRows = _.groupBy(maxVisibleItems, 'row');
@@ -1331,12 +1312,28 @@ export default class Timeline extends React.Component {
   }
 
   /**
+   * Calculates the width of the vertical scrollbar in the grid and updates the state if it has changed.
+   * This is necessary to ensure that the timeline width is calculated correctly, especially when the vertical scrollbar appears or disappears.
+   */
+  calculateGridVerticalScrollbarWidth() {
+    // This calculation is fragile as it depends on the internal DOM structure of react-virtualized's Grid.
+    const virtualizedGridFirstChild = this._gridDomNode ? this._gridDomNode.firstChild : undefined;
+    const vScrollbarWidth = virtualizedGridFirstChild
+      ? this._gridDomNode.getBoundingClientRect().width - virtualizedGridFirstChild.getBoundingClientRect().width
+      : 0;
+    if (vScrollbarWidth !== this.state.gridVerticalScrollbarWidth) {
+      this.setState({gridVerticalScrollbarWidth: vScrollbarWidth});
+    }
+  }
+
+  /**
    * Get the width of the timeline NOT including the left group list
    * @param {?number} totalWidth Total timeline width. If not supplied we use the timeline ref
    * @returns {number} The width in pixels
    */
   getTimelineWidth(totalWidth) {
-    return totalWidth !== undefined ? totalWidth : this._grid.props.width;
+    const fullWidth = totalWidth !== undefined ? totalWidth : this._grid ? this._grid.props.width : 0;
+    return Math.max(0, fullWidth - (this.state.gridVerticalScrollbarWidth || 0));
   }
 
   /**
@@ -2501,10 +2498,8 @@ export default class Timeline extends React.Component {
       });
     }
 
-    const ganttVerticalScrollbarWidth =
-      this._gridDomNode && this._gridDomNode.firstChild
-        ? this._gridDomNode.getBoundingClientRect().width - this._gridDomNode.firstChild.getBoundingClientRect().width
-        : 0;
+    const gridVerticalScrollbarWidth = this.state.gridVerticalScrollbarWidth || 0;
+    const timelineContentWidth = this.getTimelineWidth(this.state.gridWidth);
     return (
       <div style={{flex: 1, overflow: 'hidden'}}>
         <Measure
@@ -2548,17 +2543,22 @@ export default class Timeline extends React.Component {
                     />,
                     document.body
                   )}
-                  <Timebar
-                    componentId={this.props.componentId}
-                    cursorTime={this.getCursor()}
-                    start={this.getStartDate()}
-                    end={this.getEndDate()}
-                    width={this.state.gridWidth}
-                    leftOffset={0}
-                    selectedRanges={this.state.selection}
-                    setVerticalGridLines={this.setVerticalGridLines}
-                    {...varTimebarProps}
-                  />
+                  <div className="rct9k-timebar-row" style={{width: this.state.gridWidth}}>
+                    <Timebar
+                      componentId={this.props.componentId}
+                      cursorTime={this.getCursor()}
+                      start={this.getStartDate()}
+                      end={this.getEndDate()}
+                      width={timelineContentWidth}
+                      leftOffset={0}
+                      selectedRanges={this.state.selection}
+                      setVerticalGridLines={this.setVerticalGridLines}
+                      {...varTimebarProps}
+                    />
+                    {gridVerticalScrollbarWidth > 0 && (
+                      <div className="rct9k-timebar-scrollbar-gutter" style={{width: gridVerticalScrollbarWidth}} />
+                    )}
+                  </div>
                   {markers.map(m => (
                     <Marker
                       key={m.key}
@@ -2580,7 +2580,7 @@ export default class Timeline extends React.Component {
                     rowHeight={this.rowHeight}
                     rowCount={this.state.groups.length}
                     columnCount={1}
-                    cellRenderer={this.cellRenderer(this.getTimelineWidth(this.state.gridWidth))}
+                    cellRenderer={this.cellRenderer(timelineContentWidth)}
                     grid_ref_callback={this.grid_ref_callback}
                     shallowUpdateCheck={shallowUpdateCheck}
                     forceRedrawFunc={forceRedrawFunc}
@@ -2588,7 +2588,7 @@ export default class Timeline extends React.Component {
                   />
                   <Scrollbar
                     minScrollPosition={this.getMinDate().valueOf()}
-                    maxScrollPosition={this.getMaxDateWithExtraMsForScrollbar().valueOf()}
+                    maxScrollPosition={this.getMaxDate().valueOf()}
                     scrollPosition={this.getStartDate().valueOf()}
                     pageSize={this.getEndDate().valueOf() - this.getStartDate().valueOf()}
                     hasArrows={true}
@@ -2604,21 +2604,8 @@ export default class Timeline extends React.Component {
                   {backgroundLayer &&
                     React.cloneElement(backgroundLayer, {
                       startDateTimeline: this.getStartDate(),
-                      // Because the background layers are in front of the gantt TimelineBody
-                      // (because they need to display in front of the colored background of the rows)
-                      // they cover up the vertical scrollbar. So that's why we need to make then stop before the vertical scrollbar
-                      endDateTimeline: this.getEndDate()
-                        .clone()
-                        .add(
-                          -getDurationFromPixels(
-                            ganttVerticalScrollbarWidth,
-                            this.getStartDate(),
-                            this.getEndDate(),
-                            this.state.gridWidth
-                          ),
-                          'milliseconds'
-                        ),
-                      width: this.state.gridWidth - ganttVerticalScrollbarWidth,
+                      endDateTimeline: this.getEndDate(),
+                      width: timelineContentWidth,
                       leftOffset: 0,
                       height: bodyHeight - (this.state.hasHorizontalScrollbar ? SCROLLBAR_SIZE : 0),
                       topOffset: timebarHeight,
