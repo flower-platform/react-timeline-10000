@@ -81,6 +81,7 @@ export const DEFAULT_ROW_ODD_CLASS = '';
 export const DRAG_TO_CREATE_POPUP_CLOSE_TIME = 5000;
 export const DRAG_TO_CREATE_POPUP_LABEL_2 = 'Popup will close in a few moments.';
 
+const GRID_LEFT_BORDER = 1;
 const FADE_OPACITY_OFFSET = 0.1;
 const FADE_TIMER_INTERVAR = 100;
 export const ZOOM_PERCENT = 0.2;
@@ -1316,11 +1317,10 @@ export default class Timeline extends React.Component {
    * This is necessary to ensure that the timeline width is calculated correctly, especially when the vertical scrollbar appears or disappears.
    */
   calculateGridVerticalScrollbarWidth() {
-    // This calculation is fragile as it depends on the internal DOM structure of react-virtualized's Grid.
-    const virtualizedGridFirstChild = this._gridDomNode ? this._gridDomNode.firstChild : undefined;
-    const vScrollbarWidth = virtualizedGridFirstChild
-      ? this._gridDomNode.getBoundingClientRect().width - virtualizedGridFirstChild.getBoundingClientRect().width
+    let vScrollbarWidth = this._gridDomNode
+      ? this._gridDomNode.offsetWidth - this._gridDomNode.clientWidth - GRID_LEFT_BORDER
       : 0;
+    vScrollbarWidth = Math.max(0, vScrollbarWidth);
     if (vScrollbarWidth !== this.state.gridVerticalScrollbarWidth) {
       this.setState({gridVerticalScrollbarWidth: vScrollbarWidth});
     }
@@ -1331,7 +1331,7 @@ export default class Timeline extends React.Component {
    * @param {?number} totalWidth Total timeline width. If not supplied we use the timeline ref
    * @returns {number} The width in pixels
    */
-  getTimelineWidth(totalWidth) {
+  getTimelineWidth(totalWidth = undefined) {
     const fullWidth = totalWidth !== undefined ? totalWidth : this._grid ? this._grid.props.width : 0;
     return Math.max(0, fullWidth - (this.state.gridVerticalScrollbarWidth || 0));
   }

@@ -1,5 +1,7 @@
 ## Unreleased
 
+* [Prevent timeline items from rendering underneath the vertical scrollbar](https://github.com/flower-platform/react-timeline-10000/pull/117/)
+
 ## v2.16.0
 
 * [Fix blank page when resizing gantt to minimum width](https://github.com/flower-platform/react-timeline-10000/pull/116)
