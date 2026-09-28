@@ -22,9 +22,22 @@ interface ContextMenuProps {
    */
   positionToOpen?: Point;
   /**
+   * used usually when we have some components which render modals and we want that clicking during modal opening to not trigger their close
+   * and the menu close, this happening because popup detects click on modal as click on outside it and close the modals
+   */
+  preventMenuClose?: boolean;
+  /**
+   * it is given to the Popup in order to have possibility to customize its style
+   */
+  className?: string;
+  /**
    * Callback for extra actions when the menu is closed
    */
   onClose?: () => void;
+  /**
+   * Callback to render some content in the popup before the menu with effective actions
+   */
+  preRenderContent?: () => React.ReactElement
 }
 
 const testids = createTestids('ContextMenu', {
@@ -80,8 +93,10 @@ export class ContextMenu extends React.Component<ContextMenuProps, ContextMenuSt
   }
 
   close() {
-    this.setState({ isOpened: false });
-    this.props.onClose && this.props.onClose();
+    if (!this.props.preventMenuClose) {
+      this.setState({ isOpened: false });
+      this.props.onClose && this.props.onClose();
+    }
   }
 
   /**
@@ -134,13 +149,14 @@ export class ContextMenu extends React.Component<ContextMenuProps, ContextMenuSt
     const visibleActions = this.getVisisbleActions(this.props.actions);
     return <>
       <TestsAreDemoCheat objectToPublish={this} />
-      <Popup id={this.id} basic wide='very' data-testid={testids.popup} context={this.getPopupContext()}
+      <Popup id={this.id} className={this.props.className} basic wide='very' data-testid={testids.popup} context={this.getPopupContext()}
         style={{ maxHeight: '80vh', maxWidth: '80vw', overflow: 'auto', visibility: this.state.isAdjusted ? 'visible' : 'hidden' }}
         positionFixed
         position='bottom left'
         onClose={() => {
           this.close();
         }} open={(this.state.isOpened && visibleActions.length > 0)}>
+        {this.props.preRenderContent?.()}
         <Menu className="rct9k-context-menu" secondary vertical >
           {visibleActions.map((action: IAction) => {
             const key = visibleActions.indexOf(action);
