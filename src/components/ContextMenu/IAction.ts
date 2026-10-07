@@ -49,6 +49,7 @@ export interface IAction {
     isDisabled?: (param: IActionParam) => boolean,
     icon?: SemanticShorthandItem<IconProps>,
     label?: string | ((param: IActionParam) => string),
+    key?: string | ((param: IActionParam) => string),
     /**
      * Function that will be called when user will click this menu entry. Will receives as parameter the current selected items
      */

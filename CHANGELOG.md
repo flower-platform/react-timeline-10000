@@ -1,4 +1,5 @@
 ## Unreleased
+* [Improving data-testids for actions](https://github.com/flower-platform/react-timeline-10000/pull/109)
 
 * [Prevent timeline items from rendering underneath the vertical scrollbar](https://github.com/flower-platform/react-timeline-10000/pull/117/)
 
