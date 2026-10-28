@@ -321,6 +321,31 @@
   outline: none !important;
 }
 
+/* We use `scrollbar-gutter: stable !important` instead of `overflow-y: scroll` 
+ * to prevent layout shifts when content size changes.. 
+ *
+ * - `overflow-y: scroll` forces a vertical scrollbar to stay permanently visible, 
+ * even when there is no content to scroll,
+ * - `scrollbar-gutter: stable` reserves space for the vertical scrollbar gutter,
+ * preventing the grid content from "jumping" when a scrollbar dynamically appears or disappears.
+ */
+.rct9k-grid.ReactVirtualized__Grid {
+  scrollbar-gutter: stable !important;
+}
+
+/* 
+ * This ensure the scrollbar width is immediately set to 10px on initial render.
+ * Without this explicit rule, getVerticalScrollbarGutterWidth() measures the browser's 
+ * native scrollbar (~15px in Chrome) during initial component mounting. This is before global styles (Semantic UI)
+ * fully apply (a few moments after `document.readyState === 'complete'`).  
+ * Setting it directly on the Grid prevents incorrect initial width calculations and layout shift.
+ * Without this, we would not be able to measure the scrollbar width correctly until after the first render,
+ * which can cause layout issues. Also, we would not be able to cache the correct width.
+ */
+.rct9k-grid.ReactVirtualized__Grid::-webkit-scrollbar {
+  width: 10px;
+}
+
 .ReactVirtualized__Grid {
   overflow-x: hidden;
 }
