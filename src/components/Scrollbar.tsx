@@ -162,7 +162,7 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
         // a scrollbar that is "double binded" to a state variable in the parent component (e.g. in gantt)
         // It is caused by a small precision lost when converting from pixels to client unit and then back again
         const oldScrollPositionInPixels = this.props.direction == Direction.HORIZONTAL ? this._outterDiv.scrollLeft : this._outterDiv.scrollTop;
-         if (roundDoubleToDecimals(scrollPositionInPixels) == roundDoubleToDecimals(oldScrollPositionInPixels)) {
+        if (roundDoubleToDecimals(scrollPositionInPixels) == roundDoubleToDecimals(oldScrollPositionInPixels)) {
             return;
         }
         if (this.props.direction == Direction.HORIZONTAL) {
