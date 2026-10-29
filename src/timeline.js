@@ -2576,6 +2576,7 @@ export default class Timeline extends React.Component {
                     onScroll={this.handleScrollGantt}
                   />
                   <Scrollbar
+                    width={timelineContentWidth}
                     minScrollPosition={this.getMinDate().valueOf()}
                     maxScrollPosition={this.getMaxDate().valueOf()}
                     scrollPosition={this.getStartDate().valueOf()}

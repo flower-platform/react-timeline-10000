@@ -1,6 +1,6 @@
 ## Unreleased
 
-* Keep the timebar and the timeline body the same width whether the vertical scrollbar is visible or not.
+* [Keep the timebar and the timeline body the same width whether the vertical scrollbar is visible or not](https://github.com/flower-platform/react-timeline-10000/pull/119)
 
 ## v2.17.0
 
