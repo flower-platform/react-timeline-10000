@@ -138,22 +138,18 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
             nextProps.maxScrollPosition != this.props.maxScrollPosition ||
             nextProps.pageSize != this.props.pageSize ||
             nextProps.scrollPosition != this.props.scrollPosition) { 
-            console.log('componentWillReceiveProps', nextProps.scrollPosition, nextProps.minScrollPosition, nextProps.maxScrollPosition, nextProps.pageSize);
-            console.log('componentWillReceiveProps', this.props.scrollPosition, this.props.minScrollPosition, this.props.maxScrollPosition, this.props.pageSize);
             this.setScrollPosition(nextProps);
         }
     }
 
     componentDidUpdate(prevProps: Readonly<ScrollbarProperties>, prevState: Readonly<{ scrollbarSize: number; }>, snapshot?: any): void {
         if (this.state.scrollbarSize != prevState.scrollbarSize) {
-            console.log('componentDidUpdate', this.state.scrollbarSize, prevState.scrollbarSize);
             this.setScrollPosition(this.props);
         }
     }
 
     setScrollPosition(props: ScrollbarProperties) {
         const pixels_per_unit = this.state.scrollbarSize / props.pageSize;
-        console.log('setScrollPosition', props.scrollPosition, props.minScrollPosition, pixels_per_unit);
        this.setScrollPositionInPx((props.scrollPosition - props.minScrollPosition) * pixels_per_unit);
     }
 
@@ -162,15 +158,10 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
             return;
         }
         
-        // The parent converts scrollLeft to a time and back (moment drops the fractional
-        // millisecond). The difference is a fraction of a pixel. scrollLeft is an integer,
-        // so writing that fraction back floors it by 1px and onScroll runs again, walking
-        // down until the time is a whole number of milliseconds.
+        // We need this check because else a small flicker appears on the scrollbar when scrolling
+        // a scrollbar that is "double binded" to a state variable in the parent component (e.g. in gantt)
+        // It is caused by a small precision lost when converting from pixels to client unit and then back again
         const oldScrollPositionInPixels = this.props.direction == Direction.HORIZONTAL ? this._outterDiv.scrollLeft : this._outterDiv.scrollTop;
-        /*if (Math.abs(scrollPositionInPixels - oldScrollPositionInPixels) < 1) {
-            return;
-        }*/
-       console.log("d1: ", roundDoubleToDecimals(scrollPositionInPixels), "d2: ", roundDoubleToDecimals(oldScrollPositionInPixels));
          if (roundDoubleToDecimals(scrollPositionInPixels) == roundDoubleToDecimals(oldScrollPositionInPixels)) {
             return;
         }
@@ -182,10 +173,8 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
     }
 
     onScroll() {
-        console.log('onScroll', this.props.direction, this._outterDiv.scrollLeft, this.state.scrollbarSize, this.props.pageSize);
         const unit_per_px = this.state.scrollbarSize === 0 ? 0 : this.props.pageSize / this.state.scrollbarSize;
         const scrollPositionInPixels = this.props.direction == Direction.HORIZONTAL ? this._outterDiv.scrollLeft : this._outterDiv.scrollTop;
-        console.log('onScroll1', this.props.direction, scrollPositionInPixels, unit_per_px, this.props.minScrollPosition + unit_per_px * scrollPositionInPixels);
         this.props.onScroll?.(this.props.minScrollPosition + unit_per_px * scrollPositionInPixels);
     }
 
@@ -225,7 +214,6 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
             onResize={contentRect => {
                 const newSize = contentRect.bounds ? (this.props.direction == Direction.HORIZONTAL ? contentRect.bounds.width : contentRect.bounds.height) : 0;
                 if (newSize != this.state.scrollbarSize) {
-                    console.log('Scrollbar onResize', newSize, 'old size', this.state.scrollbarSize, this.props.width );
                     this.setState({ scrollbarSize: newSize });
                 }
             }}>
@@ -240,7 +228,7 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
                             this._outterDiv = node;
                         }
                         }
-                        onScroll={() => {console.log('Scrollbar onScroll'); this.onScroll()}}>
+                        onScroll={() => this.onScroll()}>
                         <div
                             className={this.props.direction == Direction.HORIZONTAL ? "rct9k-horizontal-scrollbar-inner" : "rct9k-vertical-scrollbar-inner"}
                             style={this.props.direction == Direction.HORIZONTAL ? { width: this.getInnerDivSize() } : { height: this.getInnerDivSize() }}>
