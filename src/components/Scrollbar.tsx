@@ -31,6 +31,12 @@ export interface ScrollbarProperties {
     direction?: Direction;
 
     /**
+     * Outer size in pixels. Horizontal scrollbar uses this as its width so `scrollbarSize`
+     * matches the gantt content width (grid width minus the vertical scrollbar gutter).
+     */
+    width?: number;
+
+    /**
      * By default Semantic ui hides the increase/decrease arrow buttons of the scrollbars on Webkit based browsers. So it default to false.
      * This should be set to true if the scrollbar needs to display the arrow buttons.
      */
@@ -159,7 +165,6 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
         if (roundDoubleToDecimals(scrollPositionInPixels) == roundDoubleToDecimals(oldScrollPositionInPixels)) {
             return;
         }
-        
         if (this.props.direction == Direction.HORIZONTAL) {
             this._outterDiv.scrollLeft = scrollPositionInPixels;
         } else {
@@ -193,7 +198,8 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
             || nextProps.maxScrollPosition !== props.maxScrollPosition
             || nextProps.pageSize !== props.pageSize
             || nextProps.direction !== props.direction
-            || nextProps.hasArrows !== props.hasArrows) {
+            || nextProps.hasArrows !== props.hasArrows
+            || nextProps.width !== props.width) {
             return true;
         }
         if (nextState.scrollbarSize !== state.scrollbarSize) {
@@ -216,6 +222,7 @@ export class Scrollbar extends React.Component<ScrollbarProperties, { scrollbarS
                     this.isScrollbarNeeded(this.props) ?
                     <div data-testid={scrollbarTestIds.div}
                         className={this.getOutterDivClassName()}
+                        style={this.props.width != null ? {width: this.props.width} : undefined}
                         ref={(node) => {
                             measureRef(node);
                             this._outterDiv = node;

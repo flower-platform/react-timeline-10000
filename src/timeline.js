@@ -15,7 +15,7 @@ import {Marker} from './components/Marker';
 import TimelineBody from './components/body';
 import SelectBox from './components/selector';
 import Timebar from './components/timebar';
-import {intToPix, pixToInt} from './utils/commonUtils';
+import {getVerticalScrollbarGutterWidth, intToPix, pixToInt} from './utils/commonUtils';
 import {
   adjustRowTopPositionToViewport,
   getMaxOverlappingItems,
@@ -81,7 +81,7 @@ export const DEFAULT_ROW_ODD_CLASS = '';
 export const DRAG_TO_CREATE_POPUP_CLOSE_TIME = 5000;
 export const DRAG_TO_CREATE_POPUP_LABEL_2 = 'Popup will close in a few moments.';
 
-const GRID_LEFT_BORDER = 1;
+export const GRID_LEFT_BORDER = 1;
 const FADE_OPACITY_OFFSET = 0.1;
 const FADE_TIMER_INTERVAR = 100;
 export const ZOOM_PERCENT = 0.2;
@@ -685,8 +685,7 @@ export default class Timeline extends React.Component {
       touchPositionX: undefined,
       fadeEffectOpen: false,
       fadeEffectContent: undefined,
-      fadeEffectOpacity: 0,
-      gridVerticalScrollbarWidth: 0
+      fadeEffectOpacity: 0
     };
 
     // These functions need to be bound because they are passed as parameters.
@@ -891,7 +890,6 @@ export default class Timeline extends React.Component {
       this.fillInTimelineWithEmptyRows(this.props.groups);
       this.refreshGrid();
     }
-    this.calculateGridVerticalScrollbarWidth();
   }
 
   isTouchDevice() {
@@ -1313,27 +1311,18 @@ export default class Timeline extends React.Component {
   }
 
   /**
-   * Calculates the width of the vertical scrollbar in the grid and updates the state if it has changed.
-   * This is necessary to ensure that the timeline width is calculated correctly, especially when the vertical scrollbar appears or disappears.
-   */
-  calculateGridVerticalScrollbarWidth() {
-    let vScrollbarWidth = this._gridDomNode
-      ? this._gridDomNode.offsetWidth - this._gridDomNode.clientWidth - GRID_LEFT_BORDER
-      : 0;
-    vScrollbarWidth = Math.max(0, vScrollbarWidth);
-    if (vScrollbarWidth !== this.state.gridVerticalScrollbarWidth) {
-      this.setState({gridVerticalScrollbarWidth: vScrollbarWidth});
-    }
-  }
-
-  /**
    * Get the width of the timeline NOT including the left group list
+   * Always subtracts the reserved vertical scrollbar gutter so rows and the timebar
+   * keep the same width whether the native scrollbar is visible or not.
    * @param {?number} totalWidth Total timeline width. If not supplied we use the timeline ref
+   * @param {?number} verticalScrollbarGutterWidth Width of the reserved vertical scrollbar gutter.
+   * If not supplied, we use the measured width of the reserved gutter on the timeline grid.
    * @returns {number} The width in pixels
    */
-  getTimelineWidth(totalWidth = undefined) {
+  getTimelineWidth(totalWidth = undefined, verticalScrollbarGutterWidth = undefined) {
     const fullWidth = totalWidth !== undefined ? totalWidth : this._grid ? this._grid.props.width : 0;
-    return Math.max(0, fullWidth - (this.state.gridVerticalScrollbarWidth || 0));
+    const scrollbarGutter = verticalScrollbarGutterWidth || getVerticalScrollbarGutterWidth(this._gridDomNode);
+    return Math.max(0, fullWidth - scrollbarGutter);
   }
 
   /**
@@ -2498,8 +2487,8 @@ export default class Timeline extends React.Component {
       });
     }
 
-    const gridVerticalScrollbarWidth = this.state.gridVerticalScrollbarWidth || 0;
-    const timelineContentWidth = this.getTimelineWidth(this.state.gridWidth);
+    const verticalScrollbarGutterWidth = getVerticalScrollbarGutterWidth(this._gridDomNode);
+    const timelineContentWidth = this.getTimelineWidth(this.state.gridWidth, verticalScrollbarGutterWidth);
     return (
       <div style={{flex: 1, overflow: 'hidden'}}>
         <Measure
@@ -2555,8 +2544,8 @@ export default class Timeline extends React.Component {
                       setVerticalGridLines={this.setVerticalGridLines}
                       {...varTimebarProps}
                     />
-                    {gridVerticalScrollbarWidth > 0 && (
-                      <div className="rct9k-timebar-scrollbar-gutter" style={{width: gridVerticalScrollbarWidth}} />
+                    {verticalScrollbarGutterWidth > 0 && (
+                      <div className="rct9k-timebar-scrollbar-gutter" style={{width: verticalScrollbarGutterWidth}} />
                     )}
                   </div>
                   {markers.map(m => (
@@ -2587,6 +2576,7 @@ export default class Timeline extends React.Component {
                     onScroll={this.handleScrollGantt}
                   />
                   <Scrollbar
+                    width={timelineContentWidth}
                     minScrollPosition={this.getMinDate().valueOf()}
                     maxScrollPosition={this.getMaxDate().valueOf()}
                     scrollPosition={this.getStartDate().valueOf()}
